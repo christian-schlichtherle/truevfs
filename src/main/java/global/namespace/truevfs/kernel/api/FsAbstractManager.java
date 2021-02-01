@@ -4,8 +4,6 @@
  */
 package global.namespace.truevfs.kernel.api;
 
-import global.namespace.truevfs.comp.shed.UniqueObject;
-
 /**
  * An abstract file system manager.
  * <p>
@@ -13,5 +11,4 @@ import global.namespace.truevfs.comp.shed.UniqueObject;
  *
  * @author Christian Schlichtherle
  */
-public abstract class FsAbstractManager
-extends UniqueObject implements FsManager { }
+public abstract class FsAbstractManager implements FsManager { }

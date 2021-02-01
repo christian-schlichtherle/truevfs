@@ -56,49 +56,38 @@ abstract class CacheController<E extends FsArchiveEntry> implements DelegatingAr
     @Override
     public InputSocket<? extends Entry> input(BitField<FsAccessOption> options, FsNodeName name) {
         // This class requires ON-DEMAND LOOKUP of its delegate socket!
-        return new DelegatingInputSocket<Entry>() {
-
-            @Override
-            public InputSocket<? extends Entry> socket() {
-                assert writeLockedByCurrentThread();
-
-                EntryCache cache = caches.get(name);
-                if (null == cache) {
-                    if (!options.get(CACHE)) {
-                        return getController().input(options, name);
-                    }
-                    cache = new EntryCache(name);
+        return (DelegatingInputSocket<Entry>) () -> {
+            assert isWriteLockedByCurrentThread();
+            EntryCache cache = caches.get(name);
+            if (null == cache) {
+                if (!options.get(CACHE)) {
+                    return getController().input(options, name);
                 }
-                return cache.input(options);
+                cache = new EntryCache(name);
             }
+            return cache.input(options);
         };
     }
 
     @Override
     public OutputSocket<? extends Entry> output(BitField<FsAccessOption> options, FsNodeName name, Optional<? extends Entry> template) {
         // This class requires ON-DEMAND LOOKUP of its delegate socket!
-        return new DelegatingOutputSocket<Entry>() {
-
-            @Override
-            public OutputSocket<? extends Entry> socket() {
-                assert writeLockedByCurrentThread();
-
-                EntryCache cache = caches.get(name);
-                if (null == cache) {
-                    if (!options.get(CACHE)) {
-                        return getController().output(options, name, template);
-                    }
-                    cache = new EntryCache(name);
+        return (DelegatingOutputSocket<Entry>) () -> {
+            assert isWriteLockedByCurrentThread();
+            EntryCache cache = caches.get(name);
+            if (null == cache) {
+                if (!options.get(CACHE)) {
+                    return getController().output(options, name, template);
                 }
-                return cache.output(options, template);
+                cache = new EntryCache(name);
             }
+            return cache.output(options, template);
         };
     }
 
     @Override
     public void make(final BitField<FsAccessOption> options, final FsNodeName name, final Entry.Type type, final Optional<? extends Entry> template) throws IOException {
-        assert writeLockedByCurrentThread();
-
+        assert isWriteLockedByCurrentThread();
         getController().make(options, name, type, template);
         val cache = caches.remove(name);
         if (null != cache) {
@@ -108,8 +97,7 @@ abstract class CacheController<E extends FsArchiveEntry> implements DelegatingAr
 
     @Override
     public void unlink(final BitField<FsAccessOption> options, final FsNodeName name) throws IOException {
-        assert writeLockedByCurrentThread();
-
+        assert isWriteLockedByCurrentThread();
         getController().unlink(options, name);
         val cache = caches.remove(name);
         if (null != cache) {
@@ -119,9 +107,8 @@ abstract class CacheController<E extends FsArchiveEntry> implements DelegatingAr
 
     @Override
     public void sync(final BitField<FsSyncOption> options) throws FsSyncException {
-        assert writeLockedByCurrentThread();
-        assert !readLockedByCurrentThread();
-
+        assert isWriteLockedByCurrentThread();
+        assert !isReadLockedByCurrentThread();
         syncCacheEntries(options);
         getController().sync(options.clear(CLEAR_CACHE));
         if (caches.isEmpty()) {
@@ -185,23 +172,20 @@ abstract class CacheController<E extends FsArchiveEntry> implements DelegatingAr
         }
 
         InputSocket<? extends Entry> input(final BitField<FsAccessOption> options) {
-
-            final class Input extends DelegatingInputSocket<Entry> {
+            return cache.configure(new DecoratingInputSocket<Entry>() {
 
                 final BitField<FsAccessOption> _options = options.clear(CACHE); // consume
 
-                final InputSocket<? extends Entry> socket = getController().input(_options, name);
-
-                @Override
-                protected InputSocket<? extends Entry> socket() throws IOException {
-                    return socket;
+                {
+                    socket = getController().input(_options, name);
                 }
 
                 @Override
-                public InputStream stream(final Optional<? extends OutputSocket<? extends Entry>> peer)
-                        throws IOException {
-                    assert writeLockedByCurrentThread();
-                    return new DecoratingInputStream(socket().stream(peer)) {
+                public InputStream stream(
+                        final Optional<? extends OutputSocket<? extends Entry>> peer
+                ) throws IOException {
+                    assert isWriteLockedByCurrentThread();
+                    return new DecoratingInputStream(socket.stream(peer)) {
 
                         {
                             assert isMounted();
@@ -209,7 +193,7 @@ abstract class CacheController<E extends FsArchiveEntry> implements DelegatingAr
 
                         @Override
                         public void close() throws IOException {
-                            assert writeLockedByCurrentThread();
+                            assert isWriteLockedByCurrentThread();
                             in.close();
                             register();
                         }
@@ -217,38 +201,31 @@ abstract class CacheController<E extends FsArchiveEntry> implements DelegatingAr
                 }
 
                 @Override
-                public SeekableByteChannel channel(Optional<? extends OutputSocket<? extends Entry>> peer)
-                        throws IOException {
+                public SeekableByteChannel channel(Optional<? extends OutputSocket<? extends Entry>> peer) {
                     throw new AssertionError();
                 }
-            }
-
-            return cache.configure(new Input()).input();
+            }).input();
         }
 
         OutputSocket<? extends Entry> output(final BitField<FsAccessOption> options, final Optional<? extends Entry> template) {
-
             // This class requires lazy initialization of its channel, but no automatic decoupling on exceptions!
-            final class Output extends DelegatingOutputSocket<Entry> {
+            return new DecoratingOutputSocket<Entry>() {
 
                 final BitField<FsAccessOption> _options = options.clear(CACHE); // consume
 
-                final OutputSocket<? extends Entry> socket = cache
-                        .configure(getController().output(_options.clear(EXCLUSIVE), name, template))
-                        .output();
-
-                @Override
-                protected OutputSocket<? extends Entry> socket() {
-                    return socket;
+                {
+                    socket = cache
+                            .configure(getController().output(_options.clear(EXCLUSIVE), name, template))
+                            .output();
                 }
 
                 @Override
-                public OutputStream stream(final Optional<? extends InputSocket<? extends Entry>> peer)
-                        throws IOException {
-                    assert writeLockedByCurrentThread();
+                public OutputStream stream(
+                        final Optional<? extends InputSocket<? extends Entry>> peer
+                ) throws IOException {
+                    assert isWriteLockedByCurrentThread();
                     preOutput();
-
-                    return new DecoratingOutputStream(socket().stream(peer)) {
+                    return new DecoratingOutputStream(socket.stream(peer)) {
 
                         {
                             register();
@@ -256,7 +233,7 @@ abstract class CacheController<E extends FsArchiveEntry> implements DelegatingAr
 
                         @Override
                         public void close() throws IOException {
-                            assert writeLockedByCurrentThread();
+                            assert isWriteLockedByCurrentThread();
                             out.close();
                             postOutput();
                         }
@@ -264,12 +241,12 @@ abstract class CacheController<E extends FsArchiveEntry> implements DelegatingAr
                 }
 
                 @Override
-                public SeekableByteChannel channel(final Optional<? extends InputSocket<? extends Entry>> peer)
-                        throws IOException {
-                    assert writeLockedByCurrentThread();
+                public SeekableByteChannel channel(
+                        final Optional<? extends InputSocket<? extends Entry>> peer
+                ) throws IOException {
+                    assert isWriteLockedByCurrentThread();
                     preOutput();
-
-                    return new DecoratingSeekableChannel(socket().channel(peer)) {
+                    return new DecoratingSeekableChannel(socket.channel(peer)) {
 
                         {
                             register();
@@ -277,7 +254,7 @@ abstract class CacheController<E extends FsArchiveEntry> implements DelegatingAr
 
                         @Override
                         public void close() throws IOException {
-                            assert writeLockedByCurrentThread();
+                            assert isWriteLockedByCurrentThread();
                             channel.close();
                             postOutput();
                         }
@@ -361,9 +338,7 @@ abstract class CacheController<E extends FsArchiveEntry> implements DelegatingAr
                         }
                     }
                 }
-            }
-
-            return new Output();
+            };
         }
     }
 }

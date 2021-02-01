@@ -214,9 +214,11 @@ public final class TConfig extends Resource<IllegalStateException> {
      * Note that accessing the global configuration is not thread-safe!
      *
      * @return The current configuration.
-     * @see    #open()
+     * @see #open()
      */
-    public static TConfig current() { return configs.peekOrElse(GLOBAL); }
+    public static TConfig current() {
+        return configs.peekOrElse(GLOBAL);
+    }
 
     /**
      * Creates a new current configuration by copying the current configuration
@@ -224,9 +226,11 @@ public final class TConfig extends Resource<IllegalStateException> {
      * stack.
      *
      * @return The new current configuration.
-     * @see    #current()
+     * @see #current()
      */
-    public static TConfig open() { return configs.push(new TConfig(current())); }
+    public static TConfig open() {
+        return configs.push(new TConfig(current()));
+    }
 
     // I don't think these fields should be volatile.
     // This would make a difference if and only if two threads were changing
@@ -238,14 +242,18 @@ public final class TConfig extends Resource<IllegalStateException> {
     private TArchiveDetector detector;
     private BitField<FsAccessOption> preferences;
 
-    /** Default constructor for the global configuration. */
+    /**
+     * Default constructor for the global configuration.
+     */
     private TConfig() {
         this.manager = FsManagerLocator.SINGLETON.get();
         this.detector = TArchiveDetector.ALL;
         this.preferences = BitField.of(CREATE_PARENTS);
     }
 
-    /** Copy constructor for inheritable thread local configurations. */
+    /**
+     * Copy constructor for inheritable thread local configurations.
+     */
     private TConfig(final TConfig template) {
         this.manager = template.getManager();
         this.detector = template.getArchiveDetector();
@@ -285,7 +293,7 @@ public final class TConfig extends Resource<IllegalStateException> {
      * prospective archive files.
      *
      * @return The {@link TArchiveDetector} to use for scanning path names for
-     *         prospective archive files.
+     * prospective archive files.
      * @see #getArchiveDetector
      */
     public TArchiveDetector getArchiveDetector() {
@@ -300,8 +308,8 @@ public final class TConfig extends Resource<IllegalStateException> {
      * {@link TPath} gets created.
      *
      * @param detector the default {@link TArchiveDetector} to use for
-     *        scanning path names for prospective archive files.
-     * @see   #getArchiveDetector()
+     *                 scanning path names for prospective archive files.
+     * @see #getArchiveDetector()
      */
     public void setArchiveDetector(final TArchiveDetector detector) {
         checkOpen();
@@ -323,12 +331,12 @@ public final class TConfig extends Resource<IllegalStateException> {
      * Changing this property will show effect upon the next access to the
      * virtual file system.
      *
-     * @param  preferences the access preferences.
+     * @param preferences the access preferences.
      * @throws IllegalArgumentException if an option is present in
-     *         {@code accessPreferences} which is not present in
-     *         {@link FsAccessOptions#ACCESS_PREFERENCES_MASK} or if both
-     *         {@link FsAccessOption#STORE} and
-     *         {@link FsAccessOption#COMPRESS} have been set.
+     *                                  {@code accessPreferences} which is not present in
+     *                                  {@link FsAccessOptions#ACCESS_PREFERENCES_MASK} or if both
+     *                                  {@link FsAccessOption#STORE} and
+     *                                  {@link FsAccessOption#COMPRESS} have been set.
      */
     public void setAccessPreferences(final BitField<FsAccessOption> preferences) {
         checkOpen();
@@ -346,9 +354,9 @@ public final class TConfig extends Resource<IllegalStateException> {
      * Returns {@code true} if and only if the given access option is set in
      * the access preferences.
      *
-     * @param  option the access option to test.
+     * @param option the access option to test.
      * @return {@code true} if and only if the given access option is set in
-     *         the access preferences.
+     * the access preferences.
      */
     public boolean getAccessPreference(FsAccessOption option) {
         return getAccessPreferences().get(option);
@@ -360,8 +368,8 @@ public final class TConfig extends Resource<IllegalStateException> {
      * virtual file system.
      *
      * @param option the access option to set or clear.
-     * @param set {@code true} if you want the option to be set or
-     *        {@code false} if you want it to be cleared.
+     * @param set    {@code true} if you want the option to be set or
+     *               {@code false} if you want it to be cleared.
      */
     public void setAccessPreference(FsAccessOption option, boolean set) {
         setAccessPreferences(getAccessPreferences().set(option, set));
@@ -411,11 +419,13 @@ public final class TConfig extends Resource<IllegalStateException> {
      * directories in the platform file system!
      *
      * @return The value of the property {@code lenient}, which is {@code true}
-     *         if and only if the access preference
-     *         {@link FsAccessOption#CREATE_PARENTS} is set in the
-     *         {@linkplain #getAccessPreferences() access accessPreferences}.
+     * if and only if the access preference
+     * {@link FsAccessOption#CREATE_PARENTS} is set in the
+     * {@linkplain #getAccessPreferences() access accessPreferences}.
      */
-    public boolean isLenient() { return getAccessPreference(CREATE_PARENTS); }
+    public boolean isLenient() {
+        return getAccessPreference(CREATE_PARENTS);
+    }
 
     /**
      * Sets the value of the property {@code lenient}.
@@ -429,16 +439,19 @@ public final class TConfig extends Resource<IllegalStateException> {
     }
 
     @Override
-    public void close() throws IllegalStateException { super.close(); }
+    public void close() throws IllegalStateException {
+        super.close();
+    }
 
     /**
      * Pops this configuration off the inheritable thread local configuration
      * stack.
      *
      * @throws IllegalStateException If this configuration is not the
-     *         {@linkplain #current() current configuration}.
+     *                               {@linkplain #current() current configuration}.
      */
-    @Override protected void onBeforeClose() throws IllegalStateException {
+    @Override
+    protected void onBeforeClose() throws IllegalStateException {
         configs.popIf(this);
     }
 

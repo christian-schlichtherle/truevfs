@@ -4,7 +4,7 @@
  */
 package global.namespace.truevfs.comp.zipdriver;
 
-import global.namespace.truevfs.kernel.api.FsArchiveDriverTestSuite;
+import global.namespace.truevfs.it.base.FsArchiveDriverTestSuite;
 
 /**
  * @author Christian Schlichtherle

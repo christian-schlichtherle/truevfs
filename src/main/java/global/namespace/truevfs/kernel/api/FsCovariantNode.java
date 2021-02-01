@@ -182,7 +182,7 @@ extends FsAbstractNode implements Cloneable {
      * Returns the permission mapped for the {@link #getKey() key} property.
      */
     @Override
-    public Boolean isPermitted(Access type, Entity entity) {
+    public Optional<Boolean> isPermitted(Access type, Entity entity) {
         return map.get(key).isPermitted(type, entity);
     }
 

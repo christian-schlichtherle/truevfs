@@ -9,12 +9,11 @@ import java.nio.ByteBuffer;
 import java.util.concurrent.atomic.AtomicInteger;
 
 /**
- * A pool of I/O buffers which share their contents with
- * {@linkplain ByteBuffer byte buffer}s.
+ * A pool of I/O buffers which share their contents with {@linkplain ByteBuffer byte buffer}s.
  *
  * @author Christian Schlichtherle
  */
-public final class MemoryBufferPool extends IoBufferPool {
+public final class MemoryBufferPool implements IoBufferPool {
 
     private static final String BUFFER_NAME = "buffer-";
 
@@ -62,10 +61,11 @@ public final class MemoryBufferPool extends IoBufferPool {
 
         @Override
         public void release() throws IOException {
-            if (released) return;
-            active.getAndDecrement();
-            super.release();
-            released = true;
+            if (!released) {
+                active.getAndDecrement();
+                super.release();
+                released = true;
+            }
         }
     }
 }

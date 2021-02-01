@@ -4,7 +4,10 @@
  */
 package global.namespace.truevfs.kernel.impl;
 
-import global.namespace.truevfs.comp.cio.*;
+import global.namespace.truevfs.comp.cio.DecoratingEntry;
+import global.namespace.truevfs.comp.cio.Entry;
+import global.namespace.truevfs.comp.cio.InputSocket;
+import global.namespace.truevfs.comp.cio.OutputSocket;
 import global.namespace.truevfs.comp.io.Streams;
 import global.namespace.truevfs.comp.logging.LocalizedLogger;
 import global.namespace.truevfs.comp.shed.BitField;
@@ -12,7 +15,6 @@ import global.namespace.truevfs.kernel.api.*;
 import lombok.val;
 import org.slf4j.Logger;
 
-import javax.annotation.Nullable;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -88,10 +90,10 @@ abstract class BasicArchiveController<E extends FsArchiveEntry> implements Archi
         requireNonNull(options);
         requireNonNull(name);
 
-        return new AbstractInputSocket<E>() {
+        return new InputSocket<E>() {
 
             @Override
-            public E target() throws IOException {
+            public E getTarget() throws IOException {
                 checkSync(options, name, READ);
                 val optNode = autoMount(options, false).node(options, name);
                 if (optNode.isPresent()) {
@@ -118,9 +120,9 @@ abstract class BasicArchiveController<E extends FsArchiveEntry> implements Archi
 
             InputSocket<E> socket(final Optional<? extends OutputSocket<? extends Entry>> peer) throws IOException {
                 if (peer.isPresent()) {
-                    peer.get().target(); // may sync() if in same target archive file!
+                    peer.get().getTarget(); // may sync() if in same target archive file!
                 }
-                return input(target().getName());
+                return input(getTarget().getName());
             }
         };
     }
@@ -129,10 +131,10 @@ abstract class BasicArchiveController<E extends FsArchiveEntry> implements Archi
 
     @Override
     public OutputSocket<? extends Entry> output(final BitField<FsAccessOption> options, final FsNodeName name, final Optional<? extends Entry> template) {
-        return new AbstractOutputSocket<FsArchiveEntry>() {
+        return new OutputSocket<FsArchiveEntry>() {
 
             @Override
-            public FsArchiveEntry target() throws IOException {
+            public FsArchiveEntry getTarget() throws IOException {
                 val ae = make().head().getEntry();
                 if (options.get(APPEND)) {
                     // A proxy entry must get returned here in order to inhibit
@@ -292,7 +294,7 @@ abstract class BasicArchiveController<E extends FsArchiveEntry> implements Archi
         }
 
         @Override
-        public boolean setPermitted(Access type, Entity entity, @Nullable Boolean value) {
+        public boolean setPermitted(Access type, Entity entity, Optional<Boolean> value) {
             return entry.setPermitted(type, entity, value);
         }
     }

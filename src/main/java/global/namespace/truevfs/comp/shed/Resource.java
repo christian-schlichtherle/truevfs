@@ -38,10 +38,11 @@ public abstract class Resource<X extends Exception> implements AutoCloseable {
      */
     @Override
     public void close() throws X {
-        if (closed) return;
-        onBeforeClose();
-        closed = true;
-        onAfterClose();
+        if (!closed) {
+            onBeforeClose();
+            closed = true;
+            onAfterClose();
+        }
     }
 
     /**

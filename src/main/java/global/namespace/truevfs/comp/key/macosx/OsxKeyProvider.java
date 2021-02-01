@@ -4,9 +4,9 @@
  */
 package global.namespace.truevfs.comp.key.macosx;
 
-import global.namespace.truevfs.comp.key.spec.KeyProvider;
-import global.namespace.truevfs.comp.key.spec.UnknownKeyException;
-import global.namespace.truevfs.comp.key.spec.prompting.AbstractPromptingPbeParameters;
+import global.namespace.truevfs.comp.key.api.KeyProvider;
+import global.namespace.truevfs.comp.key.api.UnknownKeyException;
+import global.namespace.truevfs.comp.key.api.prompting.AbstractPromptingPbeParameters;
 
 import javax.annotation.Nullable;
 import java.net.URI;

@@ -9,9 +9,9 @@ import global.namespace.service.wight.core.ServiceLocator
 import global.namespace.truevfs.access.TConfig._
 import global.namespace.truevfs.access.TConfigSpec._
 import global.namespace.truevfs.comp.shed._
+import global.namespace.truevfs.driver.mock.MockArchiveDriver
 import global.namespace.truevfs.kernel.api.FsAccessOption._
 import global.namespace.truevfs.kernel.api.FsManager
-import global.namespace.truevfs.kernel.api.mock.MockArchiveDriver
 import global.namespace.truevfs.kernel.api.sl._
 import global.namespace.truevfs.kernel.api.spi._
 import org.scalatest.matchers.should.Matchers._

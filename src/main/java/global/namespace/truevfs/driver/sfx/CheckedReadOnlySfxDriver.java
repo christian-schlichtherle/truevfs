@@ -5,7 +5,7 @@
 package global.namespace.truevfs.driver.sfx;
 
 import global.namespace.truevfs.comp.zipdriver.ZipDriverEntry;
-import global.namespace.truevfs.comp.zipdriver.ZipInputService;
+import global.namespace.truevfs.comp.zipdriver.ZipInputContainer;
 
 /**
  * An archive driver for SFX/EXE files which checks the CRC32 value for all
@@ -33,7 +33,7 @@ public class CheckedReadOnlySfxDriver extends ReadOnlySfxDriver {
      * @return {@code true}
      */
     @Override
-    public boolean check(ZipDriverEntry local, ZipInputService<ZipDriverEntry> input) {
+    public boolean check(ZipDriverEntry local, ZipInputContainer<ZipDriverEntry> input) {
         return true;
     }
 }

@@ -4,8 +4,8 @@
  */
 package global.namespace.truevfs.comp.key.console;
 
-import global.namespace.truevfs.comp.key.spec.common.AesKeyStrength;
-import global.namespace.truevfs.comp.key.spec.common.AesPbeParameters;
+import global.namespace.truevfs.comp.key.api.common.AesKeyStrength;
+import global.namespace.truevfs.comp.key.api.common.AesPbeParameters;
 
 /**
  * A console based user interface for prompting for passwords.

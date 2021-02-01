@@ -4,8 +4,6 @@
  */
 package global.namespace.truevfs.kernel.api;
 
-import global.namespace.truevfs.comp.shed.UniqueObject;
-
 import java.util.Formatter;
 
 /**
@@ -14,8 +12,7 @@ import java.util.Formatter;
  *
  * @author Christian Schlichtherle
  */
-public abstract class FsAbstractNode
-extends UniqueObject implements FsNode {
+public abstract class FsAbstractNode implements FsNode {
 
     @Override
     public boolean isType(Type type) { return getTypes().is(type); }

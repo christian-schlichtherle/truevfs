@@ -4,6 +4,8 @@
  */
 package global.namespace.truevfs.kernel.impl;
 
+import global.namespace.truevfs.comp.shed.ReadWriteLockAspect;
+
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 /**
@@ -19,8 +21,8 @@ interface ReentrantReadWriteLockAspect extends ReadWriteLockAspect<ReentrantRead
      *
      * @return {@code true} if and only if the read lock is held by the current thread.
      */
-    default boolean readLockedByCurrentThread() {
-        return 0 != getLock().getReadHoldCount();
+    default boolean isReadLockedByCurrentThread() {
+        return 0 < getLock().getReadHoldCount();
     }
 
     /**
@@ -29,7 +31,7 @@ interface ReentrantReadWriteLockAspect extends ReadWriteLockAspect<ReentrantRead
      *
      * @return {@code true} if and only if the write lock is held by the current thread.
      */
-    default boolean writeLockedByCurrentThread() {
+    default boolean isWriteLockedByCurrentThread() {
         return getLock().isWriteLockedByCurrentThread();
     }
 
@@ -37,11 +39,11 @@ interface ReentrantReadWriteLockAspect extends ReadWriteLockAspect<ReentrantRead
      * Checks that the write lock is held by the current thread.
      * Use this method for lock control.
      *
-     * @throws NeedsWriteLockException if the {@link #writeLock()} is not held by the current thread.
-     * @see #writeLockedByCurrentThread
+     * @throws NeedsWriteLockException if the {@link #getWriteLock()} is not held by the current thread.
+     * @see #isWriteLockedByCurrentThread
      */
     default void checkWriteLockedByCurrentThread() {
-        if (!writeLockedByCurrentThread()) {
+        if (!isWriteLockedByCurrentThread()) {
             throw NeedsWriteLockException.apply();
         }
     }

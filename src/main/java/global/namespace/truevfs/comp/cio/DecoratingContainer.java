@@ -4,54 +4,30 @@
  */
 package global.namespace.truevfs.comp.cio;
 
-import global.namespace.truevfs.comp.shed.UniqueObject;
-
-import javax.annotation.Nullable;
-import java.util.Iterator;
 import java.util.Objects;
 
 /**
- * An abstract decorator for an entry container.
+ * An abstract decorator for a container.
  *
- * @param  <E> the type of the entries in the decorated container.
- * @param  <C> the type of the decorated entry container.
+ * @param <E> the type of the entries in the decorated container.
+ * @param <C> the type of the decorated entry container.
  * @author Christian Schlichtherle
  */
-public abstract class DecoratingContainer<
-        E extends Entry,
-        C extends Container<E>>
-extends UniqueObject implements Container<E> {
+public abstract class DecoratingContainer<E extends Entry, C extends Container<E>> implements DelegatingContainer<E> {
 
-    /** The nullable decorated entry container. */
-    protected @Nullable C container;
+    /**
+     * The decorated container.
+     */
+    protected C container;
 
-    protected DecoratingContainer() { }
+    protected DecoratingContainer() {
+    }
 
     protected DecoratingContainer(final C container) {
         this.container = Objects.requireNonNull(container);
     }
 
-    @Override
-    public int size() { return container.size(); }
-
-    @Override
-    public Iterator<E> iterator() { return container.iterator(); }
-
-    @Override
-    public @Nullable E entry(String name) { return container.entry(name); }
-
-    @Override
-    public void close() throws Exception { container.close(); }
-
-    /**
-     * Returns a string representation of this object for debugging and logging
-     * purposes.
-     */
-    @Override
-    public String toString() {
-        return String.format("%s@%x[container=%s]",
-                getClass().getName(),
-                hashCode(),
-                container);
+    public C getContainer() {
+        return container;
     }
 }

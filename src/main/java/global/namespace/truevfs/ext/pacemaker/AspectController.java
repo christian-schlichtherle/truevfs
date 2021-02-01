@@ -4,7 +4,9 @@
  */
 package global.namespace.truevfs.ext.pacemaker;
 
-import global.namespace.truevfs.comp.cio.*;
+import global.namespace.truevfs.comp.cio.Entry;
+import global.namespace.truevfs.comp.cio.InputSocket;
+import global.namespace.truevfs.comp.cio.OutputSocket;
 import global.namespace.truevfs.comp.shed.BitField;
 import global.namespace.truevfs.kernel.api.*;
 
@@ -79,7 +81,7 @@ abstract class AspectController extends FsDecoratingController {
         return new Input(controller.input(options, name));
     }
 
-    private final class Input extends AbstractInputSocket<Entry> {
+    private final class Input implements InputSocket<Entry> {
 
         private final InputSocket<? extends Entry> socket;
 
@@ -88,8 +90,8 @@ abstract class AspectController extends FsDecoratingController {
         }
 
         @Override
-        public Entry target() throws IOException {
-            return apply(socket::target);
+        public Entry getTarget() throws IOException {
+            return apply(socket::getTarget);
         }
 
         @Override
@@ -108,7 +110,7 @@ abstract class AspectController extends FsDecoratingController {
         return new Output(controller.output(options, name, template));
     }
 
-    private final class Output extends AbstractOutputSocket<Entry> {
+    private final class Output implements OutputSocket<Entry> {
 
         private final OutputSocket<? extends Entry> socket;
 
@@ -117,8 +119,8 @@ abstract class AspectController extends FsDecoratingController {
         }
 
         @Override
-        public Entry target() throws IOException {
-            return apply(socket::target);
+        public Entry getTarget() throws IOException {
+            return apply(socket::getTarget);
         }
 
         @Override

@@ -22,18 +22,22 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.Assert.fail;
 
 /**
+ * Tests archive type independent features of the {@link TPath} class.
+ *
  * @author Christian Schlichtherle
  */
-public class TPathTest extends MockArchiveDriverTestBase {
+public final class TPathTest extends MockArchiveDriverTestBase {
 
     @Test
     @SuppressWarnings("ResultOfObjectAllocationIgnored")
     public void testIllegalConstructorParametersOnWindows() {
-        if ('\\' != separatorChar) return;
-        for (final Object[] params : new Object[][] {
-            // $first, $more
-            { "c:", NO_STRINGS },
-            { "c:foo", NO_STRINGS },
+        if ('\\' != separatorChar) {
+            return;
+        }
+        for (final Object[] params : new Object[][]{
+                // $first, $more
+                {"c:", NO_STRINGS},
+                {"c:foo", NO_STRINGS},
         }) {
             try {
                 new TPath(params[0].toString(), (String[]) params[1]);
@@ -45,14 +49,16 @@ public class TPathTest extends MockArchiveDriverTestBase {
 
     @Test
     public void testStringConstructorOnWindows() {
-        if ('\\' != separatorChar) return;
-        for (final Object[] params : new Object[][] {
-            // $first, $more, $name, $address
-            //{ "c:foo", NO_STRINGS, "c:foo", "file:/c:foo" },
-            { "c:/foo", NO_STRINGS, "c:/foo", "file:/c:/foo" },
-            //{ "//", NO_STRINGS, "/", ROOT_DIRECTORY },
-            { "//foo", new String[] { "bar", "baz" }, "//foo/bar/baz", ROOT_DIRECTORY + "/foo/bar/baz" },
-            { "///foo//", new String[] { "//bar//", "//", "//baz//" }, "//foo/bar/baz", ROOT_DIRECTORY + "/foo/bar/baz" },
+        if ('\\' != separatorChar) {
+            return;
+        }
+        for (final Object[] params : new Object[][]{
+                // $first, $more, $name, $address
+                //{ "c:foo", NO_STRINGS, "c:foo", "file:/c:foo" },
+                {"c:/foo", NO_STRINGS, "c:/foo", "file:/c:/foo"},
+                //{ "//", NO_STRINGS, "/", ROOT_DIRECTORY },
+                {"//foo", new String[]{"bar", "baz"}, "//foo/bar/baz", ROOT_DIRECTORY + "/foo/bar/baz"},
+                {"///foo//", new String[]{"//bar//", "//", "//baz//"}, "//foo/bar/baz", ROOT_DIRECTORY + "/foo/bar/baz"},
         }) {
             assertConstructorWithStrings(params);
         }
@@ -60,34 +66,34 @@ public class TPathTest extends MockArchiveDriverTestBase {
 
     @Test
     public void testStringConstructor() {
-        for (final Object[] params : new Object[][] {
-            // $first, $more, $name, $address
-            { "/", NO_STRINGS, "/", ROOT_DIRECTORY },
-            { "/söme päth with späces", NO_STRINGS, "/söme päth with späces", ROOT_DIRECTORY + "söme%20päth%20with%20späces"},
-            { "/foo", NO_STRINGS, "/foo", ROOT_DIRECTORY + "foo" },
-            { "/foo", new String[] { "" }, "/foo", ROOT_DIRECTORY + "foo"},
-            { "/foo", new String[] { "bar" }, "/foo/bar", ROOT_DIRECTORY + "foo/bar"},
-            //{ "///", NO_STRINGS, "/", ROOT_DIRECTORY },
-            { "/foo", new String[] { "/bar" }, "/foo/bar", ROOT_DIRECTORY + "foo/bar"},
-            { "/foo//", new String[] { "//", "//bar//", "" }, "/foo/bar", ROOT_DIRECTORY + "foo/bar"},
-            { "/foo", new String[] { "" }, "/foo", ROOT_DIRECTORY + "foo"},
-            { "/foo", new String[] { ".." }, "/foo/..", ROOT_DIRECTORY },
-            { "/foo", new String[] { "/bar" }, "/foo/bar", ROOT_DIRECTORY + "foo/bar" },
-            { "/foo.mok", new String[] { "/bar" }, "/foo.mok/bar", "mok:" + ROOT_DIRECTORY + "foo.mok!/bar" },
-            { "/foo", new String[] { "/bar.mok" }, "/foo/bar.mok", "mok:" + ROOT_DIRECTORY + "foo/bar.mok!/" },
-            { "/foo.mok", new String[] { "/bar.mok" }, "/foo.mok/bar.mok", "mok:mok:" + ROOT_DIRECTORY + "foo.mok!/bar.mok!/" },
-            { "", new String[] { "/foo" }, "foo", CURRENT_DIRECTORY + "foo" },
-            { "", new String[] { "foo" }, "foo", CURRENT_DIRECTORY + "foo" },
-            { "", NO_STRINGS, "", CURRENT_DIRECTORY },
-            { ".", NO_STRINGS, ".", CURRENT_DIRECTORY },
-            { "söme päth with späces", NO_STRINGS, "söme päth with späces", CURRENT_DIRECTORY + "söme%20päth%20with%20späces"},
-            { "foo", NO_STRINGS, "foo", CURRENT_DIRECTORY + "foo" },
-            { "foo", new String[] { "" }, "foo", CURRENT_DIRECTORY + "foo"},
-            { "foo", new String[] { ".." }, "foo/..", CURRENT_DIRECTORY },
-            { "foo", new String[] { "bar" }, "foo/bar", CURRENT_DIRECTORY + "foo/bar" },
-            { "foo.mok", new String[] { "bar" }, "foo.mok/bar", "mok:" + CURRENT_DIRECTORY + "foo.mok!/bar" },
-            { "foo", new String[] { "bar.mok" }, "foo/bar.mok", "mok:" + CURRENT_DIRECTORY + "foo/bar.mok!/" },
-            { "foo.mok", new String[] { "bar.mok" }, "foo.mok/bar.mok", "mok:mok:" + CURRENT_DIRECTORY + "foo.mok!/bar.mok!/" },
+        for (final Object[] params : new Object[][]{
+                // $first, $more, $name, $address
+                {"/", NO_STRINGS, "/", ROOT_DIRECTORY},
+                {"/söme päth with späces", NO_STRINGS, "/söme päth with späces", ROOT_DIRECTORY + "söme%20päth%20with%20späces"},
+                {"/foo", NO_STRINGS, "/foo", ROOT_DIRECTORY + "foo"},
+                {"/foo", new String[]{""}, "/foo", ROOT_DIRECTORY + "foo"},
+                {"/foo", new String[]{"bar"}, "/foo/bar", ROOT_DIRECTORY + "foo/bar"},
+                //{ "///", NO_STRINGS, "/", ROOT_DIRECTORY },
+                {"/foo", new String[]{"/bar"}, "/foo/bar", ROOT_DIRECTORY + "foo/bar"},
+                {"/foo//", new String[]{"//", "//bar//", ""}, "/foo/bar", ROOT_DIRECTORY + "foo/bar"},
+                {"/foo", new String[]{""}, "/foo", ROOT_DIRECTORY + "foo"},
+                {"/foo", new String[]{".."}, "/foo/..", ROOT_DIRECTORY},
+                {"/foo", new String[]{"/bar"}, "/foo/bar", ROOT_DIRECTORY + "foo/bar"},
+                {"/foo.mok", new String[]{"/bar"}, "/foo.mok/bar", "mok:" + ROOT_DIRECTORY + "foo.mok!/bar"},
+                {"/foo", new String[]{"/bar.mok"}, "/foo/bar.mok", "mok:" + ROOT_DIRECTORY + "foo/bar.mok!/"},
+                {"/foo.mok", new String[]{"/bar.mok"}, "/foo.mok/bar.mok", "mok:mok:" + ROOT_DIRECTORY + "foo.mok!/bar.mok!/"},
+                {"", new String[]{"/foo"}, "foo", CURRENT_DIRECTORY + "foo"},
+                {"", new String[]{"foo"}, "foo", CURRENT_DIRECTORY + "foo"},
+                {"", NO_STRINGS, "", CURRENT_DIRECTORY},
+                {".", NO_STRINGS, ".", CURRENT_DIRECTORY},
+                {"söme päth with späces", NO_STRINGS, "söme päth with späces", CURRENT_DIRECTORY + "söme%20päth%20with%20späces"},
+                {"foo", NO_STRINGS, "foo", CURRENT_DIRECTORY + "foo"},
+                {"foo", new String[]{""}, "foo", CURRENT_DIRECTORY + "foo"},
+                {"foo", new String[]{".."}, "foo/..", CURRENT_DIRECTORY},
+                {"foo", new String[]{"bar"}, "foo/bar", CURRENT_DIRECTORY + "foo/bar"},
+                {"foo.mok", new String[]{"bar"}, "foo.mok/bar", "mok:" + CURRENT_DIRECTORY + "foo.mok!/bar"},
+                {"foo", new String[]{"bar.mok"}, "foo/bar.mok", "mok:" + CURRENT_DIRECTORY + "foo/bar.mok!/"},
+                {"foo.mok", new String[]{"bar.mok"}, "foo.mok/bar.mok", "mok:mok:" + CURRENT_DIRECTORY + "foo.mok!/bar.mok!/"},
         }) {
             assertConstructorWithStrings(params);
         }
@@ -100,18 +106,18 @@ public class TPathTest extends MockArchiveDriverTestBase {
         final FsNodePath nodePath = FsNodePath.create(URI.create(params[3].toString()));
         final TPath path = new TPath(first, more);
         assertThat(path.toString(), equalTo(name.replace(SEPARATOR, path.getFileSystem().getSeparator())));
-        assertThat(path.getMountPoint(), equalTo(nodePath.getMountPoint()));
+        assertThat(path.getMountPoint(), equalTo(nodePath.getMountPoint().get()));
         assertThat(path.getNodeName(), equalTo(nodePath.getNodeName()));
     }
 
     @Test
     public void testUriConstructor() {
-        for (final Object[] params : new Object[][] {
-            // $uri, $scheme, $succeeds
-            { "", "file", true },
-            { "/", "file", true },
-            { "file:/", "file", true },
-            { "foo:/", "foo", false },
+        for (final Object[] params : new Object[][]{
+                // $uri, $scheme, $succeeds
+                {"", "file", true},
+                {"/", "file", true},
+                {"file:/", "file", true},
+                {"foo:/", "foo", false},
         }) {
             final URI uri = URI.create(params[0].toString());
             final String scheme = params[1].toString();
@@ -133,12 +139,14 @@ public class TPathTest extends MockArchiveDriverTestBase {
 
     @Test
     public void testResolveOnWindows() {
-        if ('\\' != separatorChar) return;
-        for (final Object[] params : new Object[][] {
-            // $parent, $first, $name, $address
-            { "x", "c:/foo", "c:/foo", ROOT_DIRECTORY + "c:/foo" },
-            { "x", "//foo/bar/baz", "//foo/bar/baz", ROOT_DIRECTORY + "/foo/bar/baz" },
-            { "x", "///foo//bar//baz//", "//foo/bar/baz", ROOT_DIRECTORY + "/foo/bar/baz" },
+        if ('\\' != separatorChar) {
+            return;
+        }
+        for (final Object[] params : new Object[][]{
+                // $parent, $first, $name, $address
+                {"x", "c:/foo", "c:/foo", ROOT_DIRECTORY + "c:/foo"},
+                {"x", "//foo/bar/baz", "//foo/bar/baz", ROOT_DIRECTORY + "/foo/bar/baz"},
+                {"x", "///foo//bar//baz//", "//foo/bar/baz", ROOT_DIRECTORY + "/foo/bar/baz"},
         }) {
             assertResolve(params);
         }
@@ -146,42 +154,42 @@ public class TPathTest extends MockArchiveDriverTestBase {
 
     @Test
     public void testResolve() {
-        for (final Object[] params : new Object[][] {
-            // $parent, $first, $name, $address
-            { "", "/", "/", ROOT_DIRECTORY },
-            { "x", "/foo", "/foo", ROOT_DIRECTORY + "foo" },
-            { "x", "/foo/", "/foo", ROOT_DIRECTORY + "foo"},
-            { "x", "/foo/bar", "/foo/bar", ROOT_DIRECTORY + "foo/bar"},
-            { "x", "/foo//bar//", "/foo/bar", ROOT_DIRECTORY + "foo/bar"},
-            { "x", "/foo/..", "/foo/..", ROOT_DIRECTORY },
-            { "x", "/foo/../", "/foo/..", ROOT_DIRECTORY },
-            { "x", "/foo.mok/bar", "/foo.mok/bar", "mok:" + ROOT_DIRECTORY + "foo.mok!/bar" },
-            { "x", "/foo.mok/bar/", "/foo.mok/bar", "mok:" + ROOT_DIRECTORY + "foo.mok!/bar" },
-            { "x", "/foo/bar.mok", "/foo/bar.mok", "mok:" + ROOT_DIRECTORY + "foo/bar.mok!/" },
-            { "x", "/foo/bar.mok/", "/foo/bar.mok", "mok:" + ROOT_DIRECTORY + "foo/bar.mok!/" },
-            { "x", "/foo.mok/bar.mok", "/foo.mok/bar.mok", "mok:mok:" + ROOT_DIRECTORY + "foo.mok!/bar.mok!/" },
-            { "x", "/foo.mok/bar.mok/", "/foo.mok/bar.mok", "mok:mok:" + ROOT_DIRECTORY + "foo.mok!/bar.mok!/" },
-            { "/", "", "/", ROOT_DIRECTORY },
-            { "/", "foo", "/foo", ROOT_DIRECTORY + "foo" },
-            { "/", "foo/", "/foo", ROOT_DIRECTORY + "foo" },
-            { "/", ".", "/", ROOT_DIRECTORY },
-            { "/", "./", "/", ROOT_DIRECTORY },
-            { "", "bar", "bar", CURRENT_DIRECTORY + "bar" },
-            { ".", "bar/", "bar", CURRENT_DIRECTORY + "bar" },
-            { "foo", "bar", "foo/bar", CURRENT_DIRECTORY + "foo/bar" },
-            { "foo", "bar/", "foo/bar", CURRENT_DIRECTORY + "foo/bar"},
-            { "", "bar/..", "bar/..", CURRENT_DIRECTORY },
-            { "", "bar/../", "bar/..", CURRENT_DIRECTORY },
-            { "foo.mok", "bar", "foo.mok/bar", "mok:" + CURRENT_DIRECTORY + "foo.mok!/bar" },
-            { "foo.mok", "bar/", "foo.mok/bar", "mok:" + CURRENT_DIRECTORY + "foo.mok!/bar" },
-            { "foo", "bar.mok", "foo/bar.mok", "mok:" + CURRENT_DIRECTORY + "foo/bar.mok!/" },
-            { "foo", "bar.mok/", "foo/bar.mok", "mok:" + CURRENT_DIRECTORY + "foo/bar.mok!/" },
-            { "foo.mok", "bar.mok", "foo.mok/bar.mok", "mok:mok:" + CURRENT_DIRECTORY + "foo.mok!/bar.mok!/" },
-            { "foo.mok", "bar.mok/", "foo.mok/bar.mok", "mok:mok:" + CURRENT_DIRECTORY + "foo.mok!/bar.mok!/" },
-            { "foo.mok", "..", "", CURRENT_DIRECTORY },
-            { "foo.mok", "../", "", CURRENT_DIRECTORY },
-            { "foo.mok", "../bar.mok", "bar.mok", "mok:" + CURRENT_DIRECTORY + "bar.mok!/"},
-            { "foo.mok", "../bar.mok/", "bar.mok", "mok:" + CURRENT_DIRECTORY + "bar.mok!/"},
+        for (final Object[] params : new Object[][]{
+                // $parent, $first, $name, $address
+                {"", "/", "/", ROOT_DIRECTORY},
+                {"x", "/foo", "/foo", ROOT_DIRECTORY + "foo"},
+                {"x", "/foo/", "/foo", ROOT_DIRECTORY + "foo"},
+                {"x", "/foo/bar", "/foo/bar", ROOT_DIRECTORY + "foo/bar"},
+                {"x", "/foo//bar//", "/foo/bar", ROOT_DIRECTORY + "foo/bar"},
+                {"x", "/foo/..", "/foo/..", ROOT_DIRECTORY},
+                {"x", "/foo/../", "/foo/..", ROOT_DIRECTORY},
+                {"x", "/foo.mok/bar", "/foo.mok/bar", "mok:" + ROOT_DIRECTORY + "foo.mok!/bar"},
+                {"x", "/foo.mok/bar/", "/foo.mok/bar", "mok:" + ROOT_DIRECTORY + "foo.mok!/bar"},
+                {"x", "/foo/bar.mok", "/foo/bar.mok", "mok:" + ROOT_DIRECTORY + "foo/bar.mok!/"},
+                {"x", "/foo/bar.mok/", "/foo/bar.mok", "mok:" + ROOT_DIRECTORY + "foo/bar.mok!/"},
+                {"x", "/foo.mok/bar.mok", "/foo.mok/bar.mok", "mok:mok:" + ROOT_DIRECTORY + "foo.mok!/bar.mok!/"},
+                {"x", "/foo.mok/bar.mok/", "/foo.mok/bar.mok", "mok:mok:" + ROOT_DIRECTORY + "foo.mok!/bar.mok!/"},
+                {"/", "", "/", ROOT_DIRECTORY},
+                {"/", "foo", "/foo", ROOT_DIRECTORY + "foo"},
+                {"/", "foo/", "/foo", ROOT_DIRECTORY + "foo"},
+                {"/", ".", "/", ROOT_DIRECTORY},
+                {"/", "./", "/", ROOT_DIRECTORY},
+                {"", "bar", "bar", CURRENT_DIRECTORY + "bar"},
+                {".", "bar/", "bar", CURRENT_DIRECTORY + "bar"},
+                {"foo", "bar", "foo/bar", CURRENT_DIRECTORY + "foo/bar"},
+                {"foo", "bar/", "foo/bar", CURRENT_DIRECTORY + "foo/bar"},
+                {"", "bar/..", "bar/..", CURRENT_DIRECTORY},
+                {"", "bar/../", "bar/..", CURRENT_DIRECTORY},
+                {"foo.mok", "bar", "foo.mok/bar", "mok:" + CURRENT_DIRECTORY + "foo.mok!/bar"},
+                {"foo.mok", "bar/", "foo.mok/bar", "mok:" + CURRENT_DIRECTORY + "foo.mok!/bar"},
+                {"foo", "bar.mok", "foo/bar.mok", "mok:" + CURRENT_DIRECTORY + "foo/bar.mok!/"},
+                {"foo", "bar.mok/", "foo/bar.mok", "mok:" + CURRENT_DIRECTORY + "foo/bar.mok!/"},
+                {"foo.mok", "bar.mok", "foo.mok/bar.mok", "mok:mok:" + CURRENT_DIRECTORY + "foo.mok!/bar.mok!/"},
+                {"foo.mok", "bar.mok/", "foo.mok/bar.mok", "mok:mok:" + CURRENT_DIRECTORY + "foo.mok!/bar.mok!/"},
+                {"foo.mok", "..", "", CURRENT_DIRECTORY},
+                {"foo.mok", "../", "", CURRENT_DIRECTORY},
+                {"foo.mok", "../bar.mok", "bar.mok", "mok:" + CURRENT_DIRECTORY + "bar.mok!/"},
+                {"foo.mok", "../bar.mok/", "bar.mok", "mok:" + CURRENT_DIRECTORY + "bar.mok!/"},
         }) {
             assertResolve(params);
         }
@@ -195,18 +203,20 @@ public class TPathTest extends MockArchiveDriverTestBase {
         final TPath member = new TPath(first);
         final TPath path = parent.resolve(member);
         assertThat(path.toString(), equalTo(name.replace(SEPARATOR, path.getFileSystem().getSeparator())));
-        assertThat(path.getMountPoint(), equalTo(nodePath.getMountPoint()));
+        assertThat(path.getMountPoint(), equalTo(nodePath.getMountPoint().get()));
         assertThat(path.getNodeName(), equalTo(nodePath.getNodeName()));
     }
 
     @Test
     public void testResolveSiblingOnWindows() {
-        if ('\\' != separatorChar) return;
-        for (final Object[] params : new Object[][] {
-            // $parent, $first, $more, $name, $address
-            { "x", "c:/foo", "c:/foo", ROOT_DIRECTORY + "c:/foo" },
-            { "x", "//foo/bar/baz", "//foo/bar/baz", ROOT_DIRECTORY + "/foo/bar/baz" },
-            { "x", "///foo//bar//baz//", "//foo/bar/baz", ROOT_DIRECTORY + "/foo/bar/baz" },
+        if ('\\' != separatorChar) {
+            return;
+        }
+        for (final Object[] params : new Object[][]{
+                // $parent, $first, $more, $name, $address
+                {"x", "c:/foo", "c:/foo", ROOT_DIRECTORY + "c:/foo"},
+                {"x", "//foo/bar/baz", "//foo/bar/baz", ROOT_DIRECTORY + "/foo/bar/baz"},
+                {"x", "///foo//bar//baz//", "//foo/bar/baz", ROOT_DIRECTORY + "/foo/bar/baz"},
         }) {
             assertResolveSibling(params);
         }
@@ -214,42 +224,42 @@ public class TPathTest extends MockArchiveDriverTestBase {
 
     @Test
     public void testResolveSibling() {
-        for (final Object[] params : new Object[][] {
-            // $parent, $first, $name, $address
-            { "", "/", "/", ROOT_DIRECTORY },
-            { "x", "/foo", "/foo", ROOT_DIRECTORY + "foo" },
-            { "x", "/foo/", "/foo", ROOT_DIRECTORY + "foo"},
-            { "x", "/foo/bar", "/foo/bar", ROOT_DIRECTORY + "foo/bar"},
-            { "x", "/foo//bar//", "/foo/bar", ROOT_DIRECTORY + "foo/bar"},
-            { "x", "/foo/..", "/foo/..", ROOT_DIRECTORY },
-            { "x", "/foo/../", "/foo/..", ROOT_DIRECTORY },
-            { "x", "/foo.mok/bar", "/foo.mok/bar", "mok:" + ROOT_DIRECTORY + "foo.mok!/bar" },
-            { "x", "/foo.mok/bar/", "/foo.mok/bar", "mok:" + ROOT_DIRECTORY + "foo.mok!/bar" },
-            { "x", "/foo/bar.mok", "/foo/bar.mok", "mok:" + ROOT_DIRECTORY + "foo/bar.mok!/" },
-            { "x", "/foo/bar.mok/", "/foo/bar.mok", "mok:" + ROOT_DIRECTORY + "foo/bar.mok!/" },
-            { "x", "/foo.mok/bar.mok", "/foo.mok/bar.mok", "mok:mok:" + ROOT_DIRECTORY + "foo.mok!/bar.mok!/" },
-            { "x", "/foo.mok/bar.mok/", "/foo.mok/bar.mok", "mok:mok:" + ROOT_DIRECTORY + "foo.mok!/bar.mok!/" },
-            { "/", "", "", CURRENT_DIRECTORY },
-            { "/", "foo", "foo", CURRENT_DIRECTORY + "foo" },
-            { "/", "foo/", "foo", CURRENT_DIRECTORY + "foo" },
-            { "/", ".", ".", CURRENT_DIRECTORY },
-            { "/", "./", ".", CURRENT_DIRECTORY },
-            { "", "bar", "bar", CURRENT_DIRECTORY + "bar" },
-            { ".", "bar/", "bar", CURRENT_DIRECTORY + "bar" },
-            { "foo", "bar", "bar", CURRENT_DIRECTORY + "bar" },
-            { "foo", "bar/", "bar", CURRENT_DIRECTORY + "bar"},
-            { "", "bar/..", "bar/..", CURRENT_DIRECTORY },
-            { "", "bar/../", "bar/..", CURRENT_DIRECTORY },
-            { "foo.mok", "bar", "bar", CURRENT_DIRECTORY + "bar" },
-            { "foo.mok", "bar/", "bar", CURRENT_DIRECTORY + "bar" },
-            { "foo", "bar.mok", "bar.mok", "mok:" + CURRENT_DIRECTORY + "bar.mok!/" },
-            { "foo", "bar.mok/", "bar.mok", "mok:" + CURRENT_DIRECTORY + "bar.mok!/" },
-            { "foo.mok", "bar.mok", "bar.mok", "mok:" + CURRENT_DIRECTORY + "bar.mok!/" },
-            { "foo.mok", "bar.mok/", "bar.mok", "mok:" + CURRENT_DIRECTORY + "bar.mok!/" },
-            { "foo.mok", ".", ".", CURRENT_DIRECTORY },
-            { "foo.mok", "./", ".", CURRENT_DIRECTORY },
-            { "foo.mok", "./bar.mok", "./bar.mok", "mok:" + CURRENT_DIRECTORY + "bar.mok!/"},
-            { "foo.mok", "./bar.mok/", "./bar.mok", "mok:" + CURRENT_DIRECTORY + "bar.mok!/"},
+        for (final Object[] params : new Object[][]{
+                // $parent, $first, $name, $address
+                {"", "/", "/", ROOT_DIRECTORY},
+                {"x", "/foo", "/foo", ROOT_DIRECTORY + "foo"},
+                {"x", "/foo/", "/foo", ROOT_DIRECTORY + "foo"},
+                {"x", "/foo/bar", "/foo/bar", ROOT_DIRECTORY + "foo/bar"},
+                {"x", "/foo//bar//", "/foo/bar", ROOT_DIRECTORY + "foo/bar"},
+                {"x", "/foo/..", "/foo/..", ROOT_DIRECTORY},
+                {"x", "/foo/../", "/foo/..", ROOT_DIRECTORY},
+                {"x", "/foo.mok/bar", "/foo.mok/bar", "mok:" + ROOT_DIRECTORY + "foo.mok!/bar"},
+                {"x", "/foo.mok/bar/", "/foo.mok/bar", "mok:" + ROOT_DIRECTORY + "foo.mok!/bar"},
+                {"x", "/foo/bar.mok", "/foo/bar.mok", "mok:" + ROOT_DIRECTORY + "foo/bar.mok!/"},
+                {"x", "/foo/bar.mok/", "/foo/bar.mok", "mok:" + ROOT_DIRECTORY + "foo/bar.mok!/"},
+                {"x", "/foo.mok/bar.mok", "/foo.mok/bar.mok", "mok:mok:" + ROOT_DIRECTORY + "foo.mok!/bar.mok!/"},
+                {"x", "/foo.mok/bar.mok/", "/foo.mok/bar.mok", "mok:mok:" + ROOT_DIRECTORY + "foo.mok!/bar.mok!/"},
+                {"/", "", "", CURRENT_DIRECTORY},
+                {"/", "foo", "foo", CURRENT_DIRECTORY + "foo"},
+                {"/", "foo/", "foo", CURRENT_DIRECTORY + "foo"},
+                {"/", ".", ".", CURRENT_DIRECTORY},
+                {"/", "./", ".", CURRENT_DIRECTORY},
+                {"", "bar", "bar", CURRENT_DIRECTORY + "bar"},
+                {".", "bar/", "bar", CURRENT_DIRECTORY + "bar"},
+                {"foo", "bar", "bar", CURRENT_DIRECTORY + "bar"},
+                {"foo", "bar/", "bar", CURRENT_DIRECTORY + "bar"},
+                {"", "bar/..", "bar/..", CURRENT_DIRECTORY},
+                {"", "bar/../", "bar/..", CURRENT_DIRECTORY},
+                {"foo.mok", "bar", "bar", CURRENT_DIRECTORY + "bar"},
+                {"foo.mok", "bar/", "bar", CURRENT_DIRECTORY + "bar"},
+                {"foo", "bar.mok", "bar.mok", "mok:" + CURRENT_DIRECTORY + "bar.mok!/"},
+                {"foo", "bar.mok/", "bar.mok", "mok:" + CURRENT_DIRECTORY + "bar.mok!/"},
+                {"foo.mok", "bar.mok", "bar.mok", "mok:" + CURRENT_DIRECTORY + "bar.mok!/"},
+                {"foo.mok", "bar.mok/", "bar.mok", "mok:" + CURRENT_DIRECTORY + "bar.mok!/"},
+                {"foo.mok", ".", ".", CURRENT_DIRECTORY},
+                {"foo.mok", "./", ".", CURRENT_DIRECTORY},
+                {"foo.mok", "./bar.mok", "./bar.mok", "mok:" + CURRENT_DIRECTORY + "bar.mok!/"},
+                {"foo.mok", "./bar.mok/", "./bar.mok", "mok:" + CURRENT_DIRECTORY + "bar.mok!/"},
         }) {
             assertResolveSibling(params);
         }
@@ -263,18 +273,20 @@ public class TPathTest extends MockArchiveDriverTestBase {
         final TPath member = new TPath(first);
         final TPath path = parent.resolveSibling(member);
         assertThat(path.toString(), equalTo(name.replace(SEPARATOR, path.getFileSystem().getSeparator())));
-        assertThat(path.getMountPoint(), equalTo(nodePath.getMountPoint()));
+        assertThat(path.getMountPoint(), equalTo(nodePath.getMountPoint().get()));
         assertThat(path.getNodeName(), equalTo(nodePath.getNodeName()));
     }
 
     @Test
     public void testGetParentOnWindows() {
-        if ('\\' != separatorChar) return;
-        for (final String[] params : new String[][] {
-            // $path, $parent
-            { "c:/", null },
-            { "c:/foo", "c:/" },
-            { "c:/foo/", "c:/" },
+        if ('\\' != separatorChar) {
+            return;
+        }
+        for (final String[] params : new String[][]{
+                // $path, $parent
+                {"c:/", null},
+                {"c:/foo", "c:/"},
+                {"c:/foo/", "c:/"},
         }) {
             assertGetParent(params);
         }
@@ -282,30 +294,30 @@ public class TPathTest extends MockArchiveDriverTestBase {
 
     @Test
     public void testGetParent() {
-        for (final String[] params : new String[][] {
-            // $path, $parent
-            { "", null },
-            { ".", null },
-            { "./", null },
-            { "..", null },
-            { "../", null },
-            { "foo", null },
-            { "foo/", null },
-            { "foo/.", "foo" },
-            { "foo/./", "foo" },
-            { "foo/..", "foo" },
-            { "foo/../", "foo" },
-            { "./foo", null },
-            { "./foo/", null },
-            { "../foo", ".." },
-            { "../foo/", ".." },
-            { "/", null },
-            { "/foo", "/" },
-            { "/foo/", "/" },
-            { "/foo/..", "/foo" },
-            { "/foo/../", "/foo" },
-            //{ "/../foo", "/.." },
-            //{ "/../foo/", "/.." },
+        for (final String[] params : new String[][]{
+                // $path, $parent
+                {"", null},
+                {".", null},
+                {"./", null},
+                {"..", null},
+                {"../", null},
+                {"foo", null},
+                {"foo/", null},
+                {"foo/.", "foo"},
+                {"foo/./", "foo"},
+                {"foo/..", "foo"},
+                {"foo/../", "foo"},
+                {"./foo", null},
+                {"./foo/", null},
+                {"../foo", ".."},
+                {"../foo/", ".."},
+                {"/", null},
+                {"/foo", "/"},
+                {"/foo/", "/"},
+                {"/foo/..", "/foo"},
+                {"/foo/../", "/foo"},
+                //{ "/../foo", "/.." },
+                //{ "/../foo/", "/.." },
         }) {
             assertGetParent(params);
         }
@@ -319,16 +331,18 @@ public class TPathTest extends MockArchiveDriverTestBase {
 
     @Test
     public void testGetRootOnWindows() {
-        if ('\\' != separatorChar) return;
-        for (final String[] params : new String[][] {
-            // $test, $root
-            //{ "c:", null },
-            //{ "c:foo", null },
-            { "c://", "c:/" },
-            { "c:/", "c://" },
-            { "c:/foo", "c:/" },
-            { "//foo/bar/", "//foo/bar/" },
-            { "//foo/bar/baz", "//foo/bar/" },
+        if ('\\' != separatorChar) {
+            return;
+        }
+        for (final String[] params : new String[][]{
+                // $test, $root
+                //{ "c:", null },
+                //{ "c:foo", null },
+                {"c://", "c:/"},
+                {"c:/", "c://"},
+                {"c:/foo", "c:/"},
+                {"//foo/bar/", "//foo/bar/"},
+                {"//foo/bar/baz", "//foo/bar/"},
         }) {
             assertGetRoot(params);
         }
@@ -336,12 +350,12 @@ public class TPathTest extends MockArchiveDriverTestBase {
 
     @Test
     public void testGetRoot() {
-        for (final String[] params : new String[][] {
-            // $test, $root
-            { "", null },
-            { "foo", null },
-            { "/", "/" },
-            { "/foo", "/" },
+        for (final String[] params : new String[][]{
+                // $test, $root
+                {"", null},
+                {"foo", null},
+                {"/", "/"},
+                {"/foo", "/"},
         }) {
             assertGetRoot(params);
         }
@@ -357,16 +371,18 @@ public class TPathTest extends MockArchiveDriverTestBase {
 
     @Test
     public void testGetFileNameOnWindows() {
-        if ('\\' != separatorChar) return;
-        for (final String[] params : new String[][] {
-            // $test, $root
-            //{ "c:", null },
-            //{ "c:foo", "foo" },
-            { "c:/", null },
-            { "c:/foo", "foo" },
-            { "c:/foo/bar", "bar" },
-            { "//foo/bar/", null },
-            { "//foo/bar/baz", "baz" },
+        if ('\\' != separatorChar) {
+            return;
+        }
+        for (final String[] params : new String[][]{
+                // $test, $root
+                //{ "c:", null },
+                //{ "c:foo", "foo" },
+                {"c:/", null},
+                {"c:/foo", "foo"},
+                {"c:/foo/bar", "bar"},
+                {"//foo/bar/", null},
+                {"//foo/bar/baz", "baz"},
         }) {
             assertGetFileName(params);
         }
@@ -374,14 +390,14 @@ public class TPathTest extends MockArchiveDriverTestBase {
 
     @Test
     public void testGetFileName() {
-        for (final String[] params : new String[][] {
-            // $test, $root
-            { "", null },
-            { "foo", "foo" },
-            { "foo/bar", "bar" },
-            { "/", null },
-            { "/foo", "foo" },
-            { "/foo/bar", "bar" },
+        for (final String[] params : new String[][]{
+                // $test, $root
+                {"", null},
+                {"foo", "foo"},
+                {"foo/bar", "bar"},
+                {"/", null},
+                {"/foo", "foo"},
+                {"/foo/bar", "bar"},
         }) {
             assertGetFileName(params);
         }
@@ -396,21 +412,16 @@ public class TPathTest extends MockArchiveDriverTestBase {
     }
 
     @Test
-    public void testCutTrailingSeparators() {
-        assertThat(TPath.cutTrailingSeparators("c://", 3), is("c:/"));
-        assertThat(TPath.cutTrailingSeparators("///", 2), is("//"));
-        assertThat(TPath.cutTrailingSeparators("//", 1), is("/"));
-    }
-
-    @Test
     public void testElementsOnWindows() {
-        if ('\\' != separatorChar) return;
-        for (final Object[] params : new Object[][] {
-            // $first, $more
-            { "c:/foo", NO_STRINGS },
-            { "c:/foo", new String[] { "bar" } },
-            { "//foo/bar/boom", NO_STRINGS },
-            { "//foo/bar/boom", new String[] { "bang" } },
+        if ('\\' != separatorChar) {
+            return;
+        }
+        for (final Object[] params : new Object[][]{
+                // $first, $more
+                {"c:/foo", NO_STRINGS},
+                {"c:/foo", new String[]{"bar"}},
+                {"//foo/bar/boom", NO_STRINGS},
+                {"//foo/bar/boom", new String[]{"bang"}},
         }) {
             assertElements(params);
         }
@@ -418,14 +429,14 @@ public class TPathTest extends MockArchiveDriverTestBase {
 
     @Test
     public void testElements() {
-        for (final Object[] params : new Object[][] {
-            // $first, $more
-            { "", null },
-            { "foo", NO_STRINGS },
-            { "foo", new String[] { "bar" } },
-            { "/", null },
-            { "/foo", NO_STRINGS },
-            { "/foo", new String[] { "bar" } },
+        for (final Object[] params : new Object[][]{
+                // $first, $more
+                {"", null},
+                {"foo", NO_STRINGS},
+                {"foo", new String[]{"bar"}},
+                {"/", null},
+                {"/foo", NO_STRINGS},
+                {"/foo", new String[]{"bar"}},
         }) {
             assertElements(params);
         }

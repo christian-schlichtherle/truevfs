@@ -4,16 +4,16 @@
  */
 package global.namespace.truevfs.driver.odf;
 
-import global.namespace.truevfs.comp.cio.InputService;
+import global.namespace.truevfs.comp.cio.InputContainer;
 import global.namespace.truevfs.comp.cio.IoBufferPool;
-import global.namespace.truevfs.comp.cio.OutputService;
+import global.namespace.truevfs.comp.cio.OutputContainer;
 import global.namespace.truevfs.comp.zipdriver.JarDriver;
 import global.namespace.truevfs.comp.zipdriver.JarDriverEntry;
-import global.namespace.truevfs.comp.zipdriver.ZipInputService;
-import global.namespace.truevfs.comp.zipdriver.ZipOutputService;
+import global.namespace.truevfs.comp.zipdriver.ZipInputContainer;
+import global.namespace.truevfs.comp.zipdriver.ZipOutputContainer;
 import global.namespace.truevfs.kernel.api.FsModel;
 import global.namespace.truevfs.kernel.api.FsOutputSocketSink;
-import global.namespace.truevfs.kernel.api.cio.MultiplexingOutputService;
+import global.namespace.truevfs.kernel.api.cio.MultiplexingOutputContainer;
 
 import javax.annotation.CheckForNull;
 import java.io.IOException;
@@ -40,22 +40,22 @@ import static global.namespace.truevfs.kernel.api.FsAccessOption.GROW;
  * @see    <a href="http://docs.oasis-open.org/office/v1.0/OpenDocument-v1.0-os.pdf">Open Document Format for Office Applications (OpenDocument) v1.0; Section 17.4: MIME Type Stream</a>
  * @see    <a href="http://docs.oasis-open.org/office/v1.1/OS/OpenDocument-v1.1.pdf">Open Document Format for Office Applications (OpenDocument) v1.1; Section 17.4: MIME Type Stream</a>
  * @see    <a href="http://docs.oasis-open.org/office/v1.2/OpenDocument-v1.2-part3.pdf">Open Document Format for Office Applications (OpenDocument) Version 1.2; Part 3: Packages; Section 3.3: MIME Type Stream</a>
- * @see    OdfOutputService
+ * @see    OdfOutputContainer
  * @author Christian Schlichtherle
  */
 public class OdfDriver extends JarDriver {
 
     @Override
-    protected OutputService<JarDriverEntry> newOutput(
+    protected OutputContainer<JarDriverEntry> newOutput(
             final FsModel model,
             final FsOutputSocketSink sink,
-            final @CheckForNull InputService<JarDriverEntry> input)
+            final @CheckForNull InputContainer<JarDriverEntry> input)
     throws IOException {
-        final ZipInputService<JarDriverEntry> zis = (ZipInputService<JarDriverEntry>) input;
-        final ZipOutputService<JarDriverEntry> zos = new ZipOutputService<>(model, sink, zis, this);
+        final ZipInputContainer<JarDriverEntry> zis = (ZipInputContainer<JarDriverEntry>) input;
+        final ZipOutputContainer<JarDriverEntry> zos = new ZipOutputContainer<>(model, sink, zis, this);
         final IoBufferPool pool = getPool();
         return null != zis && sink.getOptions().get(GROW)
-                ? new MultiplexingOutputService<>(pool, zos)
-                : new OdfOutputService(pool, zos);
+                ? new MultiplexingOutputContainer<>(pool, zos)
+                : new OdfOutputContainer(pool, zos);
     }
 }

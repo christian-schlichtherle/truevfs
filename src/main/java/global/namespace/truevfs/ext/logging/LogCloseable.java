@@ -20,7 +20,7 @@ interface LogCloseable extends Closeable, LogResource  {
 
     default void log(String message) {
         try {
-            log(message, context().target());
+            log(message, context().getTarget());
         } catch (IOException e) {
             logger().trace("Couldn't resolve resource target: ", e);
         }

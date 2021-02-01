@@ -4,8 +4,6 @@
  */
 package global.namespace.truevfs.kernel.api;
 
-import global.namespace.truevfs.comp.shed.ImplementationsShouldExtend;
-
 import java.util.Optional;
 import java.util.ServiceConfigurationError;
 
@@ -18,7 +16,6 @@ import java.util.ServiceConfigurationError;
  * @see    FsDriver
  * @author Christian Schlichtherle
  */
-@ImplementationsShouldExtend(FsAbstractCompositeDriver.class)
 public interface FsCompositeDriver extends FsModel.Factory<FsManager>, FsController.Factory<FsManager> {
 
     /**

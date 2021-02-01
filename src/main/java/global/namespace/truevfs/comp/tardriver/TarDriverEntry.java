@@ -15,6 +15,7 @@ import javax.annotation.CheckForNull;
 import javax.annotation.Nullable;
 import java.io.IOException;
 import java.util.Date;
+import java.util.Optional;
 
 import static global.namespace.truevfs.comp.cio.Entry.Access.WRITE;
 import static global.namespace.truevfs.comp.cio.Entry.Size.DATA;
@@ -27,9 +28,7 @@ import static global.namespace.truevfs.comp.cio.Entry.Type.FILE;
  *
  * @author Christian Schlichtherle
  */
-public class TarDriverEntry
-extends TarArchiveEntry
-implements FsArchiveEntry, Releasable<IOException> {
+public class TarDriverEntry extends TarArchiveEntry implements FsArchiveEntry, Releasable<IOException> {
 
     // Bit masks for initialized fields.
     private static final int SIZE = 1, MODTIME = 1 << 1;
@@ -155,85 +154,88 @@ implements FsArchiveEntry, Releasable<IOException> {
     }
 
     @Override
-    public Boolean isPermitted(final Access type, final Entity entity) {
-        if (!(entity instanceof PosixEntity)) return null;
-        switch ((PosixEntity) entity) {
-        case USER:
-            switch (type) {
-            case READ:
-                return 0 != (super.getMode() & TUREAD);
-            case WRITE:
-                return 0 != (super.getMode() & TUWRITE);
-            case EXECUTE:
-                return 0 != (super.getMode() & TUEXEC);
-            }
-            break;
-        case GROUP:
-            switch (type) {
-            case READ:
-                return 0 != (super.getMode() & TGREAD);
-            case WRITE:
-                return 0 != (super.getMode() & TGWRITE);
-            case EXECUTE:
-                return 0 != (super.getMode() & TGEXEC);
-            }
-            break;
-        case OTHER:
-            switch (type) {
-            case READ:
-                return 0 != (super.getMode() & TOREAD);
-            case WRITE:
-                return 0 != (super.getMode() & TOWRITE);
-            case EXECUTE:
-                return 0 != (super.getMode() & TOEXEC);
+    public Optional<Boolean> isPermitted(final Access type, final Entity entity) {
+        if (entity instanceof PosixEntity) {
+            switch ((PosixEntity) entity) {
+                case USER:
+                    switch (type) {
+                        case READ:
+                            return Optional.of(0 != (super.getMode() & TUREAD));
+                        case WRITE:
+                            return Optional.of(0 != (super.getMode() & TUWRITE));
+                        case EXECUTE:
+                            return Optional.of(0 != (super.getMode() & TUEXEC));
+                    }
+                    break;
+                case GROUP:
+                    switch (type) {
+                        case READ:
+                            return Optional.of(0 != (super.getMode() & TGREAD));
+                        case WRITE:
+                            return Optional.of(0 != (super.getMode() & TGWRITE));
+                        case EXECUTE:
+                            return Optional.of(0 != (super.getMode() & TGEXEC));
+                    }
+                    break;
+                case OTHER:
+                    switch (type) {
+                        case READ:
+                            return Optional.of(0 != (super.getMode() & TOREAD));
+                        case WRITE:
+                            return Optional.of(0 != (super.getMode() & TOWRITE));
+                        case EXECUTE:
+                            return Optional.of(0 != (super.getMode() & TOEXEC));
+                    }
             }
         }
-        return null;
+        return Optional.empty();
     }
 
     @Override
     public boolean setPermitted(
             final Access type,
             final Entity entity,
-            final Boolean value) {
-        if (null == value || !(entity instanceof PosixEntity)) return false;
+            final Optional<Boolean> value) {
+        if (!value.isPresent() || !(entity instanceof PosixEntity)) {
+            return false;
+        }
         switch ((PosixEntity) entity) {
         case USER:
             switch (type) {
             case READ:
-                super.setMode(value ? super.getMode() | TUREAD : super.getMode() & ~TUREAD);
+                super.setMode(value.get() ? super.getMode() | TUREAD : super.getMode() & ~TUREAD);
                 return true;
             case WRITE:
-                super.setMode(value ? super.getMode() | TUWRITE : super.getMode() & ~TUWRITE);
+                super.setMode(value.get() ? super.getMode() | TUWRITE : super.getMode() & ~TUWRITE);
                 return true;
             case EXECUTE:
-                super.setMode(value ? super.getMode() | TUEXEC : super.getMode() & ~TUEXEC);
+                super.setMode(value.get() ? super.getMode() | TUEXEC : super.getMode() & ~TUEXEC);
                 return true;
             }
             break;
         case GROUP:
             switch (type) {
             case READ:
-                super.setMode(value ? super.getMode() | TGREAD : super.getMode() & ~TGREAD);
+                super.setMode(value.get() ? super.getMode() | TGREAD : super.getMode() & ~TGREAD);
                 return true;
             case WRITE:
-                super.setMode(value ? super.getMode() | TGWRITE : super.getMode() & ~TGWRITE);
+                super.setMode(value.get() ? super.getMode() | TGWRITE : super.getMode() & ~TGWRITE);
                 return true;
             case EXECUTE:
-                super.setMode(value ? super.getMode() | TGEXEC : super.getMode() & ~TGEXEC);
+                super.setMode(value.get() ? super.getMode() | TGEXEC : super.getMode() & ~TGEXEC);
                 return true;
             }
             break;
         case OTHER:
             switch (type) {
             case READ:
-                super.setMode(value ? super.getMode() | TOREAD : super.getMode() & ~TOREAD);
+                super.setMode(value.get() ? super.getMode() | TOREAD : super.getMode() & ~TOREAD);
                 return true;
             case WRITE:
-                super.setMode(value ? super.getMode() | TOWRITE : super.getMode() & ~TOWRITE);
+                super.setMode(value.get() ? super.getMode() | TOWRITE : super.getMode() & ~TOWRITE);
                 return true;
             case EXECUTE:
-                super.setMode(value ? super.getMode() | TOEXEC : super.getMode() & ~TOEXEC);
+                super.setMode(value.get() ? super.getMode() | TOEXEC : super.getMode() & ~TOEXEC);
                 return true;
             }
         }

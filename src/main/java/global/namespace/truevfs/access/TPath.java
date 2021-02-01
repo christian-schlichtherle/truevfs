@@ -592,7 +592,9 @@ public final class TPath implements Path, TRex {
     TPath getFileName() {
         final List<String> elements = getElements();
         final int l = elements.size();
-        if (l <= 0) return null;
+        if (l <= 0) {
+            return null;
+        }
         return new TPath(name(elements.get(l - 1)), getArchiveDetector(), null);
     }
 

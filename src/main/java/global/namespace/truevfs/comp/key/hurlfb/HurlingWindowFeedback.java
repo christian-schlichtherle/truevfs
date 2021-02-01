@@ -4,16 +4,14 @@
  */
 package global.namespace.truevfs.comp.key.hurlfb;
 
-import java.awt.Point;
-import java.awt.Window;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import javax.swing.JPanel;
-import javax.swing.SwingUtilities;
-import javax.swing.Timer;
-import global.namespace.truevfs.comp.key.spec.util.SuspensionPenalty;
+import global.namespace.truevfs.comp.key.api.util.SuspensionPenalty;
 import global.namespace.truevfs.comp.key.swing.feedback.DecoratingFeedback;
 import global.namespace.truevfs.comp.key.swing.feedback.Feedback;
+
+import javax.swing.*;
+import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 
 /**
  * Provides feedback by hurling the containing window for

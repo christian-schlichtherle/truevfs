@@ -4,7 +4,6 @@
  */
 package global.namespace.truevfs.comp.cio;
 
-import javax.annotation.Nullable;
 import java.io.IOException;
 import java.util.Objects;
 
@@ -13,10 +12,12 @@ import java.util.Objects;
  *
  * @author Christian Schlichtherle
  */
-public abstract class DecoratingIoBufferPool extends IoBufferPool {
-    protected @Nullable IoBufferPool pool;
+public abstract class DecoratingIoBufferPool implements IoBufferPool {
 
-    protected DecoratingIoBufferPool() { }
+    protected IoBufferPool pool;
+
+    protected DecoratingIoBufferPool() {
+    }
 
     protected DecoratingIoBufferPool(final IoBufferPool pool) {
         this.pool = Objects.requireNonNull(pool);
@@ -25,15 +26,5 @@ public abstract class DecoratingIoBufferPool extends IoBufferPool {
     @Override
     public IoBuffer allocate() throws IOException {
         return pool.allocate();
-    }
-
-    /**
-     * Returns a string representation of this object for debugging and logging
-     * purposes.
-     */
-    @Override
-    public String toString() {
-        return String.format("%s@%x[pool=%s]",
-                getClass().getName(), hashCode(), pool);
     }
 }

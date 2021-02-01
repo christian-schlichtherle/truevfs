@@ -4,8 +4,8 @@
  */
 package global.namespace.truevfs.driver.file;
 
-import global.namespace.truevfs.comp.cio.AbstractInputSocket;
 import global.namespace.truevfs.comp.cio.Entry;
+import global.namespace.truevfs.comp.cio.InputSocket;
 import global.namespace.truevfs.comp.cio.OutputSocket;
 import global.namespace.truevfs.comp.shed.BitField;
 import global.namespace.truevfs.kernel.api.FsAccessOption;
@@ -24,7 +24,7 @@ import static java.nio.file.Files.newInputStream;
  * @see    FileOutputSocket
  * @author Christian Schlichtherle
  */
-final class FileInputSocket extends AbstractInputSocket<FileNode> {
+final class FileInputSocket implements InputSocket<FileNode> {
 
     private final FileNode node;
 
@@ -36,7 +36,7 @@ final class FileInputSocket extends AbstractInputSocket<FileNode> {
     }
 
     @Override
-    public FileNode target() {
+    public FileNode getTarget() {
         return node;
     }
 

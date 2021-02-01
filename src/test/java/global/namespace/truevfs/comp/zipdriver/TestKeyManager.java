@@ -4,11 +4,11 @@
  */
 package global.namespace.truevfs.comp.zipdriver;
 
-import global.namespace.truevfs.comp.key.spec.AbstractKeyManager;
-import global.namespace.truevfs.comp.key.spec.KeyProvider;
-import global.namespace.truevfs.comp.key.spec.prompting.PromptingKey;
-import global.namespace.truevfs.comp.key.spec.prompting.PromptingKey.View;
-import global.namespace.truevfs.comp.key.spec.prompting.PromptingKeyManager;
+import global.namespace.truevfs.comp.key.api.AbstractKeyManager;
+import global.namespace.truevfs.comp.key.api.KeyProvider;
+import global.namespace.truevfs.comp.key.api.prompting.PromptingKey;
+import global.namespace.truevfs.comp.key.api.prompting.PromptingKey.View;
+import global.namespace.truevfs.comp.key.api.prompting.PromptingKeyManager;
 
 import java.net.URI;
 

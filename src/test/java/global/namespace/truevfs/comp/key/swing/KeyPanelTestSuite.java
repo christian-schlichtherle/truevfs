@@ -4,24 +4,27 @@
  */
 package global.namespace.truevfs.comp.key.swing;
 
+import global.namespace.truevfs.comp.key.api.prompting.PromptingPbeParameters;
 import global.namespace.truevfs.comp.key.swing.io.JemmyUtilsWithFile;
 import global.namespace.truevfs.comp.key.swing.util.FileChooserOfWindowOperator;
-import java.awt.EventQueue;
-import java.io.*;
+import org.junit.After;
+import org.junit.Ignore;
+import org.junit.Test;
+import org.netbeans.jemmy.ComponentChooser;
+import org.netbeans.jemmy.operators.*;
+import org.netbeans.jemmy.util.NameComponentChooser;
+
+import java.awt.*;
+import java.io.File;
+import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.net.URI;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
-import global.namespace.truevfs.comp.key.spec.prompting.PromptingPbeParameters;
-import org.junit.After;
+
 import static org.junit.Assert.*;
-import org.junit.Ignore;
-import org.junit.Test;
-import org.netbeans.jemmy.ComponentChooser;
-import org.netbeans.jemmy.operators.*;
-import org.netbeans.jemmy.util.NameComponentChooser;
 
 /**
  * @param  <P> The type of the key panel.

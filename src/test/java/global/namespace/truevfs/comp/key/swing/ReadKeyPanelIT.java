@@ -4,7 +4,7 @@
  */
 package global.namespace.truevfs.comp.key.swing;
 
-import global.namespace.truevfs.comp.key.spec.common.AesPbeParameters;
+import global.namespace.truevfs.comp.key.api.common.AesPbeParameters;
 import org.junit.Test;
 import org.netbeans.jemmy.operators.JCheckBoxOperator;
 import org.netbeans.jemmy.operators.JPasswordFieldOperator;

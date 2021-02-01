@@ -30,7 +30,7 @@ public class CheckedZipDriver extends ZipDriver {
      * @return {@code true}
      */
     @Override
-    public boolean check(ZipDriverEntry local, ZipInputService<ZipDriverEntry> input) {
+    public boolean check(ZipDriverEntry local, ZipInputContainer<ZipDriverEntry> input) {
         return true;
     }
 }

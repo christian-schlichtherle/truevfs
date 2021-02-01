@@ -17,7 +17,7 @@ import java.util.Optional;
 
 /**
  * @param  <M> the type of the mediator.
- * @param  <E> the type of the {@linkplain #target() target entry} for I/O
+ * @param  <E> the type of the {@linkplain #getTarget() target entry} for I/O
  *         operations.
  * @see    InstrumentingOutputSocket
  * @author Christian Schlichtherle
@@ -37,14 +37,12 @@ extends DecoratingInputSocket<E> {
     }
 
     @Override
-    public InputStream stream(Optional<? extends OutputSocket<? extends Entry>> peer)
-    throws IOException {
+    public InputStream stream(Optional<? extends OutputSocket<? extends Entry>> peer) throws IOException {
         return mediator.instrument(this, socket.stream(peer));
     }
 
     @Override
-    public SeekableByteChannel channel(Optional<? extends OutputSocket<? extends Entry>> peer)
-    throws IOException {
+    public SeekableByteChannel channel(Optional<? extends OutputSocket<? extends Entry>> peer) throws IOException {
         return mediator.instrument(this, socket.channel(peer));
     }
 }

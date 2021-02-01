@@ -51,8 +51,7 @@ import static global.namespace.truevfs.comp.zip.ZipParametersUtils.parameters;
  * @see    AbstractZipOutputStream
  * @author Christian Schlichtherle
  */
-public abstract class AbstractZipFile<E extends ZipEntry>
-implements Closeable, Iterable<E> {
+public abstract class AbstractZipFile<E extends ZipEntry> implements Closeable, Iterable<E> {
 
     private static final int LFH_FILE_NAME_LENGTH_POS =
             /* Local File Header signature     */ 4 +
@@ -718,19 +717,19 @@ implements Closeable, Iterable<E> {
     public String getCharset() { return charset.name(); }
 
     /**
-     * Returns the number of entries in this ZIP file.
-     */
-    public int size() { return entries.size(); }
-
-    /**
      * Returns an iteration of all entries in this ZIP file.
      * Note that the iterated entries are shared with this instance.
-     * It is illegal to change their state!
+     * It is an error to change their state!
      */
     @Override
     public Iterator<E> iterator() {
         return Collections.unmodifiableCollection(entries.values()).iterator();
     }
+
+    /**
+     * Returns the number of entries in this ZIP file.
+     */
+    public int size() { return entries.size(); }
 
     /**
      * Returns the entry for the given {@code name} or {@code null} if no entry
@@ -742,7 +741,7 @@ implements Closeable, Iterable<E> {
      * @return The entry for the given {@code name} or {@code null} if no entry
      *         with this name exists in this ZIP file.
      */
-    public E entry(String name) { return entries.get(name); }
+    public Optional<E> entry(String name) { return Optional.ofNullable(entries.get(name)); }
 
     /**
      * Returns the file length of this ZIP file in bytes.

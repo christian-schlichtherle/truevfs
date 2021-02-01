@@ -4,8 +4,8 @@
  */
 package global.namespace.truevfs.kernel.impl;
 
-import lombok.SneakyThrows;
 import global.namespace.truevfs.comp.io.ClosedStreamException;
+import global.namespace.truevfs.comp.shed.Operation;
 
 import java.io.Closeable;
 import java.io.IOException;
@@ -13,13 +13,17 @@ import java.io.IOException;
 /**
  * @author Christian Schlichtherle
  */
-class CheckedCloseable implements Closeable {
+public abstract class CheckedCloseable implements Closeable {
 
     private final Closeable closeable;
     private boolean closed;
 
-    CheckedCloseable(final Closeable closeable) {
+    protected CheckedCloseable(final Closeable closeable) {
         this.closeable = closeable;
+    }
+
+    public final boolean isOpen() {
+        return !closed;
     }
 
     /**
@@ -32,22 +36,12 @@ class CheckedCloseable implements Closeable {
         closeable.close();
     }
 
-    public final boolean isOpen() { return !closed; }
-
-    final void check() throws ClosedStreamException {
+    public final <T> T checked(final Operation<T, ? extends IOException> op) throws IOException {
         if (!isOpen()) {
             throw newClosedStreamException();
         }
+        return op.run();
     }
 
-    ClosedStreamException newClosedStreamException() {
-        return new ClosedStreamException();
-    }
-
-    @SneakyThrows
-    final <T, X extends Exception> T checked(final Op<T, X> op) throws X {
-        check();
-        return op.call();
-    }
-
+    protected abstract ClosedStreamException newClosedStreamException();
 }

@@ -4,7 +4,6 @@
  */
 package global.namespace.truevfs.kernel.impl;
 
-import lombok.val;
 import global.namespace.truevfs.comp.cio.*;
 import global.namespace.truevfs.comp.io.DecoratingInputStream;
 import global.namespace.truevfs.comp.io.DecoratingOutputStream;
@@ -12,8 +11,8 @@ import global.namespace.truevfs.comp.io.DecoratingSeekableChannel;
 import global.namespace.truevfs.comp.io.ReadOnlyChannel;
 import global.namespace.truevfs.comp.shed.Pool;
 import global.namespace.truevfs.comp.shed.Releasable;
+import lombok.val;
 
-import javax.annotation.Nullable;
 import java.io.*;
 import java.nio.channels.SeekableByteChannel;
 import java.util.Optional;
@@ -36,7 +35,8 @@ import java.util.function.Function;
  *
  * @author Christian Schlichtherle
  */
-final class CacheEntry implements Entry, Releasable<IOException>, Flushable, Closeable {
+@SuppressWarnings("OptionalUsedAsFieldOrParameterType")
+public final class CacheEntry implements Entry, Releasable<IOException>, Flushable, Closeable {
 
     private final IoBufferPool pool;
 
@@ -90,12 +90,11 @@ final class CacheEntry implements Entry, Releasable<IOException>, Flushable, Clo
     }
 
     /**
-     * Returns `null` in order to block copying of access permissions of cache entries.
+     * Returns empty in order to block copying of access permissions of cache entries.
      */
-    @Nullable
     @Override
-    public Boolean isPermitted(Access type, Entity entity) {
-        return null;
+    public Optional<Boolean> isPermitted(Access type, Entity entity) {
+        return Optional.empty();
     }
 
     /**
@@ -107,7 +106,7 @@ final class CacheEntry implements Entry, Releasable<IOException>, Flushable, Clo
      * @param input an input socket for reading the entry data from the backing store.
      * @return `this`
      */
-    CacheEntry configure(final InputSocket<? extends Entry> input) {
+    public CacheEntry configure(final InputSocket<? extends Entry> input) {
         this.input = Optional.of(input);
         return this;
     }
@@ -122,7 +121,7 @@ final class CacheEntry implements Entry, Releasable<IOException>, Flushable, Clo
      *               backing store.
      * @return `this`
      */
-    CacheEntry configure(final OutputSocket<? extends Entry> output) {
+    public CacheEntry configure(final OutputSocket<? extends Entry> output) {
         this.output = Optional.of(output);
         return this;
     }
@@ -130,8 +129,9 @@ final class CacheEntry implements Entry, Releasable<IOException>, Flushable, Clo
     /**
      * Returns an input socket for reading the cached entry data.
      */
-    InputSocket<? extends Entry> input() {
-        class Foo extends DelegatingInputSocket<Entry> implements BufferAllocator {
+    public InputSocket<? extends Entry> input() {
+
+        class Input implements BufferAllocator, InputSocket<Entry> {
 
             Buffer allocated;
 
@@ -146,23 +146,34 @@ final class CacheEntry implements Entry, Releasable<IOException>, Flushable, Clo
             }
 
             @Override
-            public InputSocket<? extends Buffer> socket() throws IOException {
+            public Entry getTarget() throws IOException {
+                return target(input.get());
+            }
+
+            InputSocket<? extends Entry> getSocket() throws IOException {
                 return buffer(inputBufferPool).input();
             }
 
             @Override
-            public Entry target() throws IOException {
-                return target(input.get());
+            public InputStream stream(Optional<? extends OutputSocket<? extends Entry>> peer) throws IOException {
+                return getSocket().stream(peer);
+            }
+
+            @Override
+            public SeekableByteChannel channel(Optional<? extends OutputSocket<? extends Entry>> peer) throws IOException {
+                return getSocket().channel(peer);
             }
         }
-        return new Foo();
+
+        return new Input();
     }
 
     /**
      * Returns an output socket for writing the cached entry data.
      */
-    OutputSocket<? extends Entry> output() {
-        class Bar extends DelegatingOutputSocket<Entry> implements BufferAllocator {
+    public OutputSocket<? extends Entry> output() {
+
+        class Output implements BufferAllocator, OutputSocket<Entry> {
 
             Buffer allocated;
 
@@ -177,16 +188,30 @@ final class CacheEntry implements Entry, Releasable<IOException>, Flushable, Clo
             }
 
             @Override
-            public OutputSocket<? extends Entry> socket() throws IOException {
+            public Entry getTarget() throws IOException {
+                return target(output.get());
+            }
+
+            OutputSocket<IoBuffer> getSocket() throws IOException {
                 return buffer(outputBufferPool).output();
             }
 
             @Override
-            public Entry target() throws IOException {
-                return target(output.get());
+            public OutputStream stream(
+                    Optional<? extends InputSocket<? extends Entry>> peer
+            ) throws IOException {
+                return getSocket().stream(peer);
+            }
+
+            @Override
+            public SeekableByteChannel channel(
+                    Optional<? extends InputSocket<? extends Entry>> peer
+            ) throws IOException {
+                return getSocket().channel(peer);
             }
         }
-        return new Bar();
+
+        return new Output();
     }
 
     /**
@@ -235,7 +260,7 @@ final class CacheEntry implements Entry, Releasable<IOException>, Flushable, Clo
             if (null != buffer) {
                 return buffer;
             } else {
-                return new ProxyEntry(socket.target());
+                return new ProxyEntry(socket.getTarget());
             }
         }
     }
@@ -243,7 +268,7 @@ final class CacheEntry implements Entry, Releasable<IOException>, Flushable, Clo
     /**
      * Defines different cache entry strategies.
      */
-    enum Strategy implements Function<CacheEntry, OutputBufferPool> {
+    public enum Strategy implements Function<CacheEntry, OutputBufferPool> {
 
         /**
          * The write-through strategy flushes any written data as soon as the output stream created by
@@ -269,7 +294,7 @@ final class CacheEntry implements Entry, Releasable<IOException>, Flushable, Clo
             }
         };
 
-        final CacheEntry newCacheEntry(IoBufferPool pool) {
+        public final CacheEntry newCacheEntry(IoBufferPool pool) {
             return new CacheEntry(this, pool);
         }
     }
@@ -382,9 +407,8 @@ final class CacheEntry implements Entry, Releasable<IOException>, Flushable, Clo
             return data.getTime(type);
         }
 
-        @Nullable
         @Override
-        public Boolean isPermitted(Access type, Entity entity) {
+        public Optional<Boolean> isPermitted(Access type, Entity entity) {
             return data.isPermitted(type, entity);
         }
 
@@ -404,13 +428,13 @@ final class CacheEntry implements Entry, Releasable<IOException>, Flushable, Clo
         }
 
         @Override
-        public InputSocket<Buffer> input() {
-            return new AbstractInputSocket<Buffer>() {
+        public InputSocket<IoBuffer> input() {
+            return new InputSocket<IoBuffer>() {
 
                 final InputSocket<? extends Entry> socket = data.input();
 
                 @Override
-                public Buffer target() {
+                public Buffer getTarget() {
                     return Buffer.this;
                 }
 
@@ -428,13 +452,13 @@ final class CacheEntry implements Entry, Releasable<IOException>, Flushable, Clo
         }
 
         @Override
-        public OutputSocket<Buffer> output() {
-            return new AbstractOutputSocket<Buffer>() {
+        public OutputSocket<IoBuffer> output() {
+            return new OutputSocket<IoBuffer>() {
 
                 final OutputSocket<? extends Entry> socket = data.output();
 
                 @Override
-                public Buffer target() {
+                public Buffer getTarget() {
                     return Buffer.this;
                 }
 

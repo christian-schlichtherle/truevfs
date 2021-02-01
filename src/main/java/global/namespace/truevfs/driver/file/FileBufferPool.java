@@ -28,7 +28,7 @@ import static java.nio.file.attribute.PosixFilePermission.*;
  *
  * @author Christian Schlichtherle
  */
-final class FileBufferPool extends IoBufferPool {
+final class FileBufferPool implements IoBufferPool {
 
     private static final Path TEMP_DIR
             = Paths.get(System.getProperty("java.io.tmpdir"));

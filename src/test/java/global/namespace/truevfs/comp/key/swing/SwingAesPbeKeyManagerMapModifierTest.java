@@ -4,8 +4,8 @@
  */
 package global.namespace.truevfs.comp.key.swing;
 
-import global.namespace.truevfs.comp.key.spec.spi.KeyManagerMapModifier;
-import global.namespace.truevfs.comp.key.spec.spi.KeyManagerMapModifierTestSuite;
+import global.namespace.truevfs.comp.key.api.spi.KeyManagerMapModifier;
+import global.namespace.truevfs.comp.key.api.spi.KeyManagerMapModifierTestSuite;
 
 /**
  * @author Christian Schlichtherle

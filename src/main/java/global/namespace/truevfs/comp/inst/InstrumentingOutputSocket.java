@@ -17,7 +17,7 @@ import java.util.Optional;
 
 /**
  * @param  <M> the type of the mediator.
- * @param  <E> the type of the {@linkplain #target() target entry} for I/O
+ * @param  <E> the type of the {@linkplain #getTarget() target entry} for I/O
  *         operations.
  * @see    InstrumentingInputSocket
  * @author Christian Schlichtherle

@@ -11,17 +11,17 @@ import global.namespace.truevfs.comp.io.ClosedInputException;
 import global.namespace.truevfs.comp.io.ClosedOutputException;
 import global.namespace.truevfs.comp.shed.BitField;
 import global.namespace.truevfs.comp.shed.ControlFlowException;
+import global.namespace.truevfs.comp.shed.Operation;
 import global.namespace.truevfs.kernel.api.*;
 import lombok.val;
 
-import javax.annotation.Nullable;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.nio.channels.SeekableByteChannel;
 import java.nio.file.NoSuchFileException;
+import java.util.Collection;
 import java.util.Collections;
-import java.util.Iterator;
 import java.util.Optional;
 import java.util.function.Supplier;
 
@@ -159,7 +159,7 @@ abstract class TargetArchiveController<E extends FsArchiveEntry> extends FileSys
             // file is opened for reading!
             // FIXME: Produce a new exception on each call!
             val ro = checkReadOnly().map(e -> (Supplier<IOException>) () -> e);
-            final InputService<E> is;
+            final InputContainer<E> is;
             try {
                 is = getDriver().newInput(getModel(), MOUNT_OPTIONS, getParent(), getName());
             } catch (FalsePositiveArchiveException e) {
@@ -171,7 +171,7 @@ abstract class TargetArchiveController<E extends FsArchiveEntry> extends FileSys
                     throw new PersistentFalsePositiveArchiveException(e);
                 }
             }
-            fs = ArchiveFileSystem.apply(getModel(), is, pn, ro);
+            fs = ArchiveFileSystem.create(getModel(), is, pn, ro);
             setInputArchive(Optional.of(new InputArchive<>(is)));
             assert isMounted();
         } else {
@@ -179,7 +179,7 @@ abstract class TargetArchiveController<E extends FsArchiveEntry> extends FileSys
                 // This may fail e.g. if the container file is a RAES encrypted ZIP file and the user cancels password
                 // prompting:
                 outputArchive(options);
-                fs = ArchiveFileSystem.apply(getModel());
+                fs = ArchiveFileSystem.create(getModel());
             } else {
                 throw new FalsePositiveArchiveException(new NoSuchFileException(getName().toString()));
             }
@@ -209,7 +209,7 @@ abstract class TargetArchiveController<E extends FsArchiveEntry> extends FileSys
             return getOutputArchive().get();
         }
         val is = getInputArchive().map(InputArchive::getDriverProduct).orElse(null);
-        final OutputService<E> os;
+        final OutputContainer<E> os;
         try {
             os = getDriver().newOutput(getModel(), options.and(ACCESS_PREFERENCES_MASK).set(CACHE), getParent(), getName(), is);
         } catch (FalsePositiveArchiveException e) {
@@ -226,7 +226,7 @@ abstract class TargetArchiveController<E extends FsArchiveEntry> extends FileSys
 
     @Override
     InputSocket<E> input(String name) {
-        return new AbstractInputSocket<E>() {
+        return new InputSocket<E>() {
 
             InputSocket<E> socket;
 
@@ -236,37 +236,25 @@ abstract class TargetArchiveController<E extends FsArchiveEntry> extends FileSys
             }
 
             @Override
-            public E target() throws IOException {
-                return socket().target();
+            public E getTarget() throws IOException {
+                return socket().getTarget();
             }
 
             @Override
             public InputStream stream(Optional<? extends OutputSocket<? extends Entry>> peer) throws IOException {
-                return syncOn(ClosedInputException.class, new Op<InputStream, IOException>() {
-
-                    @Override
-                    public InputStream call() throws IOException {
-                        return socket().stream(peer);
-                    }
-                });
+                return syncOn(ClosedInputException.class, () -> socket().stream(peer));
             }
 
             @Override
             public SeekableByteChannel channel(Optional<? extends OutputSocket<? extends Entry>> peer) throws IOException {
-                return syncOn(ClosedInputException.class, new Op<SeekableByteChannel, IOException>() {
-
-                    @Override
-                    public SeekableByteChannel call() throws IOException {
-                        return socket().channel(peer);
-                    }
-                });
+                return syncOn(ClosedInputException.class, () -> socket().channel(peer));
             }
         };
     }
 
     @Override
     OutputSocket<E> output(BitField<FsAccessOption> options, E entry) {
-        return new AbstractOutputSocket<E>() {
+        return new OutputSocket<E>() {
 
             OutputSocket<E> socket;
 
@@ -276,38 +264,26 @@ abstract class TargetArchiveController<E extends FsArchiveEntry> extends FileSys
             }
 
             @Override
-            public E target() {
+            public E getTarget() {
                 return entry;
             }
 
             @Override
             public OutputStream stream(Optional<? extends InputSocket<? extends Entry>> peer) throws IOException {
-                return syncOn(ClosedOutputException.class, new Op<OutputStream, IOException>() {
-
-                    @Override
-                    public OutputStream call() throws IOException {
-                        return socket().stream(peer);
-                    }
-                });
+                return syncOn(ClosedOutputException.class, () -> socket().stream(peer));
             }
 
             @Override
             public SeekableByteChannel channel(Optional<? extends InputSocket<? extends Entry>> peer)
                     throws IOException {
-                return syncOn(ClosedOutputException.class, new Op<SeekableByteChannel, IOException>() {
-
-                    @Override
-                    public SeekableByteChannel call() throws IOException {
-                        return socket().channel(peer);
-                    }
-                });
+                return syncOn(ClosedOutputException.class, () -> socket().channel(peer));
             }
         };
     }
 
-    private static <A, X extends IOException> A syncOn(final Class<? extends X> klass, final Op<A, X> op) throws X {
+    private static <A, X extends IOException> A syncOn(final Class<? extends X> klass, final Operation<A, X> op) throws X {
         try {
-            return op.call();
+            return op.run();
         } catch (IOException e) {
             if (klass.isInstance(e)) {
                 throw NeedsSyncException.apply();
@@ -345,18 +321,18 @@ abstract class TargetArchiveController<E extends FsArchiveEntry> extends FileSys
 
         val ois = _inputArchive
                 .map(InputArchive::clutch)
-                .filter(DisconnectingInputService::isOpen);
-        final InputService<E> is;
+                .filter(DisconnectingInputContainer::isOpen);
+        final InputContainer<E> is;
         if (ois.isPresent()) {
             is = ois.get();
         } else {
-            is = new DummyInputService<>();
+            is = new DummyInputContainer<>();
         }
 
         val oos = _outputArchive
                 .map(OutputArchive::clutch)
-                .filter(DisconnectingOutputService::isOpen);
-        final OutputService<E> os;
+                .filter(DisconnectingOutputContainer::isOpen);
+        final OutputContainer<E> os;
         if (oos.isPresent()) {
             os = oos.get();
         } else {
@@ -367,15 +343,15 @@ abstract class TargetArchiveController<E extends FsArchiveEntry> extends FileSys
         for (val cn : getFileSystem().get()) {
             for (val ae : cn.getEntries()) {
                 val aen = ae.getName();
-                if (null == os.entry(aen)) {
-                    try {
+                try {
+                    if (!os.entry(aen).isPresent()) {
                         if (DIRECTORY == ae.getType()) {
                             if (!cn.isRoot()) { // never output the root directory!
                                 if (UNKNOWN != ae.getTime(WRITE)) { // never output a ghost directory!
                                     os.output(ae).stream(Optional.empty()).close();
                                 }
                             }
-                        } else if (null != is.entry(aen)) {
+                        } else if (is.entry(aen).isPresent()) {
                             IoSockets.copy(is.input(aen), os.output(ae));
                         } else {
                             // The file system entry is a newly created
@@ -388,9 +364,9 @@ abstract class TargetArchiveController<E extends FsArchiveEntry> extends FileSys
                             ae.setSize(DATA, 0);
                             os.output(ae).stream(Optional.empty()).close();
                         }
-                    } catch (IOException e) {
-                        throw handler.fail(new FsSyncException(getMountPoint(), e));
                     }
+                } catch (IOException e) {
+                    throw handler.fail(new FsSyncException(getMountPoint(), e));
                 }
             }
         }
@@ -489,7 +465,11 @@ abstract class TargetArchiveController<E extends FsArchiveEntry> extends FileSys
         // Check if the entry is already written to the output archive.
         if (getOutputArchive().isPresent()) {
             val oa = getOutputArchive().get();
-            if (null != oa.entry(aen)) {
+            try {
+                if (oa.entry(aen).isPresent()) {
+                    throw NeedsSyncException.apply();
+                }
+            } catch (IOException e) {
                 throw NeedsSyncException.apply();
             }
         }
@@ -498,7 +478,11 @@ abstract class TargetArchiveController<E extends FsArchiveEntry> extends FileSys
         if (intention == READ) {
             if (getInputArchive().isPresent()) {
                 val ia = getInputArchive().get();
-                if (null == ia.entry(aen)) {
+                try {
+                    if (!ia.entry(aen).isPresent()) {
+                        throw NeedsSyncException.apply();
+                    }
+                } catch (IOException e) {
                     throw NeedsSyncException.apply();
                 }
             } else {
@@ -519,16 +503,16 @@ abstract class TargetArchiveController<E extends FsArchiveEntry> extends FileSys
         }
     }
 
-    private static final class InputArchive<E extends FsArchiveEntry> extends LockInputService<E> {
+    private static final class InputArchive<E extends FsArchiveEntry> extends LockInputContainer<E> {
 
-        final InputService<E> driverProduct;
+        final InputContainer<E> driverProduct;
 
-        InputArchive(InputService<E> driverProduct) {
-            super(new DisconnectingInputService<>(driverProduct));
+        InputArchive(InputContainer<E> driverProduct) {
+            super(new DisconnectingInputContainer<>(driverProduct));
             this.driverProduct = driverProduct;
         }
 
-        InputService<E> getDriverProduct() {
+        InputContainer<E> getDriverProduct() {
             return driverProduct;
         }
 
@@ -536,22 +520,21 @@ abstract class TargetArchiveController<E extends FsArchiveEntry> extends FileSys
             return clutch().isOpen();
         }
 
-        DisconnectingInputService<E> clutch() {
-            assert null != container;
-            return (DisconnectingInputService<E>) container;
+        DisconnectingInputContainer<E> clutch() {
+            return (DisconnectingInputContainer<E>) getContainer();
         }
     }
 
-    private static final class OutputArchive<E extends FsArchiveEntry> extends LockOutputService<E> {
+    private static final class OutputArchive<E extends FsArchiveEntry> extends LockOutputContainer<E> {
 
-        final OutputService<E> driverProduct;
+        final OutputContainer<E> driverProduct;
 
-        OutputArchive(OutputService<E> driverProduct) {
-            super(new DisconnectingOutputService<>(driverProduct));
+        OutputArchive(OutputContainer<E> driverProduct) {
+            super(new DisconnectingOutputContainer<>(driverProduct));
             this.driverProduct = driverProduct;
         }
 
-        OutputService<E> getDriverProduct() {
+        OutputContainer<E> getDriverProduct() {
             return driverProduct;
         }
 
@@ -559,28 +542,25 @@ abstract class TargetArchiveController<E extends FsArchiveEntry> extends FileSys
             return clutch().isOpen();
         }
 
-        DisconnectingOutputService<E> clutch() {
-            assert null != container;
-            return (DisconnectingOutputService<E>) container;
+        DisconnectingOutputContainer<E> clutch() {
+            return (DisconnectingOutputContainer<E>) getContainer();
         }
     }
 
-    private static final class DummyInputService<E extends Entry> implements InputService<E> {
+    private static final class DummyInputContainer<E extends Entry> implements InputContainer<E> {
 
-        @Override
-        public int size() {
+        private int size() {
             return 0;
         }
 
         @Override
-        public Iterator<E> iterator() {
-            return Collections.emptyIterator();
+        public Collection<E> entries() {
+            return Collections.emptyList();
         }
 
-        @Nullable
         @Override
-        public E entry(String name) {
-            return null;
+        public Optional<E> entry(String name) {
+            return Optional.empty();
         }
 
         @Override

@@ -4,7 +4,7 @@
  */
 /**
  * Provides the console based implementation of the interface
- * {@link global.namespace.truevfs.comp.key.spec.prompting.PromptingKey.View}.
+ * {@link global.namespace.truevfs.comp.key.api.prompting.PromptingKey.View}.
  *
  * @author Christian Schlichtherle
  */

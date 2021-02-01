@@ -4,8 +4,8 @@
  */
 package global.namespace.truevfs.comp.key.swing;
 
-import global.namespace.truevfs.comp.key.spec.common.AesKeyStrength;
-import global.namespace.truevfs.comp.key.spec.common.AesPbeParameters;
+import global.namespace.truevfs.comp.key.api.common.AesKeyStrength;
+import global.namespace.truevfs.comp.key.api.common.AesPbeParameters;
 
 /**
  * A Swing based user interface to prompt for passwords or key files.

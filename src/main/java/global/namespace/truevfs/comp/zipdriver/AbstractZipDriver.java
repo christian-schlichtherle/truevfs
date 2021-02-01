@@ -6,12 +6,12 @@ package global.namespace.truevfs.comp.zipdriver;
 
 import global.namespace.truevfs.comp.cio.Entry;
 import global.namespace.truevfs.comp.cio.Entry.Type;
-import global.namespace.truevfs.comp.cio.InputService;
+import global.namespace.truevfs.comp.cio.InputContainer;
 import global.namespace.truevfs.comp.cio.IoBufferPool;
-import global.namespace.truevfs.comp.cio.OutputService;
-import global.namespace.truevfs.comp.key.spec.KeyManagerMap;
-import global.namespace.truevfs.comp.key.spec.KeyProvider;
-import global.namespace.truevfs.comp.key.spec.sl.KeyManagerMapLocator;
+import global.namespace.truevfs.comp.cio.OutputContainer;
+import global.namespace.truevfs.comp.key.api.KeyManagerMap;
+import global.namespace.truevfs.comp.key.api.KeyProvider;
+import global.namespace.truevfs.comp.key.api.sl.KeyManagerMapLocator;
 import global.namespace.truevfs.comp.logging.LocalizedLogger;
 import global.namespace.truevfs.comp.shed.BitField;
 import global.namespace.truevfs.comp.shed.HashMaps;
@@ -20,7 +20,7 @@ import global.namespace.truevfs.comp.zip.ZipEntry;
 import global.namespace.truevfs.comp.zip.ZipFileParameters;
 import global.namespace.truevfs.comp.zip.ZipOutputStreamParameters;
 import global.namespace.truevfs.kernel.api.*;
-import global.namespace.truevfs.kernel.api.cio.MultiplexingOutputService;
+import global.namespace.truevfs.kernel.api.cio.MultiplexingOutputContainer;
 import global.namespace.truevfs.kernel.api.sl.IoBufferPoolLocator;
 import org.slf4j.Logger;
 
@@ -74,11 +74,11 @@ implements ZipOutputStreamParameters, ZipFileParameters<E> {
      */
     public KeyManagerMap getKeyManagerMap() { return KeyManagerMapLocator.SINGLETON; }
 
-    final @CheckForNull ZipCryptoParameters zipCryptoParameters(ZipInputService<E> input) {
+    final @CheckForNull ZipCryptoParameters zipCryptoParameters(ZipInputContainer<E> input) {
         return zipCryptoParameters(input.getModel(), input.getRawCharset());
     }
 
-    final @CheckForNull ZipCryptoParameters zipCryptoParameters(ZipOutputService<E> output) {
+    final @CheckForNull ZipCryptoParameters zipCryptoParameters(ZipOutputContainer<E> output) {
         return zipCryptoParameters(output.getModel(), output.getRawCharset());
     }
 
@@ -178,15 +178,15 @@ implements ZipOutputStreamParameters, ZipFileParameters<E> {
      * @param input the origin of the entry.
      * @return {@code entry.isEncrypted()}.
      */
-    public boolean check(E local, ZipInputService<E> input) {
+    public boolean check(E local, ZipInputContainer<E> input) {
         return local.isEncrypted();
     }
 
-    final boolean rdc(ZipInputService<E> input, E local, AbstractZipDriverEntry peer) {
+    final boolean rdc(ZipInputContainer<E> input, E local, AbstractZipDriverEntry peer) {
         return rdc(local, peer);
     }
 
-    final boolean rdc(ZipOutputService<E> output, E local, AbstractZipDriverEntry peer) {
+    final boolean rdc(ZipOutputContainer<E> output, E local, AbstractZipDriverEntry peer) {
         return rdc(peer, local);
     }
 
@@ -293,11 +293,11 @@ implements ZipOutputStreamParameters, ZipFileParameters<E> {
     public FsController decorate(FsController controller) { return new ZipKeyController(controller, this); }
 
     @Override
-    protected final ZipInputService<E> newInput(
+    protected final ZipInputContainer<E> newInput(
             final FsModel model,
             final FsInputSocketSource source)
     throws IOException {
-        final ZipInputService<E> zis = newZipInput(Objects.requireNonNull(model), source);
+        final ZipInputContainer<E> zis = newZipInput(Objects.requireNonNull(model), source);
         try {
             zis.recoverLostEntries();
         } catch (final IOException ex) {
@@ -309,19 +309,19 @@ implements ZipOutputStreamParameters, ZipFileParameters<E> {
         return zis;
     }
 
-    protected ZipInputService<E> newZipInput(FsModel model, FsInputSocketSource source) throws IOException {
-        return new ZipInputService<>(model, source, this);
+    protected ZipInputContainer<E> newZipInput(FsModel model, FsInputSocketSource source) throws IOException {
+        return new ZipInputContainer<>(model, source, this);
     }
 
     @Override
-    protected OutputService<E> newOutput(
+    protected OutputContainer<E> newOutput(
             FsModel model,
             FsOutputSocketSink sink,
-            final @CheckForNull InputService<E> input)
+            final @CheckForNull InputContainer<E> input)
     throws IOException {
-        final ZipInputService<E> zis = (ZipInputService<E>) input;
-        return new MultiplexingOutputService<>(getPool(),
-                new ZipOutputService<>(model, sink, zis, this));
+        final ZipInputContainer<E> zis = (ZipInputContainer<E>) input;
+        return new MultiplexingOutputContainer<>(getPool(),
+                new ZipOutputContainer<>(model, sink, zis, this));
     }
 
     /**

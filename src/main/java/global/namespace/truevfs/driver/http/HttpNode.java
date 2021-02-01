@@ -46,15 +46,17 @@ public class HttpNode extends FsAbstractNode implements IoEntry<HttpNode> {
     private final String name;
     protected final URI uri;
 
-    HttpNode(   final HttpController controller,
-                final FsNodeName name) {
+    HttpNode(final HttpController controller,
+             final FsNodeName name) {
         assert null != controller;
         this.controller = controller;
         this.name = name.toString();
         this.uri = controller.resolve(name).getUri();
     }
 
-    final IoBufferPool getPool() { return controller.getPool(); }
+    final IoBufferPool getPool() {
+        return controller.getPool();
+    }
 
     private HttpResponse executeHead() throws IOException {
         return controller.executeHead(this);
@@ -64,11 +66,16 @@ public class HttpNode extends FsAbstractNode implements IoEntry<HttpNode> {
         return controller.executeGet(this);
     }
 
-    protected HttpUriRequest newHead() { return new HttpHead(uri); }
+    protected HttpUriRequest newHead() {
+        return new HttpHead(uri);
+    }
 
-    protected HttpUriRequest newGet() { return new HttpGet(uri); }
+    protected HttpUriRequest newGet() {
+        return new HttpGet(uri);
+    }
 
-    private @CheckForNull String getHeaderField(String name) throws IOException {
+    private @CheckForNull
+    String getHeaderField(String name) throws IOException {
         final Header header = executeHead().getLastHeader(name);
         return null == header ? null : header.getValue();
     }
@@ -86,7 +93,9 @@ public class HttpNode extends FsAbstractNode implements IoEntry<HttpNode> {
     }
 
     @Override
-    public String getName() { return name; }
+    public String getName() {
+        return name;
+    }
 
     @Override
     public BitField<Type> getTypes() {
@@ -111,7 +120,7 @@ public class HttpNode extends FsAbstractNode implements IoEntry<HttpNode> {
             final String field = getHeaderField("content-length");
             if (null != field)
                 return Long.parseLong(field);
-        } catch (IOException ex) {
+        } catch (IOException ignored) {
         }
         return UNKNOWN;
     }
@@ -119,40 +128,53 @@ public class HttpNode extends FsAbstractNode implements IoEntry<HttpNode> {
     @Override
     @SuppressWarnings("deprecation")
     public long getTime(Access type) {
-        if (WRITE != type)
+        if (WRITE != type) {
             return UNKNOWN;
-        try {
-            final String field = getHeaderField("last-modified");
-            if (null != field)
-                return Date.parse(field);
-        } catch (IllegalArgumentException | IOException ex) {
-        }
-        return UNKNOWN;
-    }
-
-    @Override
-    public Boolean isPermitted(final Access type, final Entity entity) {
-        if (READ != type) return null;
-        try {
-            executeHead();
-            return true;
-        } catch (IOException ex) {
-            return false;
+        } else {
+            try {
+                final String field = getHeaderField("last-modified");
+                if (null != field) {
+                    return Date.parse(field);
+                }
+            } catch (IllegalArgumentException | IOException ignored) {
+            }
+            return UNKNOWN;
         }
     }
 
     @Override
-    public @Nullable Set<String> getMembers() { return null; }
+    public Optional<Boolean> isPermitted(final Access type, final Entity entity) {
+        if (READ != type) {
+            return Optional.empty();
+        } else {
+            try {
+                executeHead();
+                return Optional.of(true);
+            } catch (IOException ex) {
+                return Optional.of(false);
+            }
+        }
+    }
 
     @Override
-    public final InputSocket<HttpNode> input() { return input(NONE); }
+    public @Nullable
+    Set<String> getMembers() {
+        return null;
+    }
+
+    @Override
+    public final InputSocket<HttpNode> input() {
+        return input(NONE);
+    }
 
     protected InputSocket<HttpNode> input(BitField<FsAccessOption> options) {
         return new HttpInputSocket(options, this);
     }
 
     @Override
-    public final OutputSocket<HttpNode> output() { return output(NONE, Optional.empty()); }
+    public final OutputSocket<HttpNode> output() {
+        return output(NONE, Optional.empty());
+    }
 
     protected OutputSocket<HttpNode> output(
             BitField<FsAccessOption> options,

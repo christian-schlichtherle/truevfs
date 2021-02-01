@@ -4,7 +4,7 @@
  */
 package global.namespace.truevfs.comp.zipdriver;
 
-import global.namespace.truevfs.comp.key.spec.common.AesPbeParameters;
+import global.namespace.truevfs.comp.key.api.common.AesPbeParameters;
 import global.namespace.truevfs.comp.zip.ZipKeyException;
 import global.namespace.truevfs.kernel.api.FsController;
 

@@ -4,11 +4,11 @@
  */
 package global.namespace.truevfs.comp.key.console;
 
-import global.namespace.truevfs.comp.key.spec.KeyStrength;
-import global.namespace.truevfs.comp.key.spec.prompting.KeyPromptingDisabledException;
-import global.namespace.truevfs.comp.key.spec.prompting.PromptingKey;
-import global.namespace.truevfs.comp.key.spec.prompting.PromptingKey.Controller;
-import global.namespace.truevfs.comp.key.spec.prompting.PromptingPbeParameters;
+import global.namespace.truevfs.comp.key.api.KeyStrength;
+import global.namespace.truevfs.comp.key.api.prompting.KeyPromptingDisabledException;
+import global.namespace.truevfs.comp.key.api.prompting.PromptingKey;
+import global.namespace.truevfs.comp.key.api.prompting.PromptingKey.Controller;
+import global.namespace.truevfs.comp.key.api.prompting.PromptingPbeParameters;
 
 import java.io.Console;
 import java.io.PrintWriter;

@@ -6,9 +6,9 @@ package global.namespace.truevfs.kernel.api;
 
 import global.namespace.truevfs.comp.cio.Entry;
 import global.namespace.truevfs.comp.cio.Entry.Type;
-import global.namespace.truevfs.comp.cio.InputService;
+import global.namespace.truevfs.comp.cio.InputContainer;
 import global.namespace.truevfs.comp.cio.IoBufferPool;
-import global.namespace.truevfs.comp.cio.OutputService;
+import global.namespace.truevfs.comp.cio.OutputContainer;
 import global.namespace.truevfs.comp.shed.BitField;
 
 import javax.annotation.CheckForNull;
@@ -183,7 +183,7 @@ extends FsDriver {
      *         <em>transient false positive</em> archive file and does not
      *         get cached.
      */
-    public InputService<E> newInput(
+    public InputContainer<E> newInput(
             FsModel model,
             BitField<FsAccessOption> options,
             FsController controller,
@@ -203,7 +203,7 @@ extends FsDriver {
      * @throws IOException on any I/O error.
      * @see    #newInput(FsModel, BitField, FsController, FsNodeName)
      */
-    protected abstract InputService<E> newInput(
+    protected abstract InputContainer<E> newInput(
             FsModel model,
             FsInputSocketSource source)
     throws IOException;
@@ -214,7 +214,7 @@ extends FsDriver {
      * <p>
      * The implementation in {@link FsArchiveDriver} simply forwards the call
      * to {@link #sink}
-     * and {@link #newOutput(FsModel, FsOutputSocketSink, InputService)}.
+     * and {@link #newOutput(FsModel, FsOutputSocketSink, InputContainer)}.
      *
      * @param  model the file system model for the target archive file.
      * @param  options the options for accessing the target archive file in the
@@ -223,7 +223,7 @@ extends FsDriver {
      *         target archive file.
      * @param  name the node name of the target archive file in the parent
      *         file system.
-     * @param  input the nullable {@link InputService} for the target archive
+     * @param  input the nullable {@link InputContainer} for the target archive
      *         file.
      *         If not {@code null}, then the target archive file is going to
      *         get updated.
@@ -234,12 +234,12 @@ extends FsDriver {
      *         Note that this service does <em>not</em> need to be thread-safe!
      * @throws IOException on any I/O error.
      */
-    public OutputService<E> newOutput(
+    public OutputContainer<E> newOutput(
             FsModel model,
             BitField<FsAccessOption> options,
             FsController controller,
             FsNodeName name,
-            @CheckForNull InputService<E> input)
+            @CheckForNull InputContainer<E> input)
     throws IOException {
         return newOutput(model, sink(options, controller, name), input);
     }
@@ -250,7 +250,7 @@ extends FsDriver {
      *
      * @param  model the file system model.
      * @param  sink the sink for writing the target archive file.
-     * @param  input the nullable {@link InputService} for the target archive
+     * @param  input the nullable {@link InputContainer} for the target archive
      *         file.
      *         If not {@code null}, then the target archive file is going to
      *         get updated.
@@ -260,12 +260,12 @@ extends FsDriver {
      * @return A new output service for writing the target archive file.
      *         Note that this service does <em>not</em> need to be thread-safe!
      * @throws IOException on any I/O error.
-     * @see    #newOutput(FsModel, BitField, FsController, FsNodeName, InputService)
+     * @see    #newOutput(FsModel, BitField, FsController, FsNodeName, InputContainer)
      */
-    protected abstract OutputService<E> newOutput(
+    protected abstract OutputContainer<E> newOutput(
             FsModel model,
             FsOutputSocketSink sink,
-            @CheckForNull InputService<E> input)
+            @CheckForNull InputContainer<E> input)
     throws IOException;
 
     /**
@@ -306,7 +306,7 @@ extends FsDriver {
      *         driver.
      * @param  name the node name.
      * @return A sink for writing an artifact of this driver.
-     * @see    #newOutput(FsModel, BitField, FsController, FsNodeName, InputService)
+     * @see    #newOutput(FsModel, BitField, FsController, FsNodeName, InputContainer)
      */
     protected FsOutputSocketSink sink(
             BitField<FsAccessOption> options,

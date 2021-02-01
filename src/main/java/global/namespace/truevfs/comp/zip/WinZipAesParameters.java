@@ -4,7 +4,7 @@
  */
 package global.namespace.truevfs.comp.zip;
 
-import global.namespace.truevfs.comp.key.spec.common.AesKeyStrength;
+import global.namespace.truevfs.comp.key.api.common.AesKeyStrength;
 
 /**
  * The parameters of this interface are used with WinZip AES encrypted entries.

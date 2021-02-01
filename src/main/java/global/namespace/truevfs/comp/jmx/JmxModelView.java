@@ -208,8 +208,8 @@ public class JmxModelView<M extends FsModel> extends StandardMBean implements Jm
             }
 
             @Override
-            public Boolean isPermitted(Access type, Entity entity) {
-                return null;
+            public Optional<Boolean> isPermitted(Access type, Entity entity) {
+                return Optional.empty();
             }
         }
 

@@ -6,18 +6,18 @@ package global.namespace.truevfs.driver.zip.raes;
 
 import global.namespace.truevfs.comp.cio.Entry;
 import global.namespace.truevfs.comp.cio.Entry.Type;
-import global.namespace.truevfs.comp.cio.InputService;
-import global.namespace.truevfs.comp.cio.OutputService;
+import global.namespace.truevfs.comp.cio.InputContainer;
+import global.namespace.truevfs.comp.cio.OutputContainer;
 import global.namespace.truevfs.comp.shed.BitField;
 import global.namespace.truevfs.comp.zipdriver.JarDriver;
 import global.namespace.truevfs.comp.zipdriver.JarDriverEntry;
-import global.namespace.truevfs.comp.zipdriver.ZipInputService;
-import global.namespace.truevfs.comp.zipdriver.ZipOutputService;
+import global.namespace.truevfs.comp.zipdriver.ZipInputContainer;
+import global.namespace.truevfs.comp.zipdriver.ZipOutputContainer;
 import global.namespace.truevfs.driver.zip.raes.crypto.RaesOutputStream;
 import global.namespace.truevfs.driver.zip.raes.crypto.RaesParameters;
 import global.namespace.truevfs.driver.zip.raes.crypto.RaesReadOnlyChannel;
 import global.namespace.truevfs.kernel.api.*;
-import global.namespace.truevfs.kernel.api.cio.MultiplexingOutputService;
+import global.namespace.truevfs.kernel.api.cio.MultiplexingOutputContainer;
 
 import javax.annotation.CheckForNull;
 import java.io.IOException;
@@ -86,7 +86,7 @@ public abstract class ZipRaesDriver extends JarDriver {
     protected abstract long getAuthenticationTrigger();
 
     @Override
-    public final boolean check(JarDriverEntry local, ZipInputService<JarDriverEntry> input) {
+    public final boolean check(JarDriverEntry local, ZipInputContainer<JarDriverEntry> input) {
         // Optimization: If the cipher text alias the encrypted ZIP file is
         // smaller than the authentication trigger, then its entire cipher text
         // has already been authenticated by {@link ZipRaesDriver#zipInput}.
@@ -107,7 +107,7 @@ public abstract class ZipRaesDriver extends JarDriver {
     public FsController decorate(FsController controller) { return new ZipRaesKeyController(controller, this); }
 
     @Override
-    protected ZipInputService<JarDriverEntry> newZipInput(
+    protected ZipInputContainer<JarDriverEntry> newZipInput(
             final FsModel model,
             final FsInputSocketSource source)
     throws IOException {
@@ -132,18 +132,18 @@ public abstract class ZipRaesDriver extends JarDriver {
                 }
             }
         }
-        return new ZipInputService<>(model, new Source(), this);
+        return new ZipInputContainer<>(model, new Source(), this);
     }
 
     @Override
-    protected OutputService<JarDriverEntry> newOutput(
+    protected OutputContainer<JarDriverEntry> newOutput(
             final FsModel model,
             final FsOutputSocketSink sink,
-            final @CheckForNull InputService<JarDriverEntry> input)
+            final @CheckForNull InputContainer<JarDriverEntry> input)
     throws IOException {
-        final ZipInputService<JarDriverEntry> zis = (ZipInputService<JarDriverEntry>) input;
-        return new MultiplexingOutputService<>(getPool(),
-                new ZipOutputService<>(model, new RaesSocketSink(model, sink), zis, this));
+        final ZipInputContainer<JarDriverEntry> zis = (ZipInputContainer<JarDriverEntry>) input;
+        return new MultiplexingOutputContainer<>(getPool(),
+                new ZipOutputContainer<>(model, new RaesSocketSink(model, sink), zis, this));
     }
 
     @SuppressWarnings("PackageVisibleInnerClass")

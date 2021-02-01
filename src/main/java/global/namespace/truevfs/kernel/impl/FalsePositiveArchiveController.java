@@ -5,7 +5,9 @@
 package global.namespace.truevfs.kernel.impl;
 
 import bali.Cache;
-import global.namespace.truevfs.comp.cio.*;
+import global.namespace.truevfs.comp.cio.Entry;
+import global.namespace.truevfs.comp.cio.InputSocket;
+import global.namespace.truevfs.comp.cio.OutputSocket;
 import global.namespace.truevfs.comp.shed.BitField;
 import global.namespace.truevfs.comp.shed.ControlFlowException;
 import global.namespace.truevfs.kernel.api.*;
@@ -124,7 +126,7 @@ abstract class FalsePositiveArchiveController implements FsDelegatingController 
 
     @Override
     public InputSocket<? extends Entry> input(BitField<FsAccessOption> options, FsNodeName name) {
-        return new AbstractInputSocket<Entry>() {
+        return new InputSocket<Entry>() {
 
             FsController last;
             InputSocket<? extends Entry> socket;
@@ -138,8 +140,8 @@ abstract class FalsePositiveArchiveController implements FsDelegatingController 
             }
 
             @Override
-            public Entry target() throws IOException {
-                return apply(name, (c, n) -> socket(c, n).target());
+            public Entry getTarget() throws IOException {
+                return apply(name, (c, n) -> socket(c, n).getTarget());
             }
 
             @Override
@@ -160,7 +162,7 @@ abstract class FalsePositiveArchiveController implements FsDelegatingController 
             FsNodeName name,
             Optional<? extends Entry> template
     ) {
-        return new AbstractOutputSocket<Entry>() {
+        return new OutputSocket<Entry>() {
 
             FsController last;
             OutputSocket<? extends Entry> socket;
@@ -174,8 +176,8 @@ abstract class FalsePositiveArchiveController implements FsDelegatingController 
             }
 
             @Override
-            public Entry target() throws IOException {
-                return apply(name, (c, n) -> socket(c, n).target());
+            public Entry getTarget() throws IOException {
+                return apply(name, (c, n) -> socket(c, n).getTarget());
             }
 
             @Override

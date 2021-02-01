@@ -5,7 +5,7 @@
 package global.namespace.truevfs.comp.tardriver;
 
 import global.namespace.truevfs.comp.cio.IoBufferPool;
-import global.namespace.truevfs.kernel.api.FsArchiveDriverTestSuite;
+import global.namespace.truevfs.it.base.FsArchiveDriverTestSuite;
 import global.namespace.truevfs.kernel.api.FsTestConfig;
 
 /**

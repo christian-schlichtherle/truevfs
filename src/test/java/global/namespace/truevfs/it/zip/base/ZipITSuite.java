@@ -509,8 +509,7 @@ public abstract class ZipITSuite implements ZipEntryFactory<ZipEntry> {
             final byte[] buf = new byte[data1.length];
             for (int i = 0; i < 30; i++) {
                 final String name = i + ".txt";
-                final ZipEntry entry = zf.entry(name);
-                assertEquals(data1.length, entry.getSize());
+                assertEquals(data1.length, zf.entry(name).get().getSize());
                 try (InputStream in = zf.getInputStream(name)) {
                     int off = 0;
                     int read;

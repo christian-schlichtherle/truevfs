@@ -17,7 +17,7 @@ import static org.hamcrest.MatcherAssert.assertThat;
 /**
  * @author  Christian Schlichtherle
  */
-public class TFileSystemTest extends MockArchiveDriverTestBase {
+public final class TFileSystemTest extends MockArchiveDriverTestBase {
 
     @Test
     public void testNewFileSystem() throws IOException {

@@ -4,16 +4,17 @@
  */
 package global.namespace.truevfs.comp.key.swing;
 
-import global.namespace.truevfs.comp.key.spec.common.AesKeyStrength;
-import static global.namespace.truevfs.comp.key.spec.common.AesKeyStrength.*;
+import global.namespace.truevfs.comp.key.api.common.AesKeyStrength;
 import global.namespace.truevfs.comp.key.swing.util.JemmyUtils;
 import org.junit.After;
-import static org.junit.Assert.assertSame;
-import static org.junit.Assert.fail;
 import org.junit.Before;
 import org.junit.Test;
 import org.netbeans.jemmy.operators.JComboBoxOperator;
 import org.netbeans.jemmy.operators.JFrameOperator;
+
+import static global.namespace.truevfs.comp.key.api.common.AesKeyStrength.*;
+import static org.junit.Assert.assertSame;
+import static org.junit.Assert.fail;
 
 /**
  * @author  Christian Schlichtherle

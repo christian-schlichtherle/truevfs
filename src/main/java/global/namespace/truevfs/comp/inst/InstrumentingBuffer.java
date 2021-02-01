@@ -15,8 +15,7 @@ import java.util.Objects;
  * @param  <M> the type of the mediator.
  * @author Christian Schlichtherle
  */
-public class InstrumentingBuffer<M extends Mediator<M>>
-extends DecoratingIoBuffer {
+public class InstrumentingBuffer<M extends Mediator<M>> extends DecoratingIoBuffer {
 
     protected final M mediator;
 

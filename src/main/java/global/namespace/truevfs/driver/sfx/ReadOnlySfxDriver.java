@@ -4,8 +4,8 @@
  */
 package global.namespace.truevfs.driver.sfx;
 
-import global.namespace.truevfs.comp.cio.InputService;
-import global.namespace.truevfs.comp.cio.OutputService;
+import global.namespace.truevfs.comp.cio.InputContainer;
+import global.namespace.truevfs.comp.cio.OutputContainer;
 import global.namespace.truevfs.comp.shed.BitField;
 import global.namespace.truevfs.comp.zipdriver.ZipDriver;
 import global.namespace.truevfs.comp.zipdriver.ZipDriverEntry;
@@ -56,12 +56,12 @@ public class ReadOnlySfxDriver extends ZipDriver {
     }
 
     @Override
-    public final OutputService<ZipDriverEntry> newOutput(
+    public final OutputContainer<ZipDriverEntry> newOutput(
             FsModel model,
             BitField<FsAccessOption> options,
             FsController controller,
             FsNodeName name,
-            @CheckForNull InputService<ZipDriverEntry> input)
+            @CheckForNull InputContainer<ZipDriverEntry> input)
     throws IOException {
         throw new FsReadOnlyFileSystemException(model.getMountPoint());
     }

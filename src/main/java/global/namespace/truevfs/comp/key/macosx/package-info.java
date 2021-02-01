@@ -5,7 +5,7 @@
 /**
  * Provides the
  * {@link global.namespace.truevfs.comp.key.macosx.OsxAesPbeKeyManagerMapModifier} for
- * persisting {@link global.namespace.truevfs.comp.key.spec.common.AesPbeParameters}
+ * persisting {@link global.namespace.truevfs.comp.key.api.common.AesPbeParameters}
  * with Apple's Keychain Services API.
  *
  * @author Christian Schlichtherle

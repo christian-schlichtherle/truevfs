@@ -4,7 +4,7 @@
  */
 package global.namespace.truevfs.comp.key.swing;
 
-import global.namespace.truevfs.comp.key.spec.KeyStrength;
+import global.namespace.truevfs.comp.key.api.KeyStrength;
 import global.namespace.truevfs.comp.key.swing.util.EnhancedPanel;
 
 import javax.swing.*;

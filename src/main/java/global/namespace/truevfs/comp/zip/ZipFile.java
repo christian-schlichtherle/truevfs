@@ -18,6 +18,7 @@ import java.nio.charset.Charset;
 import java.nio.file.Path;
 import java.util.Enumeration;
 import java.util.Iterator;
+import java.util.Optional;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 import java.util.zip.ZipException;
@@ -253,13 +254,11 @@ public class ZipFile extends AbstractZipFile<ZipEntry> {
      *         if no entry with this name exists in this ZIP file.
      */
     @Override
-    public ZipEntry entry(String name) {
-        final ZipEntry ze = super.entry(name);
-        return ze != null ? ze.clone() : null;
+    public Optional<ZipEntry> entry(String name) {
+        return super.entry(name).map(ZipEntry::clone);
     }
 
     @Override
-    @SuppressWarnings("deprecation")
     public InputStream getPreambleInputStream() throws IOException {
         final InputStream in;
         lock.lock();
@@ -272,7 +271,6 @@ public class ZipFile extends AbstractZipFile<ZipEntry> {
     }
 
     @Override
-    @SuppressWarnings("deprecation")
     public InputStream getPostambleInputStream() throws IOException {
         final InputStream in;
         lock.lock();
@@ -311,10 +309,7 @@ public class ZipFile extends AbstractZipFile<ZipEntry> {
     }
 
     @Override
-    @SuppressWarnings("deprecation")
-    protected InputStream getInputStream(
-            String name, Boolean check, boolean process)
-    throws  IOException {
+    protected InputStream getInputStream(String name, Boolean check, boolean process) throws  IOException {
         final InputStream in;
         lock.lock();
         try {

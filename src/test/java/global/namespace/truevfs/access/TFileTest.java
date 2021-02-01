@@ -6,8 +6,6 @@ package global.namespace.truevfs.access;
 
 import global.namespace.truevfs.kernel.api.FsNodePath;
 import org.junit.Test;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.io.IOException;
@@ -27,9 +25,6 @@ import static org.junit.Assert.*;
  * @author  Christian Schlichtherle
  */
 public final class TFileTest extends MockArchiveDriverTestBase {
-
-    private static final Logger
-            logger = LoggerFactory.getLogger(TFileTest.class);
 
     private TFile archive;
 

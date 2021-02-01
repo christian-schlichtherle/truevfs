@@ -16,8 +16,7 @@ import java.io.IOException;
  * @param  <M> the type of the JMX mediator.
  * @author Christian Schlichtherle
  */
-public class JmxBuffer<M extends JmxMediator<M>>
-extends InstrumentingBuffer<M> implements JmxComponent {
+public class JmxBuffer<M extends JmxMediator<M>> extends InstrumentingBuffer<M> implements JmxComponent {
 
     public JmxBuffer(M mediator, IoBuffer entry) {
         super(mediator, entry);

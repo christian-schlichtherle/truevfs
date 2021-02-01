@@ -10,7 +10,6 @@ import global.namespace.truevfs.comp.cio.Entry.Type;
 import global.namespace.truevfs.comp.cio.InputSocket;
 import global.namespace.truevfs.comp.cio.OutputSocket;
 import global.namespace.truevfs.comp.shed.BitField;
-import global.namespace.truevfs.comp.shed.ImplementationsShouldExtend;
 
 import java.io.IOException;
 import java.lang.annotation.Inherited;
@@ -71,7 +70,6 @@ import static global.namespace.truevfs.kernel.api.FsAssertion.Level.*;
  * @see <a href="http://www.ietf.org/rfc/rfc2119.txt">RFC 2119: Key words for use in RFCs to Indicate Requirement Levels</a>
  */
 @SuppressWarnings("OptionalUsedAsFieldOrParameterType")
-@ImplementationsShouldExtend(FsAbstractController.class)
 public interface FsController {
 
     /**
@@ -104,10 +102,7 @@ public interface FsController {
      * @throws IOException on any I/O error.
      */
     @FsAssertion(atomic = YES, consistent = YES, isolated = YES, durable = NOT_APPLICABLE)
-    Optional<? extends FsNode> node(
-            BitField<FsAccessOption> options,
-            FsNodeName name)
-            throws IOException;
+    Optional<? extends FsNode> node(BitField<FsAccessOption> options, FsNodeName name) throws IOException;
 
     /**
      * Checks if the file system node for the given {@code name} exists when
@@ -120,11 +115,7 @@ public interface FsController {
      * @throws IOException on any I/O error.
      */
     @FsAssertion(atomic = YES, consistent = YES, isolated = YES, durable = NOT_APPLICABLE)
-    void checkAccess(
-            BitField<FsAccessOption> options,
-            FsNodeName name,
-            BitField<Access> types)
-            throws IOException;
+    void checkAccess(BitField<FsAccessOption> options, FsNodeName name, BitField<Access> types) throws IOException;
 
     /**
      * Sets the named file system node as read-only.
@@ -137,8 +128,7 @@ public interface FsController {
      *                     supported.
      */
     @FsAssertion(atomic = YES, consistent = YES, isolated = YES)
-    void setReadOnly(BitField<FsAccessOption> options, FsNodeName name)
-            throws IOException;
+    void setReadOnly(BitField<FsAccessOption> options, FsNodeName name) throws IOException;
 
     /**
      * Makes an attempt to set the last access time of all types in the given
@@ -158,11 +148,7 @@ public interface FsController {
      *                              {@code null}.
      */
     @FsAssertion(atomic = NO, consistent = YES, isolated = YES)
-    boolean setTime(
-            BitField<FsAccessOption> options,
-            FsNodeName name,
-            Map<Access, Long> times)
-            throws IOException;
+    boolean setTime(BitField<FsAccessOption> options, FsNodeName name, Map<Access, Long> times) throws IOException;
 
     /**
      * Makes an attempt to set the last access time of all types in the given
@@ -183,8 +169,8 @@ public interface FsController {
             BitField<FsAccessOption> options,
             FsNodeName name,
             BitField<Access> types,
-            long value)
-            throws IOException;
+            long value
+    ) throws IOException;
 
     /**
      * Returns an input socket for reading the contents of the file system
@@ -197,9 +183,7 @@ public interface FsController {
      * @return An {@code InputSocket}.
      */
     @FsAssertion(atomic = YES, consistent = YES, isolated = YES, durable = NOT_APPLICABLE)
-    InputSocket<? extends Entry> input(
-            BitField<FsAccessOption> options,
-            FsNodeName name);
+    InputSocket<? extends Entry> input(BitField<FsAccessOption> options, FsNodeName name);
 
     /**
      * Returns an output socket for writing the contents of the node addressed
@@ -221,7 +205,8 @@ public interface FsController {
     OutputSocket<? extends Entry> output(
             BitField<FsAccessOption> options,
             FsNodeName name,
-            Optional<? extends Entry> template);
+            Optional<? extends Entry> template
+    );
 
     /**
      * Creates or replaces and finally links a chain of one or more entries
@@ -256,8 +241,8 @@ public interface FsController {
             BitField<FsAccessOption> options,
             FsNodeName name,
             Type type,
-            Optional<? extends Entry> template)
-            throws IOException;
+            Optional<? extends Entry> template
+    ) throws IOException;
 
     /**
      * Removes the named file system node from the file system.
@@ -268,8 +253,7 @@ public interface FsController {
      * @throws IOException on any I/O error.
      */
     @FsAssertion(atomic = YES, consistent = YES, isolated = YES)
-    void unlink(BitField<FsAccessOption> options, FsNodeName name)
-            throws IOException;
+    void unlink(BitField<FsAccessOption> options, FsNodeName name) throws IOException;
 
     /**
      * Commits all unsynchronized changes to the contents of this file system
@@ -319,9 +303,6 @@ public interface FsController {
          * @param parent  the nullable parent file system controller.
          * @return A new file system controller for the mount point of the given file system model.
          */
-        FsController newController(
-                Context context,
-                FsModel model,
-                Optional<? extends FsController> parent);
+        FsController newController(Context context, FsModel model, Optional<? extends FsController> parent);
     }
 }

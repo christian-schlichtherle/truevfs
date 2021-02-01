@@ -6,15 +6,15 @@ package global.namespace.truevfs.it.zip;
 
 import global.namespace.truevfs.access.TConfig;
 import global.namespace.truevfs.access.TFile;
-import global.namespace.truevfs.comp.key.spec.prompting.TestView.Action;
+import global.namespace.truevfs.comp.key.api.prompting.TestView.Action;
 import global.namespace.truevfs.comp.zipdriver.TestWinZipAesDriver;
 import global.namespace.truevfs.it.base.TFileITSuite;
 import org.junit.Test;
 
 import java.io.IOException;
 
-import static global.namespace.truevfs.comp.key.spec.prompting.TestView.Action.CANCEL;
-import static global.namespace.truevfs.comp.key.spec.prompting.TestView.Action.ENTER;
+import static global.namespace.truevfs.comp.key.api.prompting.TestView.Action.CANCEL;
+import static global.namespace.truevfs.comp.key.api.prompting.TestView.Action.ENTER;
 import static global.namespace.truevfs.kernel.api.FsAccessOption.ENCRYPT;
 import static org.junit.Assert.*;
 

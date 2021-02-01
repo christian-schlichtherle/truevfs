@@ -10,36 +10,29 @@ import java.nio.channels.SeekableByteChannel;
 import java.util.Optional;
 
 /**
- * Delegates all methods to another output socket.
+ * Forwards all calls to another output socket.
  * <p>
  * Implementations should be immutable.
  *
- * @param <E> the type of the {@linkplain #target() target entry} for I/O operations.
+ * @param <E> the type of the {@linkplain #getTarget() target entry} for I/O operations.
  * @author Christian Schlichtherle
  * @see DelegatingInputSocket
  */
-public abstract class DelegatingOutputSocket<E extends Entry> extends AbstractOutputSocket<E> {
+public interface DelegatingOutputSocket<E extends Entry> extends DelegatingIoSocket<E>, OutputSocket<E> {
 
     /**
      * Returns the delegate output socket.
-     *
-     * @return The delegate output socket.
-     * @throws IOException on any I/O error.
      */
-    protected abstract OutputSocket<? extends E> socket() throws IOException;
+    @Override
+    OutputSocket<? extends E> getSocket();
 
     @Override
-    public E target() throws IOException {
-        return socket().target();
+    default OutputStream stream(Optional<? extends InputSocket<? extends Entry>> peer) throws IOException {
+        return getSocket().stream(peer);
     }
 
     @Override
-    public OutputStream stream(Optional<? extends InputSocket<? extends Entry>> peer) throws IOException {
-        return socket().stream(peer);
-    }
-
-    @Override
-    public SeekableByteChannel channel(Optional<? extends InputSocket<? extends Entry>> peer) throws IOException {
-        return socket().channel(peer);
+    default SeekableByteChannel channel(Optional<? extends InputSocket<? extends Entry>> peer) throws IOException {
+        return getSocket().channel(peer);
     }
 }

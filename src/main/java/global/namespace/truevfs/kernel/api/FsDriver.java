@@ -4,8 +4,6 @@
  */
 package global.namespace.truevfs.kernel.api;
 
-import global.namespace.truevfs.comp.shed.UniqueObject;
-
 import java.util.Optional;
 
 /**
@@ -16,9 +14,7 @@ import java.util.Optional;
  * @see    FsCompositeDriver
  * @author Christian Schlichtherle
  */
-public abstract class FsDriver
-        extends UniqueObject
-        implements FsModel.Factory<FsManager>, FsController.Factory<FsManager> {
+public abstract class FsDriver implements FsModel.Factory<FsManager>, FsController.Factory<FsManager> {
 
     /**
      * Returns {@code true} if and only if this is an archive driver, that is,

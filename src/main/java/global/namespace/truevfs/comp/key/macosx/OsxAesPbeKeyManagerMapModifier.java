@@ -5,9 +5,9 @@
 package global.namespace.truevfs.comp.key.macosx;
 
 import global.namespace.service.wight.annotation.ServiceImplementation;
-import global.namespace.truevfs.comp.key.spec.KeyManager;
-import global.namespace.truevfs.comp.key.spec.common.AesPbeParameters;
-import global.namespace.truevfs.comp.key.spec.spi.KeyManagerMapModifier;
+import global.namespace.truevfs.comp.key.api.KeyManager;
+import global.namespace.truevfs.comp.key.api.common.AesPbeParameters;
+import global.namespace.truevfs.comp.key.api.spi.KeyManagerMapModifier;
 
 import java.util.Map;
 import java.util.ServiceConfigurationError;

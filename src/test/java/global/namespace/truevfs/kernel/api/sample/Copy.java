@@ -84,7 +84,7 @@ public final class Copy {
                     .controller(driver, dstPath.getMountPoint().get())
                     .output(BitField.of(CREATE_PARENTS, EXCLUSIVE),
                             dstPath.getNodeName(),
-                            Optional.of(srcSocket.target()));
+                            Optional.of(srcSocket.getTarget()));
             IoSockets.copy(srcSocket, dstSocket);
         } finally {
             // Commit all unsynchronized changes to the contents of federated

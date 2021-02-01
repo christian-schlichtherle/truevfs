@@ -6,7 +6,7 @@ package global.namespace.truevfs.driver.zip.raes.crypto;
 
 import global.namespace.truevfs.comp.io.LittleEndianOutputStream;
 import global.namespace.truevfs.comp.io.Sink;
-import global.namespace.truevfs.comp.key.spec.common.AesKeyStrength;
+import global.namespace.truevfs.comp.key.api.common.AesKeyStrength;
 import global.namespace.truevfs.comp.zip.crypto.BufferedPartialBlockCipher;
 import global.namespace.truevfs.comp.zip.crypto.CipherOutputStream;
 import global.namespace.truevfs.comp.zip.crypto.CtrBlockCipher;

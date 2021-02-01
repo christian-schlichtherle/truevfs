@@ -4,7 +4,7 @@
  */
 package global.namespace.truevfs.comp.key.swing;
 
-import global.namespace.truevfs.comp.key.spec.prompting.PromptingPbeParameters;
+import global.namespace.truevfs.comp.key.api.prompting.PromptingPbeParameters;
 import global.namespace.truevfs.comp.key.swing.feedback.Feedback;
 import global.namespace.truevfs.comp.key.swing.util.EnhancedPanel;
 import global.namespace.truevfs.comp.key.swing.util.PanelEvent;

@@ -5,11 +5,11 @@
 package global.namespace.truevfs.access;
 
 import global.namespace.truevfs.kernel.api.FsMountPoint;
+import lombok.val;
 import org.junit.Test;
 
 import java.io.IOException;
 import java.net.URI;
-import java.nio.file.Path;
 import java.nio.file.Paths;
 
 import static global.namespace.truevfs.kernel.api.FsUriModifier.CANONICALIZE;
@@ -21,7 +21,7 @@ import static org.junit.Assert.fail;
 /**
  * @author  Christian Schlichtherle
  */
-public class TFileSystemProviderTest extends MockArchiveDriverTestBase {
+public final class TFileSystemProviderTest extends MockArchiveDriverTestBase {
 
     private TFileSystemProvider provider;
 
@@ -30,14 +30,14 @@ public class TFileSystemProviderTest extends MockArchiveDriverTestBase {
         super.setUp();
         try {
             provider = TFileSystemProvider.class.getDeclaredConstructor().newInstance();
-        } catch (Exception ex) {
-            throw new AssertionError(ex);
+        } catch (Exception e) {
+            throw new AssertionError(e);
         }
     }
 
     @Test
     public void testNewFileSystemFromPath() {
-        for (final Object[] params : new Object[][] {
+        for (val params : new Object[][] {
             // $first, $more, $mountPoint
             { "foo.mok", new String[] { "x", "bar.mok", "y" }, "mok:mok:" + CURRENT_DIRECTORY + "foo.mok!/x/bar.mok!/" },
             { "foo.mok", new String[] { "bar.mok" }, "mok:mok:" + CURRENT_DIRECTORY + "foo.mok!/bar.mok!/" },
@@ -46,17 +46,19 @@ public class TFileSystemProviderTest extends MockArchiveDriverTestBase {
             { "foo", new String[] { "x" }, null },
             { "foo", NO_STRINGS, null },
         }) {
-            final String first = params[0].toString();
-            final String[] more = (String[]) params[1];
-            final Path path = Paths.get(first, more);
-            final FsMountPoint mountPoint = null == params[2]
+            val first = params[0].toString();
+            val more = (String[]) params[1];
+            val path = Paths.get(first, more);
+            val mountPoint = null == params[2]
                     ? null
                     : FsMountPoint.create(URI.create(params[2].toString()), CANONICALIZE);
             try {
-                final TFileSystem fs = provider.newFileSystem(path, getEnvironment());
-                if (null == mountPoint) fail();
+                val fs = provider.newFileSystem(path, getEnvironment());
+                if (null == mountPoint) {
+                    fail();
+                }
                 assertThat(fs.getMountPoint(), is(mountPoint));
-                for (final String entry : new String[] {
+                for (val entry : new String[] {
                     "",
                     "foo",
                     "/",
@@ -64,15 +66,17 @@ public class TFileSystemProviderTest extends MockArchiveDriverTestBase {
                 }) {
                     assertThat(fs.getPath(entry).getFileSystem(), sameInstance(fs));
                 }
-            } catch (final UnsupportedOperationException ex) {
-                if (null != mountPoint) throw ex;
+            } catch (final UnsupportedOperationException e) {
+                if (null != mountPoint) {
+                    throw e;
+                }
             }
         }
     }
 
     @Test
     public void testNewFileSystemFromUri() {
-        for (final String[] params : new String[][] {
+        for (val params : new String[][] {
             // $uri, $mountPoint
             { provider.getScheme() + ":/foo.mok/x/bar.mok/y/", "mok:mok:" + ROOT_DIRECTORY + "foo.mok!/x/bar.mok!/" },
             { provider.getScheme() + ":/foo.mok/x/bar.mok/y", "mok:mok:" + ROOT_DIRECTORY + "foo.mok!/x/bar.mok!/" },
@@ -90,45 +94,42 @@ public class TFileSystemProviderTest extends MockArchiveDriverTestBase {
             { provider.getScheme() + ":/x", ROOT_DIRECTORY.toString() },
             { provider.getScheme() + ":/", ROOT_DIRECTORY.toString() },
         }) {
-            final URI uri = URI.create(params[0]);
-            final FsMountPoint mountPoint = FsMountPoint.create(URI.create(params[1]));
-            try {
-                final TFileSystem fs = provider.newFileSystem(uri, getEnvironment());
-                if (null == mountPoint) fail();
-                assertThat(fs.getMountPoint(), is(mountPoint));
-                for (final String entry : new String[] {
-                    "",
-                    "foo",
-                    "/",
-                    "/foo",
-                }) {
-                    assertThat(fs.getPath(entry).getFileSystem(), sameInstance(fs));
-                }
-            } catch (final UnsupportedOperationException ex) {
-                if (null != mountPoint) throw ex;
+            val uri = URI.create(params[0]);
+            val mountPoint = FsMountPoint.create(URI.create(params[1]));
+            val fs = provider.newFileSystem(uri, getEnvironment());
+            assertThat(fs.getMountPoint(), is(mountPoint));
+            for (val entry : new String[] {
+                "",
+                "foo",
+                "/",
+                "/foo",
+            }) {
+                assertThat(fs.getPath(entry).getFileSystem(), sameInstance(fs));
             }
         }
     }
 
     @Test
     public void testGetPath() {
-        for (final Object[] params : new Object[][] {
+        for (val params : new Object[][] {
             // $uri, $succeeds
             { "", false },
             { "/", false },
             { "file:/", false },
             { "tpath:/", true },
         }) {
-            final URI uri = URI.create(params[0].toString());
-            final boolean succeeds = (Boolean) params[1];
+            val uri = URI.create(params[0].toString());
+            val succeeds = (Boolean) params[1];
             TPath path;
             try {
                 path = provider.getPath(uri);
-                if (!succeeds)
+                if (!succeeds) {
                     fail();
-            } catch (IllegalArgumentException ex) {
-                if (succeeds)
-                    throw ex;
+                }
+            } catch (final IllegalArgumentException e) {
+                if (succeeds) {
+                    throw e;
+                }
                 return;
             }
             assertThat(path.getFileSystem().provider(), sameInstance(provider));

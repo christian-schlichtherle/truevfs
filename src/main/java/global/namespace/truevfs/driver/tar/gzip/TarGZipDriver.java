@@ -4,18 +4,18 @@
  */
 package global.namespace.truevfs.driver.tar.gzip;
 
-import global.namespace.truevfs.comp.cio.InputService;
-import global.namespace.truevfs.comp.cio.OutputService;
+import global.namespace.truevfs.comp.cio.InputContainer;
+import global.namespace.truevfs.comp.cio.OutputContainer;
 import global.namespace.truevfs.comp.io.AbstractSink;
 import global.namespace.truevfs.comp.io.AbstractSource;
 import global.namespace.truevfs.comp.io.Streams;
 import global.namespace.truevfs.comp.shed.BitField;
 import global.namespace.truevfs.comp.tardriver.TarDriver;
 import global.namespace.truevfs.comp.tardriver.TarDriverEntry;
-import global.namespace.truevfs.comp.tardriver.TarInputService;
-import global.namespace.truevfs.comp.tardriver.TarOutputService;
+import global.namespace.truevfs.comp.tardriver.TarInputContainer;
+import global.namespace.truevfs.comp.tardriver.TarOutputContainer;
 import global.namespace.truevfs.kernel.api.*;
-import global.namespace.truevfs.kernel.api.cio.MultiplexingOutputService;
+import global.namespace.truevfs.kernel.api.cio.MultiplexingOutputContainer;
 
 import javax.annotation.CheckForNull;
 import java.io.IOException;
@@ -62,7 +62,7 @@ public class TarGZipDriver extends TarDriver {
     }
 
     @Override
-    protected InputService<TarDriverEntry> newInput(
+    protected InputContainer<TarDriverEntry> newInput(
             final FsModel model,
             final FsInputSocketSource source)
             throws IOException {
@@ -85,14 +85,14 @@ public class TarGZipDriver extends TarDriver {
             }
         }
 
-        return new TarInputService(model, new Source(), this);
+        return new TarInputContainer(model, new Source(), this);
     }
 
     @Override
-    protected OutputService<TarDriverEntry> newOutput(
+    protected OutputContainer<TarDriverEntry> newOutput(
             final FsModel model,
             final FsOutputSocketSink sink,
-            final @CheckForNull InputService<TarDriverEntry> input)
+            final @CheckForNull InputContainer<TarDriverEntry> input)
             throws IOException {
 
         class Sink extends AbstractSink {
@@ -113,7 +113,7 @@ public class TarGZipDriver extends TarDriver {
             }
         }
 
-        return new MultiplexingOutputService<>(getPool(), new TarOutputService(model, new Sink(), this));
+        return new MultiplexingOutputContainer<>(getPool(), new TarOutputContainer(model, new Sink(), this));
     }
 
     /**

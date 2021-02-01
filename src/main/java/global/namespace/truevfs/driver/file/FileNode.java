@@ -65,8 +65,9 @@ class FileNode extends FsAbstractNode implements IoBuffer {
 
     final FileNode createIoBuffer() throws IOException {
         FileBufferPool pool = this.pool;
-        if (null == pool)
+        if (null == pool) {
             this.pool = pool = new FileBufferPool(getParent(), getFileName());
+        }
         return pool.allocate();
     }
 
@@ -81,9 +82,13 @@ class FileNode extends FsAbstractNode implements IoBuffer {
         return null != path ? path.toString() : "";
     }
 
-    @Override public void release() throws IOException { }
+    @Override
+    public void release() throws IOException {
+    }
 
-    /** Returns the decorated file. */
+    /**
+     * Returns the decorated file.
+     */
     final Path getPath() {
         return path;
     }
@@ -97,10 +102,10 @@ class FileNode extends FsAbstractNode implements IoBuffer {
     public final BitField<Type> getTypes() {
         try {
             final BasicFileAttributes attr = readBasicFileAttributes();
-            if      (attr.isRegularFile())  return FILE_TYPE;
-            else if (attr.isDirectory())    return DIRECTORY_TYPE;
+            if (attr.isRegularFile()) return FILE_TYPE;
+            else if (attr.isDirectory()) return DIRECTORY_TYPE;
             else if (attr.isSymbolicLink()) return SYMLINK_TYPE;
-            else if (attr.isOther())        return SPECIAL_TYPE;
+            else if (attr.isOther()) return SPECIAL_TYPE;
         } catch (IOException ignore) {
             // This doesn't exist or may be inaccessible. In either case...
         }
@@ -111,10 +116,14 @@ class FileNode extends FsAbstractNode implements IoBuffer {
     public final boolean isType(final Type type) {
         try {
             switch (type) {
-            case FILE:      return readBasicFileAttributes().isRegularFile();
-            case DIRECTORY: return readBasicFileAttributes().isDirectory();
-            case SYMLINK:   return readBasicFileAttributes().isSymbolicLink();
-            case SPECIAL:   return readBasicFileAttributes().isOther();
+                case FILE:
+                    return readBasicFileAttributes().isRegularFile();
+                case DIRECTORY:
+                    return readBasicFileAttributes().isDirectory();
+                case SYMLINK:
+                    return readBasicFileAttributes().isSymbolicLink();
+                case SPECIAL:
+                    return readBasicFileAttributes().isOther();
             }
         } catch (IOException ignored) {
         }
@@ -136,9 +145,12 @@ class FileNode extends FsAbstractNode implements IoBuffer {
         try {
             final BasicFileAttributes attr = readBasicFileAttributes();
             switch (type) {
-            case CREATE: return attr.creationTime().toMillis();
-            case READ:   return attr.lastAccessTime().toMillis();
-            case WRITE:  return attr.lastModifiedTime().toMillis();
+                case CREATE:
+                    return attr.creationTime().toMillis();
+                case READ:
+                    return attr.lastAccessTime().toMillis();
+                case WRITE:
+                    return attr.lastModifiedTime().toMillis();
             }
         } catch (IOException ignore) {
             // This doesn't exist or may be inaccessible. In either case...
@@ -147,40 +159,51 @@ class FileNode extends FsAbstractNode implements IoBuffer {
     }
 
     @Override
-    public Boolean isPermitted(final Access type, final Entity entity) {
-        if (!(entity instanceof PosixEntity)) return null;
-        try {
-            final Set<PosixFilePermission> permissions = getPosixFilePermissions(path);
-            switch ((PosixEntity) entity) {
-            case USER:
-                switch (type) {
-                case READ:    return permissions.contains(OWNER_READ);
-                case WRITE:   return permissions.contains(OWNER_WRITE);
-                case EXECUTE: return permissions.contains(OWNER_EXECUTE);
+    public Optional<Boolean> isPermitted(final Access type, final Entity entity) {
+        if (entity instanceof PosixEntity) {
+            try {
+                final Set<PosixFilePermission> permissions = getPosixFilePermissions(path);
+                switch ((PosixEntity) entity) {
+                    case USER:
+                        switch (type) {
+                            case READ:
+                                return Optional.of(permissions.contains(OWNER_READ));
+                            case WRITE:
+                                return Optional.of(permissions.contains(OWNER_WRITE));
+                            case EXECUTE:
+                                return Optional.of(permissions.contains(OWNER_EXECUTE));
+                        }
+                        break;
+                    case GROUP:
+                        switch (type) {
+                            case READ:
+                                return Optional.of(permissions.contains(GROUP_READ));
+                            case WRITE:
+                                return Optional.of(permissions.contains(GROUP_WRITE));
+                            case EXECUTE:
+                                return Optional.of(permissions.contains(GROUP_EXECUTE));
+                        }
+                        break;
+                    case OTHER:
+                        switch (type) {
+                            case READ:
+                                return Optional.of(permissions.contains(OTHERS_READ));
+                            case WRITE:
+                                return Optional.of(permissions.contains(OTHERS_WRITE));
+                            case EXECUTE:
+                                return Optional.of(permissions.contains(OTHERS_EXECUTE));
+                        }
                 }
-                break;
-            case GROUP:
-                switch (type) {
-                case READ:    return permissions.contains(GROUP_READ);
-                case WRITE:   return permissions.contains(GROUP_WRITE);
-                case EXECUTE: return permissions.contains(GROUP_EXECUTE);
-                }
-                break;
-            case OTHER:
-                switch (type) {
-                case READ:    return permissions.contains(OTHERS_READ);
-                case WRITE:   return permissions.contains(OTHERS_WRITE);
-                case EXECUTE: return permissions.contains(OTHERS_EXECUTE);
-                }
+            } catch (UnsupportedOperationException | IOException ignore) {
+                // Unsupported, doesn't exist or inaccessible. In either case...
             }
-        } catch (UnsupportedOperationException | IOException ignore) {
-            // Unsupported, doesn't exist or inaccessible. In either case...
         }
-        return null;
+        return Optional.empty();
     }
 
     @Override
-    public final @Nullable Set<String> getMembers() {
+    public final @Nullable
+    Set<String> getMembers() {
         try {
             try (final DirectoryStream<Path> stream = newDirectoryStream(path)) {
                 final Set<String> result = new LinkedHashSet<>();
@@ -208,9 +231,7 @@ class FileNode extends FsAbstractNode implements IoBuffer {
         return output(NONE, Optional.empty());
     }
 
-    final OutputSocket<FileNode> output(
-            BitField<FsAccessOption> options,
-            Optional<? extends Entry> template) {
+    final OutputSocket<FileNode> output(BitField<FsAccessOption> options, Optional<? extends Entry> template) {
         return new FileOutputSocket(options, this, template);
     }
 }

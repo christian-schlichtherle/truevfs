@@ -82,9 +82,9 @@ class AspectControllerSpec extends AnyWordSpec {
       "input(**)" when calling {
 
         "target()" in new Fixture2 {
-          socket.target
+          socket.getTarget
           verify(controller).apply(any)
-          verify(delegateSocket).target
+          verify(delegateSocket).getTarget
         }
 
         "stream(*)" in new Fixture2 {
@@ -103,9 +103,9 @@ class AspectControllerSpec extends AnyWordSpec {
       "output(**)" when calling {
 
         "target()" in new Fixture3 {
-          socket.target
+          socket.getTarget
           verify(controller).apply(any)
-          verify(delegateSocket).target
+          verify(delegateSocket).getTarget
         }
 
         "stream(*)" in new Fixture3 {

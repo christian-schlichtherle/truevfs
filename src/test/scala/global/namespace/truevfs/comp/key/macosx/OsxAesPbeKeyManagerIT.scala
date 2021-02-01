@@ -4,9 +4,9 @@
  */
 package global.namespace.truevfs.comp.key.macosx
 
-import global.namespace.truevfs.comp.key.spec.common.AesPbeParameters
-import global.namespace.truevfs.comp.key.spec.prompting.KeyPromptingDisabledException
-import global.namespace.truevfs.comp.key.spec.{KeyManager, KeyManagerITSuite, KeyProvider, UnknownKeyException}
+import global.namespace.truevfs.comp.key.api.common.AesPbeParameters
+import global.namespace.truevfs.comp.key.api.prompting.KeyPromptingDisabledException
+import global.namespace.truevfs.comp.key.api.{KeyManager, KeyManagerITSuite, KeyProvider, UnknownKeyException}
 import org.mockito.Mockito.when
 import org.scalatestplus.mockito.MockitoSugar._
 

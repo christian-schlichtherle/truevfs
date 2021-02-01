@@ -5,10 +5,10 @@
 package global.namespace.truevfs.comp.key.swing;
 
 import global.namespace.service.wight.annotation.ServiceImplementation;
-import global.namespace.truevfs.comp.key.spec.KeyManager;
-import global.namespace.truevfs.comp.key.spec.common.AesPbeParameters;
-import global.namespace.truevfs.comp.key.spec.prompting.PromptingKeyManager;
-import global.namespace.truevfs.comp.key.spec.spi.KeyManagerMapModifier;
+import global.namespace.truevfs.comp.key.api.KeyManager;
+import global.namespace.truevfs.comp.key.api.common.AesPbeParameters;
+import global.namespace.truevfs.comp.key.api.prompting.PromptingKeyManager;
+import global.namespace.truevfs.comp.key.api.spi.KeyManagerMapModifier;
 
 import java.awt.*;
 import java.util.Map;

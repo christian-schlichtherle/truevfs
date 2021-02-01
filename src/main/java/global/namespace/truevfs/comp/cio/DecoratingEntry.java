@@ -4,24 +4,24 @@
  */
 package global.namespace.truevfs.comp.cio;
 
-import global.namespace.truevfs.comp.shed.UniqueObject;
-
-import javax.annotation.Nullable;
 import java.util.Objects;
+import java.util.Optional;
 
 /**
  * An abstract decorator for an entry.
  *
- * @param  <E> the type of the decorated entry.
+ * @param <E> the type of the decorated entry.
  * @author Christian Schlichtherle
  */
-public abstract class DecoratingEntry<E extends Entry>
-extends UniqueObject implements Entry {
+public abstract class DecoratingEntry<E extends Entry> implements Entry {
 
-    /** The nullable decorated entry. */
-    protected @Nullable E entry;
+    /**
+     * The decorated entry.
+     */
+    protected E entry;
 
-    protected DecoratingEntry() { }
+    protected DecoratingEntry() {
+    }
 
     protected DecoratingEntry(final E entry) {
         this.entry = Objects.requireNonNull(entry);
@@ -43,17 +43,7 @@ extends UniqueObject implements Entry {
     }
 
     @Override
-    public Boolean isPermitted(Access type, Entity entity) {
+    public Optional<Boolean> isPermitted(Access type, Entity entity) {
         return entry.isPermitted(type, entity);
-    }
-
-    /**
-     * Returns a string representation of this object for debugging and logging
-     * purposes.
-     */
-    @Override
-    public String toString() {
-        return String.format("%s@%x[entry=%s]",
-                getClass().getName(), hashCode(), entry);
     }
 }

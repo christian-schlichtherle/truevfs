@@ -4,7 +4,6 @@
  */
 package global.namespace.truevfs.driver.file;
 
-import global.namespace.truevfs.comp.cio.AbstractOutputSocket;
 import global.namespace.truevfs.comp.cio.Entry;
 import global.namespace.truevfs.comp.cio.InputSocket;
 import global.namespace.truevfs.comp.cio.IoSockets;
@@ -38,7 +37,7 @@ import static java.nio.file.StandardCopyOption.REPLACE_EXISTING;
  * @author Christian Schlichtherle
  */
 @SuppressWarnings("OptionalUsedAsFieldOrParameterType")
-final class FileOutputSocket extends AbstractOutputSocket<FileNode> {
+final class FileOutputSocket implements global.namespace.truevfs.comp.cio.OutputSocket<FileNode> {
 
     private static final int
             INITIAL_CAPACITY = initialCapacity(FsAccessOption.values().length);
@@ -67,7 +66,7 @@ final class FileOutputSocket extends AbstractOutputSocket<FileNode> {
     }
 
     @Override
-    public FileNode target() { return node; }
+    public FileNode getTarget() { return node; }
 
     private FileNode begin() throws IOException {
         final FileNode buffer;

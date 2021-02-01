@@ -5,7 +5,6 @@
 package global.namespace.truevfs.comp.cio;
 
 import global.namespace.truevfs.comp.shed.Pool;
-import global.namespace.truevfs.comp.shed.UniqueObject;
 
 import java.io.IOException;
 
@@ -19,10 +18,10 @@ import java.io.IOException;
  *
  * @author Christian Schlichtherle
  */
-public abstract class IoBufferPool
-extends UniqueObject implements Pool<IoBuffer, IOException> {
+public interface IoBufferPool extends Pool<IoBuffer, IOException> {
 
-    @Override public final void release(IoBuffer buffer) throws IOException {
+    @Override
+    default void release(IoBuffer buffer) throws IOException {
         buffer.release();
     }
 }

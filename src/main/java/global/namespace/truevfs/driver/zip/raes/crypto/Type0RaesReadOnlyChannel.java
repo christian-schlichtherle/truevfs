@@ -6,8 +6,8 @@ package global.namespace.truevfs.driver.zip.raes.crypto;
 
 import global.namespace.truevfs.comp.io.IntervalReadOnlyChannel;
 import global.namespace.truevfs.comp.io.MutableBuffer;
-import global.namespace.truevfs.comp.key.spec.common.AesKeyStrength;
-import global.namespace.truevfs.comp.key.spec.util.SuspensionPenalty;
+import global.namespace.truevfs.comp.key.api.common.AesKeyStrength;
+import global.namespace.truevfs.comp.key.api.util.SuspensionPenalty;
 import global.namespace.truevfs.comp.zip.crypto.CipherReadOnlyChannel;
 import global.namespace.truevfs.comp.zip.crypto.CtrBlockCipher;
 import global.namespace.truevfs.comp.zip.crypto.SeekableBlockCipher;

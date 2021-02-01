@@ -11,10 +11,10 @@ import java.io.IOException;
  *
  * @author Christian Schlichtherle
  */
-public abstract class DecoratingIoBuffer
-extends DecoratingEntry<IoBuffer> implements IoBuffer {
+public abstract class DecoratingIoBuffer extends DecoratingEntry<IoBuffer> implements IoBuffer {
 
-    protected DecoratingIoBuffer() { }
+    protected DecoratingIoBuffer() {
+    }
 
     protected DecoratingIoBuffer(IoBuffer entry) {
         super(entry);

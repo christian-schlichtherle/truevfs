@@ -4,10 +4,10 @@
  */
 package global.namespace.truevfs.driver.zip.raes;
 
-import global.namespace.truevfs.comp.cio.InputService;
+import global.namespace.truevfs.comp.cio.InputContainer;
 import global.namespace.truevfs.comp.zipdriver.JarDriverEntry;
-import global.namespace.truevfs.comp.zipdriver.ZipInputService;
-import global.namespace.truevfs.comp.zipdriver.ZipOutputService;
+import global.namespace.truevfs.comp.zipdriver.ZipInputContainer;
+import global.namespace.truevfs.comp.zipdriver.ZipOutputContainer;
 import global.namespace.truevfs.kernel.api.FsModel;
 import global.namespace.truevfs.kernel.api.FsOutputSocketSink;
 
@@ -43,18 +43,18 @@ public class ParanoidZipRaesDriver extends ZipRaesDriver {
      * {@inheritDoc}
      * <p>
      * The implementation in the class {@link ParanoidZipRaesDriver} returns a
-     * new {@link ZipOutputService}.
+     * new {@link ZipOutputContainer}.
      * This restricts the number of concurrent sink entry streams to one in
      * order to inhibit writing unencrypted temporary files for buffering the
      * written entries.
      */
     @Override
-    protected final ZipOutputService<JarDriverEntry> newOutput(
+    protected final ZipOutputContainer<JarDriverEntry> newOutput(
             final FsModel model,
             final FsOutputSocketSink sink,
-            final @CheckForNull InputService<JarDriverEntry> input)
+            final @CheckForNull InputContainer<JarDriverEntry> input)
     throws IOException {
-        final ZipInputService<JarDriverEntry> zis = (ZipInputService<JarDriverEntry>) input;
-        return new ZipOutputService<>(model, new RaesSocketSink(model, sink), zis, this);
+        final ZipInputContainer<JarDriverEntry> zis = (ZipInputContainer<JarDriverEntry>) input;
+        return new ZipOutputContainer<>(model, new RaesSocketSink(model, sink), zis, this);
     }
 }

@@ -5,7 +5,7 @@
 package global.namespace.truevfs.driver.tar.xz;
 
 import global.namespace.truevfs.comp.tardriver.TarDriverEntry;
-import global.namespace.truevfs.kernel.api.FsArchiveDriverTestSuite;
+import global.namespace.truevfs.it.base.FsArchiveDriverTestSuite;
 
 /**
  * @author Christian Schlichtherle

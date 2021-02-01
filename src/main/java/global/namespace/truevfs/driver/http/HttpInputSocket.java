@@ -20,7 +20,7 @@ import java.util.Optional;
  * @see    HttpOutputSocket
  * @author Christian Schlichtherle
  */
-public class HttpInputSocket extends AbstractInputSocket<HttpNode> {
+public class HttpInputSocket implements InputSocket<HttpNode> {
 
     private final HttpNode entry;
 
@@ -33,7 +33,7 @@ public class HttpInputSocket extends AbstractInputSocket<HttpNode> {
     }
 
     @Override
-    public HttpNode target() {
+    public HttpNode getTarget() {
         return entry;
     }
 

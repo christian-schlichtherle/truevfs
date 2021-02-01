@@ -34,17 +34,14 @@ abstract class ResourceController<E extends FsArchiveEntry> implements Delegatin
 
     private static final int waitTimeoutMillis = LockingStrategy.acquireTimeoutMillis;
 
-    private final ResourceAccountant accountant = new ResourceAccountant(writeLock());
+    private final ResourceAccountant accountant = new ResourceAccountant(getWriteLock());
 
     @Override
     public InputSocket<? extends Entry> input(BitField<FsAccessOption> options, FsNodeName name) {
-        return new DelegatingInputSocket<Entry>() {
+        return new DecoratingInputSocket<Entry>() {
 
-            final InputSocket<? extends Entry> socket = getController().input(options, name);
-
-            @Override
-            protected InputSocket<? extends Entry> socket() {
-                return socket;
+            {
+                socket = getController().input(options, name);
             }
 
             @Override
@@ -62,13 +59,10 @@ abstract class ResourceController<E extends FsArchiveEntry> implements Delegatin
 
     @Override
     public OutputSocket<? extends Entry> output(BitField<FsAccessOption> options, FsNodeName name, Optional<? extends Entry> template) {
-        return new DelegatingOutputSocket<Entry>() {
+        return new DecoratingOutputSocket<Entry>() {
 
-            final OutputSocket<? extends Entry> socket = getController().output(options, name, template);
-
-            @Override
-            protected OutputSocket<? extends Entry> socket() {
-                return socket;
+            {
+                socket = getController().output(options, name, template);
             }
 
             @Override
@@ -86,8 +80,8 @@ abstract class ResourceController<E extends FsArchiveEntry> implements Delegatin
 
     @Override
     public void sync(final BitField<FsSyncOption> options) throws FsSyncException {
-        assert writeLockedByCurrentThread();
-        assert !readLockedByCurrentThread();
+        assert isWriteLockedByCurrentThread();
+        assert !isReadLockedByCurrentThread();
 
         // HC SVNT DRACONES!
         val beforeWait = accountant.resources();

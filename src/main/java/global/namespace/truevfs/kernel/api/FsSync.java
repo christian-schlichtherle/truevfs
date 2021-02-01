@@ -56,7 +56,7 @@ public final class FsSync {
      */
     public void run() throws FsSyncException {
 
-        final class SyncVisitor implements Visitor<FsController, RuntimeException> {
+        class SyncVisitor implements Visitor<FsController, RuntimeException> {
 
             final FsSyncExceptionBuilder builder = new FsSyncExceptionBuilder();
 

@@ -8,7 +8,7 @@ import java.io.IOException;
 
 /**
  * An I/O socket is a <em>stateless</em> factory for I/O streams and channels
- * which operate on a {@linkplain #target() target entry}.
+ * which operate on a {@linkplain #getTarget() target entry}.
  * Because an I/O socket is stateless, it can get safely shared between
  * different components, in particular between different threads.
  * <p>
@@ -42,7 +42,7 @@ import java.io.IOException;
  * <p>
  * Implementations should be immutable.
  *
- * @param  <E> the type of the {@linkplain #target() target entry} for I/O
+ * @param  <E> the type of the {@linkplain #getTarget() target entry} for I/O
  *         operations.
  * @author Christian Schlichtherle
  */
@@ -61,5 +61,5 @@ public interface IoSocket<E extends Entry> {
      * @return The local target for I/O operations.
      * @throws IOException on any I/O error.
      */
-    E target() throws IOException;
+    E getTarget() throws IOException;
 }

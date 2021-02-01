@@ -6,7 +6,6 @@ package global.namespace.truevfs.kernel.api;
 
 import global.namespace.truevfs.comp.cio.Entry;
 import global.namespace.truevfs.comp.shed.BitField;
-import global.namespace.truevfs.comp.shed.ImplementationsShouldExtend;
 
 import javax.annotation.Nullable;
 import java.util.Set;
@@ -17,7 +16,6 @@ import java.util.Set;
  *
  * @author Christian Schlichtherle
  */
-@ImplementationsShouldExtend(FsAbstractNode.class)
 public interface FsNode extends Entry {
 
     /**

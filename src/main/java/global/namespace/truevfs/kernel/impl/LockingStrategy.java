@@ -4,6 +4,7 @@
  */
 package global.namespace.truevfs.kernel.impl;
 
+import global.namespace.truevfs.comp.shed.Operation;
 import lombok.val;
 
 import java.util.Random;
@@ -13,7 +14,7 @@ import java.util.concurrent.locks.Lock;
 
 /**
  * Implements a locking strategy with enumerable options to control dead lock prevention.
- * Note that in order to make this class work as designed, you <strong>must</strong> call {@link Using#call(Op)} for
+ * Note that in order to make this class work as designed, you <strong>must</strong> call {@link Using#call(Operation)} for
  * <em>each and every</em> {@linkplain #using(Lock) lock} which may participate in a dead lock!
  * Otherwise, the locking strategy will not work!
  *
@@ -62,19 +63,16 @@ enum LockingStrategy {
     };
 
     private static final int arbitrateMaxMillis = 100;
+
     static final int acquireTimeoutMillis = arbitrateMaxMillis;
-    private static final ThreadLocal<Account> accounts =
-            ThreadLocal.withInitial(() -> new Account(ThreadLocalRandom.current()));
 
-    private static class Account {
+    private static final ThreadLocal<Account> accounts = ThreadLocal.withInitial(Account::new);
 
-        private final Random rnd;
+    private static final class Account {
+
+        private final Random rnd = ThreadLocalRandom.current();
 
         private int lockCount;
-
-        Account(final Random rnd) {
-            this.rnd = rnd;
-        }
 
         void arbitrate() {
             try {
@@ -119,13 +117,13 @@ enum LockingStrategy {
         return new Using() {
 
             @Override
-            public <T, X extends Exception> T call(final Op<T, X> op) throws X {
+            public <T, X extends Exception> T call(final Operation<T, X> op) throws X {
                 val account = accounts.get();
                 if (0 < account.lockCount) {
                     acquire(lock);
                     account.lockCount += 1;
                     try {
-                        return op.call();
+                        return op.run();
                     } finally {
                         account.lockCount -= 1;
                         lock.unlock();
@@ -137,7 +135,7 @@ enum LockingStrategy {
                                 lock.lock();
                                 account.lockCount += 1;
                                 try {
-                                    return op.call();
+                                    return op.run();
                                 } finally {
                                     account.lockCount -= 1;
                                     lock.unlock();
@@ -157,6 +155,6 @@ enum LockingStrategy {
     @FunctionalInterface
     interface Using {
 
-        <T, X extends Exception> T call(Op<T, X> op) throws X;
+        <T, X extends Exception> T call(Operation<T, X> op) throws X;
     }
 }

@@ -62,7 +62,7 @@ class ArchiveFileSystem<E extends FsArchiveEntry>
      *
      * @param model the archive model to use.
      */
-    static <E extends FsArchiveEntry> ArchiveFileSystem<E> apply(ArchiveModel<E> model) {
+    static <E extends FsArchiveEntry> ArchiveFileSystem<E> create(ArchiveModel<E> model) {
         return new ArchiveFileSystem<>(model);
     }
 
@@ -101,24 +101,28 @@ class ArchiveFileSystem<E extends FsArchiveEntry>
      * @param <E>          the type of the archive entries.
      * @return A new archive file system.
      */
-    static <E extends FsArchiveEntry> ArchiveFileSystem<E> apply(
+    static <E extends FsArchiveEntry> ArchiveFileSystem<E> create(
             ArchiveModel<E> model,
             Container<E> archive,
             Entry rootTemplate,
             Optional<? extends Supplier<? extends Throwable>> readOnly
-    ) {
-        return readOnly
-                .<ArchiveFileSystem<E>>map(cause -> new ReadOnlyArchiveFileSystem<>(model, archive, rootTemplate, cause))
-                .orElseGet(() -> new ArchiveFileSystem<>(model, archive, rootTemplate));
+    ) throws IOException {
+        return readOnly.isPresent()
+                ? new ReadOnlyArchiveFileSystem<>(model, archive, rootTemplate, readOnly.get())
+                : new ArchiveFileSystem<>(model, archive, rootTemplate);
     }
 
-    ArchiveFileSystem(final ArchiveModel<E> model, final Container<E> archive, final Entry rootTemplate) {
+    ArchiveFileSystem(
+            final ArchiveModel<E> model,
+            final Container<E> archive,
+            final Entry rootTemplate
+    ) throws IOException {
         // Allocate some extra capacity for creating missing parent directories.
-        this(model, new EntryTable<>(archive.size() + OVERHEAD_SIZE));
+        this(model, new EntryTable<>(archive.entries().size() + OVERHEAD_SIZE));
         // Load entries from source archive:
         val paths = new LinkedList<String>();
         val normalizer = new PathNormalizer(SEPARATOR_CHAR);
-        archive.forEach(ae -> {
+        archive.entries().forEach(ae -> {
             val path = cutTrailingSeparators(
                     // Fix invalid Windoze file name separators:
                     normalizer.normalize(ae.getName().replace('\\', SEPARATOR_CHAR)),

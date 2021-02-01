@@ -4,8 +4,9 @@
  */
 package global.namespace.truevfs.comp.cio;
 
-import java.io.IOException;
 import global.namespace.truevfs.comp.shed.Releasable;
+
+import java.io.IOException;
 
 /**
  * A releasable I/O entry.

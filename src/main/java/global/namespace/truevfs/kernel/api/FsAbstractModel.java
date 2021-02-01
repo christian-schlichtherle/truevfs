@@ -4,8 +4,6 @@
  */
 package global.namespace.truevfs.kernel.api;
 
-import global.namespace.truevfs.comp.shed.UniqueObject;
-
 import java.util.Objects;
 import java.util.Optional;
 
@@ -20,7 +18,7 @@ import static java.util.Locale.ENGLISH;
  * @author Christian Schlichtherle
  */
 @SuppressWarnings("OptionalUsedAsFieldOrParameterType")
-public abstract class FsAbstractModel extends UniqueObject implements FsModel {
+public abstract class FsAbstractModel implements FsModel {
 
     private final FsMountPoint mountPoint;
     private final Optional<? extends FsModel> parent;

@@ -4,16 +4,16 @@
  */
 package global.namespace.truevfs.comp.key.macosx;
 
+import global.namespace.truevfs.comp.key.api.AbstractKeyManager;
+import global.namespace.truevfs.comp.key.api.KeyManager;
+import global.namespace.truevfs.comp.key.api.KeyProvider;
+import global.namespace.truevfs.comp.key.api.prompting.AbstractPromptingPbeParameters;
 import global.namespace.truevfs.comp.key.macosx.keychain.DuplicateItemException;
 import global.namespace.truevfs.comp.key.macosx.keychain.Keychain;
 import global.namespace.truevfs.comp.key.macosx.keychain.Keychain.AttributeClass;
 import global.namespace.truevfs.comp.key.macosx.keychain.Keychain.Item;
 import global.namespace.truevfs.comp.key.macosx.keychain.Keychain.Visitor;
 import global.namespace.truevfs.comp.key.macosx.keychain.KeychainException;
-import global.namespace.truevfs.comp.key.spec.AbstractKeyManager;
-import global.namespace.truevfs.comp.key.spec.KeyManager;
-import global.namespace.truevfs.comp.key.spec.KeyProvider;
-import global.namespace.truevfs.comp.key.spec.prompting.AbstractPromptingPbeParameters;
 import global.namespace.truevfs.comp.logging.LocalizedLogger;
 
 import java.beans.XMLDecoder;

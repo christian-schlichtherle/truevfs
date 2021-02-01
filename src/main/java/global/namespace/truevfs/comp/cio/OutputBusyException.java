@@ -7,11 +7,9 @@ package global.namespace.truevfs.comp.cio;
 import javax.annotation.Nullable;
 
 /**
- * Indicates that an entity (an entry or container) could not get written
- * because the entity or its container is busy.
- * This exception is recoverable, meaning it should be possible to repeat the
- * operation successfully as soon as the entity or its container is not busy
- * anymore and no other exceptional conditions apply.
+ * Indicates that an entity (an entry or container) could not get written because the entity or its container is busy.
+ * This exception is recoverable, meaning it should be possible to repeat the operation successfully as soon as the
+ * entity or its container is not busy anymore and no other exceptional conditions apply.
  *
  * @see    InputBusyException
  * @author Christian Schlichtherle

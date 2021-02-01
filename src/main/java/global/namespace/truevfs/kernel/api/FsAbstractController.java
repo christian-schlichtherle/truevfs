@@ -6,7 +6,6 @@ package global.namespace.truevfs.kernel.api;
 
 import global.namespace.truevfs.comp.cio.Entry.Access;
 import global.namespace.truevfs.comp.shed.BitField;
-import global.namespace.truevfs.comp.shed.UniqueObject;
 
 import java.io.IOException;
 import java.util.Map;
@@ -20,8 +19,7 @@ import java.util.Objects;
  *
  * @author Christian Schlichtherle
  */
-public abstract class FsAbstractController
-extends UniqueObject implements FsController {
+public abstract class FsAbstractController implements FsController {
 
     private final FsModel model;
 

@@ -4,10 +4,11 @@
   */
  package global.namespace.truevfs.kernel.impl;
 
- import lombok.Value;
- import lombok.val;
  import global.namespace.truevfs.comp.shed.ExceptionHandler;
  import global.namespace.truevfs.comp.shed.HashMaps;
+ import global.namespace.truevfs.comp.shed.LockAspect;
+ import lombok.Value;
+ import lombok.val;
 
  import java.io.Closeable;
  import java.io.IOException;
@@ -74,7 +75,7 @@
      }
 
      @Override
-     public Lock lock() {
+     public Lock getLock() {
          return lock;
      }
 
@@ -96,13 +97,9 @@
       */
      void stopAccountingFor(Closeable resource) {
          if (null != accounts.remove(resource)) {
-             locked(new Op<Object, RuntimeException>() {
-
-                 @Override
-                 public Object call() {
-                     condition.signalAll();
-                     return null;
-                 }
+             runLocked(() -> {
+                 condition.signalAll();
+                 return null;
              });
          }
      }
@@ -127,30 +124,26 @@
       *                If this is non-positive, then there is no timeout for waiting.
       */
      void awaitClosingOfOtherThreadsResources(long timeout) {
-         locked(new Op<Void, RuntimeException>() {
-
-             @Override
-             public Void call() {
-                 try {
-                     if (0 < timeout) {
-                         long toWait = TimeUnit.MILLISECONDS.toNanos(timeout);
-                         while (0 < toWait && resources().isNeedsWaiting()) {
-                             toWait = condition.awaitNanos(toWait);
-                         }
-                     } else {
-                         while (resources().isNeedsWaiting()) {
-                             condition.await();
-                         }
+         runLocked(() -> {
+             try {
+                 if (0 < timeout) {
+                     long toWait = TimeUnit.MILLISECONDS.toNanos(timeout);
+                     while (0 < toWait && resources().isNeedsWaiting()) {
+                         toWait = condition.awaitNanos(toWait);
                      }
-                 } catch (final InterruptedException e) {
-                     // Fix rare racing condition between Thread.interrupt() and
-                     // Condition.signalAll() events.
-                     if (0 == resources().getTotal()) {
-                         Thread.currentThread().interrupt();
+                 } else {
+                     while (resources().isNeedsWaiting()) {
+                         condition.await();
                      }
                  }
-                 return null;
+             } catch (final InterruptedException e) {
+                 // Fix rare racing condition between Thread.interrupt() and
+                 // Condition.signalAll() events.
+                 if (0 == resources().getTotal()) {
+                     Thread.currentThread().interrupt();
+                 }
              }
+             return null;
          });
      }
 

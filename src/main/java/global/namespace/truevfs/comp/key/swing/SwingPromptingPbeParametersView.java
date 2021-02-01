@@ -4,14 +4,14 @@
  */
 package global.namespace.truevfs.comp.key.swing;
 
-import global.namespace.truevfs.comp.key.spec.KeyStrength;
-import global.namespace.truevfs.comp.key.spec.PbeParameters;
-import global.namespace.truevfs.comp.key.spec.UnknownKeyException;
-import global.namespace.truevfs.comp.key.spec.prompting.KeyPromptingDisabledException;
-import global.namespace.truevfs.comp.key.spec.prompting.KeyPromptingInterruptedException;
-import global.namespace.truevfs.comp.key.spec.prompting.PromptingKey;
-import global.namespace.truevfs.comp.key.spec.prompting.PromptingKey.Controller;
-import global.namespace.truevfs.comp.key.spec.prompting.PromptingPbeParameters;
+import global.namespace.truevfs.comp.key.api.KeyStrength;
+import global.namespace.truevfs.comp.key.api.PbeParameters;
+import global.namespace.truevfs.comp.key.api.UnknownKeyException;
+import global.namespace.truevfs.comp.key.api.prompting.KeyPromptingDisabledException;
+import global.namespace.truevfs.comp.key.api.prompting.KeyPromptingInterruptedException;
+import global.namespace.truevfs.comp.key.api.prompting.PromptingKey;
+import global.namespace.truevfs.comp.key.api.prompting.PromptingKey.Controller;
+import global.namespace.truevfs.comp.key.api.prompting.PromptingPbeParameters;
 import global.namespace.truevfs.comp.key.swing.sl.InvalidKeyFeedbackLocator;
 import global.namespace.truevfs.comp.key.swing.sl.UnknownKeyFeedbackLocator;
 import global.namespace.truevfs.comp.key.swing.util.Windows;

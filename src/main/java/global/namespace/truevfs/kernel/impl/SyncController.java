@@ -4,11 +4,14 @@
  */
 package global.namespace.truevfs.kernel.impl;
 
-import global.namespace.truevfs.comp.cio.*;
+import global.namespace.truevfs.comp.cio.Entry;
+import global.namespace.truevfs.comp.cio.InputSocket;
+import global.namespace.truevfs.comp.cio.OutputSocket;
 import global.namespace.truevfs.comp.io.DecoratingInputStream;
 import global.namespace.truevfs.comp.io.DecoratingOutputStream;
 import global.namespace.truevfs.comp.io.DecoratingSeekableChannel;
 import global.namespace.truevfs.comp.shed.BitField;
+import global.namespace.truevfs.comp.shed.Operation;
 import global.namespace.truevfs.kernel.api.*;
 import lombok.val;
 
@@ -42,170 +45,100 @@ abstract class SyncController<E extends FsArchiveEntry> implements DelegatingArc
 
     @Override
     public Optional<? extends FsNode> node(BitField<FsAccessOption> options, FsNodeName name) throws IOException {
-        return apply(new Op<Optional<? extends FsNode>, IOException>() {
-
-            @Override
-            public Optional<? extends FsNode> call() throws IOException {
-                return getController().node(options, name);
-            }
-        });
+        return apply(() -> getController().node(options, name));
     }
 
     @Override
     public void checkAccess(BitField<FsAccessOption> options, FsNodeName name, BitField<Entry.Access> types) throws IOException {
-        apply(new Op<Void, IOException>() {
-
-            @Override
-            public Void call() throws IOException {
-                getController().checkAccess(options, name, types);
-                return null;
-            }
+        apply(() -> {
+            getController().checkAccess(options, name, types);
+            return null;
         });
     }
 
     @Override
     public void setReadOnly(BitField<FsAccessOption> options, FsNodeName name) throws IOException {
-        apply(new Op<Void, IOException>() {
-
-            @Override
-            public Void call() throws IOException {
-                getController().setReadOnly(options, name);
-                return null;
-            }
+        apply(() -> {
+            getController().setReadOnly(options, name);
+            return null;
         });
     }
 
     @Override
     public boolean setTime(BitField<FsAccessOption> options, FsNodeName name, Map<Entry.Access, Long> times) throws IOException {
-        return apply(new Op<Boolean, IOException>() {
-
-            @Override
-            public Boolean call() throws IOException {
-                return getController().setTime(options, name, times);
-            }
-        });
+        return apply(() -> getController().setTime(options, name, times));
     }
 
     @Override
     public boolean setTime(BitField<FsAccessOption> options, FsNodeName name, BitField<Entry.Access> types, long time) throws IOException {
-        return apply(new Op<Boolean, IOException>() {
-
-            @Override
-            public Boolean call() throws IOException {
-                return getController().setTime(options, name, types, time);
-            }
-        });
+        return apply(() -> getController().setTime(options, name, types, time));
     }
 
     @Override
     public InputSocket<? extends Entry> input(BitField<FsAccessOption> options, FsNodeName name) {
-        return new AbstractInputSocket<Entry>() {
+        return new InputSocket<Entry>() {
 
             final InputSocket<? extends Entry> socket = getController().input(options, name);
 
             @Override
-            public Entry target() throws IOException {
-                return apply(new Op<Entry, IOException>() {
-
-                    @Override
-                    public Entry call() throws IOException {
-                        return socket.target();
-                    }
-                });
+            public Entry getTarget() throws IOException {
+                return apply(socket::getTarget);
             }
 
             @Override
             public InputStream stream(Optional<? extends OutputSocket<? extends Entry>> peer) throws IOException {
-                return apply(new Op<InputStream, IOException>() {
-
-                    @Override
-                    public InputStream call() throws IOException {
-                        return new SyncInputStream(socket.stream(peer));
-                    }
-                });
+                return apply(() -> new SyncInputStream(socket.stream(peer)));
             }
 
             @Override
             public SeekableByteChannel channel(Optional<? extends OutputSocket<? extends Entry>> peer) throws IOException {
-                return apply(new Op<SeekableByteChannel, IOException>() {
-
-                    @Override
-                    public SeekableByteChannel call() throws IOException {
-                        return new SyncSeekableChannel(socket.channel(peer));
-                    }
-                });
+                return apply(() -> new SyncSeekableChannel(socket.channel(peer)));
             }
         };
     }
 
     @Override
     public OutputSocket<? extends Entry> output(BitField<FsAccessOption> options, FsNodeName name, Optional<? extends Entry> template) {
-        return new AbstractOutputSocket<Entry>() {
+        return new OutputSocket<Entry>() {
 
             final OutputSocket<? extends Entry> socket = getController().output(options, name, template);
 
             @Override
-            public Entry target() throws IOException {
-                return apply(new Op<Entry, IOException>() {
-
-                    @Override
-                    public Entry call() throws IOException {
-                        return socket.target();
-                    }
-                });
+            public Entry getTarget() throws IOException {
+                return apply(socket::getTarget);
             }
 
             @Override
             public OutputStream stream(Optional<? extends InputSocket<? extends Entry>> peer) throws IOException {
-                return apply(new Op<OutputStream, IOException>() {
-
-                    @Override
-                    public OutputStream call() throws IOException {
-                        return new SyncOutputStream(socket.stream(peer));
-                    }
-                });
+                return apply(() -> new SyncOutputStream(socket.stream(peer)));
             }
 
             @Override
             public SeekableByteChannel channel(Optional<? extends InputSocket<? extends Entry>> peer)
                     throws IOException {
-                return apply(new Op<SeekableByteChannel, IOException>() {
-
-                    @Override
-                    public SeekableByteChannel call() throws IOException {
-                        return new SyncSeekableChannel(socket.channel(peer));
-                    }
-                });
+                return apply(() -> new SyncSeekableChannel(socket.channel(peer)));
             }
         };
     }
 
     @Override
     public void make(BitField<FsAccessOption> options, FsNodeName name, Entry.Type type, Optional<? extends Entry> template) throws IOException {
-        apply(new Op<Void, IOException>() {
-
-            @Override
-            public Void call() throws IOException {
-                getController().make(options, name, type, template);
-                return null;
-            }
+        apply(() -> {
+            getController().make(options, name, type, template);
+            return null;
         });
     }
 
     @Override
     public void unlink(BitField<FsAccessOption> options, FsNodeName name) throws IOException {
-        apply(new Op<Void, IOException>() {
-
-            @Override
-            public Void call() throws IOException {
-                // HC SVNT DRACONES!
-                getController().unlink(options, name);
-                // Eventually make the file system controller chain eligible for GC.
-                if (name.isRoot()) {
-                    getController().sync(RESET);
-                }
-                return null;
+        apply(() -> {
+            // HC SVNT DRACONES!
+            getController().unlink(options, name);
+            // Eventually make the file system controller chain eligible for GC.
+            if (name.isRoot()) {
+                getController().sync(RESET);
             }
+            return null;
         });
     }
 
@@ -218,10 +151,10 @@ abstract class SyncController<E extends FsArchiveEntry> implements DelegatingArc
      * @throws FsSyncException        if any error conditions apply.
      * @throws IOException            at the discretion of {@code operation}.
      */
-    private <T> T apply(final Op<T, IOException> op) throws IOException {
+    private <T> T apply(final Operation<T, IOException> op) throws IOException {
         while (true) {
             try {
-                return op.call();
+                return op.run();
             } catch (final NeedsSyncException e1) {
                 checkWriteLockedByCurrentThread();
                 try {
@@ -236,8 +169,8 @@ abstract class SyncController<E extends FsArchiveEntry> implements DelegatingArc
 
     @Override
     public void sync(final BitField<FsSyncOption> options) throws FsSyncException {
-        assert writeLockedByCurrentThread();
-        assert !readLockedByCurrentThread();
+        assert isWriteLockedByCurrentThread();
+        assert !isReadLockedByCurrentThread();
 
         doSync(options);
     }
@@ -287,13 +220,9 @@ abstract class SyncController<E extends FsArchiveEntry> implements DelegatingArc
 
         @Override
         public void close() throws IOException {
-            apply(new Op<Void, IOException>() {
-
-                @Override
-                public Void call() throws IOException {
-                    in.close();
-                    return null;
-                }
+            apply(() -> {
+                in.close();
+                return null;
             });
         }
     }
@@ -306,13 +235,9 @@ abstract class SyncController<E extends FsArchiveEntry> implements DelegatingArc
 
         @Override
         public void close() throws IOException {
-            apply(new Op<Void, IOException>() {
-
-                @Override
-                public Void call() throws IOException {
-                    out.close();
-                    return null;
-                }
+            apply(() -> {
+                out.close();
+                return null;
             });
         }
     }
@@ -325,13 +250,9 @@ abstract class SyncController<E extends FsArchiveEntry> implements DelegatingArc
 
         @Override
         public void close() throws IOException {
-            apply(new Op<Void, IOException>() {
-
-                @Override
-                public Void call() throws IOException {
-                    channel.close();
-                    return null;
-                }
+            apply(() -> {
+                channel.close();
+                return null;
             });
         }
     }

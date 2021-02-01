@@ -22,67 +22,47 @@ import java.util.Optional;
 @SuppressWarnings("OptionalUsedAsFieldOrParameterType")
 public final class IoSockets {
 
-    private IoSockets() { }
+    private IoSockets() {
+    }
 
     /**
-     * Copies an input stream {@link InputSocket#stream created}
-     * by the given {@code input} socket to an output stream
-     * {@link OutputSocket#stream created} by the given {@code output}
-     * socket.
+     * Copies an input stream {@link InputSocket#stream created} by the given {@code input} socket to an output stream
+     * {@link OutputSocket#stream created} by the given {@code output} socket.
      * <p>
-     * This is a high performance implementation which uses a pooled daemon
-     * thread to fill a FIFO of pooled buffers which is concurrently flushed by
-     * the current thread.
+     * This is a high performance implementation which uses a pooled daemon thread to fill a FIFO of pooled buffers
+     * which is concurrently flushed by the current thread.
      *
-     * @param input an input socket for the input target.
+     * @param input  an input socket for the input target.
      * @param output an output socket for the output target.
      */
-    public static void copy(InputSocket<?> input, OutputSocket<?> output)
-    throws IOException {
-        Streams.copy(new InputAdapter(input, output), new OutputAdapter(output, input));
-    }
+    public static void copy(InputSocket<?> input, OutputSocket<?> output) throws IOException {
 
-    private static class InputAdapter implements Source {
+        class Input implements Source {
 
-        final InputSocket<? extends Entry> input;
-        final Optional<? extends OutputSocket<? extends Entry>> output;
+            @Override
+            public InputStream stream() throws IOException {
+                return input.stream(Optional.of(output));
+            }
 
-        InputAdapter(final InputSocket<? extends Entry> input, final OutputSocket<? extends Entry> output) {
-            this.input = input;
-            this.output = Optional.of(output);
+            @Override
+            public SeekableByteChannel channel() throws IOException {
+                return input.channel(Optional.of(output));
+            }
         }
 
-        @Override
-        public InputStream stream() throws IOException {
-            return input.stream(output);
+        class Output implements Sink {
+
+            @Override
+            public OutputStream stream() throws IOException {
+                return output.stream(Optional.of(input));
+            }
+
+            @Override
+            public SeekableByteChannel channel() throws IOException {
+                return output.channel(Optional.of(input));
+            }
         }
 
-        @Override
-        public SeekableByteChannel channel() throws IOException {
-            return input.channel(output);
-        }
-    }
-
-    private static class OutputAdapter implements Sink {
-
-        final OutputSocket<? extends Entry> output;
-        final Optional<? extends InputSocket<? extends Entry>> input;
-
-        OutputAdapter(
-                final OutputSocket<? extends Entry> output,
-                final InputSocket<? extends Entry> input) {
-            this.output = output;
-            this.input = Optional.of(input);
-        }
-
-        @Override
-        public OutputStream stream() throws IOException {
-            return output.stream(input);
-        }
-
-        @Override
-        public SeekableByteChannel channel() throws IOException {
-            return output.channel(input);
-        }
+        Streams.copy(new Input(), new Output());
     }
 }

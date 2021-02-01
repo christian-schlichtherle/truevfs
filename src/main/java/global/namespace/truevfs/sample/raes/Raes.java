@@ -7,7 +7,7 @@ package global.namespace.truevfs.sample.raes;
 import global.namespace.truevfs.comp.io.AbstractSink;
 import global.namespace.truevfs.comp.io.AbstractSource;
 import global.namespace.truevfs.comp.io.Streams;
-import global.namespace.truevfs.comp.key.spec.sl.KeyManagerMapLocator;
+import global.namespace.truevfs.comp.key.api.sl.KeyManagerMapLocator;
 import global.namespace.truevfs.driver.zip.raes.KeyManagerRaesParameters;
 import global.namespace.truevfs.driver.zip.raes.crypto.RaesOutputStream;
 import global.namespace.truevfs.driver.zip.raes.crypto.RaesReadOnlyChannel;

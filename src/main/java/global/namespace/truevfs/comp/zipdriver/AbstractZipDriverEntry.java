@@ -10,6 +10,8 @@ import global.namespace.truevfs.comp.zip.ZipEntry;
 import global.namespace.truevfs.kernel.api.FsArchiveEntries;
 import global.namespace.truevfs.kernel.api.FsArchiveEntry;
 
+import java.util.Optional;
+
 import static global.namespace.truevfs.comp.cio.Entry.Access.WRITE;
 import static global.namespace.truevfs.comp.cio.Entry.Size.DATA;
 import static global.namespace.truevfs.comp.cio.Entry.Type.DIRECTORY;
@@ -80,10 +82,10 @@ public abstract class AbstractZipDriverEntry extends ZipEntry implements FsArchi
     }
 
     @Override
-    public Boolean isPermitted(Access type, Entity entity) { return null; }
+    public Optional<Boolean> isPermitted(Access type, Entity entity) { return Optional.empty(); }
 
     @Override
-    public boolean setPermitted(Access type, Entity entity, Boolean value) {
+    public boolean setPermitted(Access type, Entity entity, Optional<Boolean> value) {
         return false;
     }
 

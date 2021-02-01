@@ -23,7 +23,7 @@ import java.util.concurrent.locks.ReentrantLock;
  *
  * @author Christian Schlichtherle
  */
-public class Streams {
+public final class Streams {
 
     /**
      * The size of the FIFO used for exchanging I/O buffers between a reader

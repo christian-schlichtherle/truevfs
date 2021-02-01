@@ -4,7 +4,6 @@
  */
 package global.namespace.truevfs.driver.http;
 
-import global.namespace.truevfs.comp.cio.AbstractOutputSocket;
 import global.namespace.truevfs.comp.cio.Entry;
 import global.namespace.truevfs.comp.cio.InputSocket;
 import global.namespace.truevfs.comp.shed.BitField;
@@ -22,7 +21,7 @@ import java.util.Optional;
  * @author Christian Schlichtherle
  */
 @SuppressWarnings("OptionalUsedAsFieldOrParameterType")
-public class HttpOutputSocket extends AbstractOutputSocket<HttpNode> {
+public class HttpOutputSocket implements global.namespace.truevfs.comp.cio.OutputSocket<HttpNode> {
 
     private final HttpNode entry;
 
@@ -36,7 +35,7 @@ public class HttpOutputSocket extends AbstractOutputSocket<HttpNode> {
     }
 
     @Override
-    public HttpNode target() {
+    public HttpNode getTarget() {
         return entry;
     }
 

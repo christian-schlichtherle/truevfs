@@ -4,13 +4,11 @@
  */
 package global.namespace.truevfs.comp.key.swing.feedback;
 
+import global.namespace.truevfs.comp.key.api.util.SuspensionPenalty;
+
+import javax.swing.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import javax.swing.JButton;
-import javax.swing.JOptionPane;
-import javax.swing.JPanel;
-import javax.swing.Timer;
-import global.namespace.truevfs.comp.key.spec.util.SuspensionPenalty;
 
 /**
  * Provides feedback by disabling the default button of the root pane for

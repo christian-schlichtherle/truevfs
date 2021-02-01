@@ -5,8 +5,8 @@
 package global.namespace.truevfs.comp.key.def;
 
 import global.namespace.service.wight.annotation.ServiceImplementation;
-import global.namespace.truevfs.comp.key.spec.spi.KeyManagerMapModifier;
-import global.namespace.truevfs.comp.key.spec.spi.KeyManagerMapModifierTestSuite;
+import global.namespace.truevfs.comp.key.api.spi.KeyManagerMapModifier;
+import global.namespace.truevfs.comp.key.api.spi.KeyManagerMapModifierTestSuite;
 
 import static org.junit.Assert.assertEquals;
 

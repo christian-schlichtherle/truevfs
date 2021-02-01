@@ -63,7 +63,7 @@ public final class TFileSystemProvider extends FileSystemProvider {
     private final String scheme;
     private final FsNodePath root;
 
-    private Map<FsMountPoint, WeakReference<TFileSystem>> fileSystems = new WeakHashMap<>();
+    private final Map<FsMountPoint, WeakReference<TFileSystem>> fileSystems = new WeakHashMap<>();
 
     /**
      * Obtains a file system provider for the given {@link TPath} URI.
@@ -133,11 +133,12 @@ public final class TFileSystemProvider extends FileSystemProvider {
                 : name;
     }
 
-    private static TConfig open(Map<String, ?> env) {
+    private static TConfig open(final Map<String, ?> env) {
         final TConfig config = TConfig.open();
-        final TArchiveDetector detector =
-                (TArchiveDetector) env.get(Parameter.ARCHIVE_DETECTOR);
-        if (null != detector) config.setArchiveDetector(detector);
+        final TArchiveDetector detector = (TArchiveDetector) env.get(Parameter.ARCHIVE_DETECTOR);
+        if (null != detector) {
+            config.setArchiveDetector(detector);
+        }
         return config;
     }
 
@@ -172,8 +173,9 @@ public final class TFileSystemProvider extends FileSystemProvider {
     public TFileSystem newFileSystem(Path path, Map<String, ?> configuration) {
         try (TConfig ignored = open(configuration)) {
             final TPath p = new TPath(path);
-            if (null == p.getMountPoint().getParent())
+            if (!p.getMountPoint().getParent().isPresent()) {
                 throw new UnsupportedOperationException("No prospective archive file detected."); // don't be greedy!
+            }
             return p.getFileSystem();
         }
     }
@@ -354,18 +356,16 @@ public final class TFileSystemProvider extends FileSystemProvider {
             if (dstEntry.get().isType(DIRECTORY)) dst.delete();
         }
         final InputSocket<?> input = src.input(src.getAccessPreferences());
-        final OutputSocket<?> output = dst.output(o, preserve ? input.target() : null);
+        final OutputSocket<?> output = dst.output(o, preserve ? input.getTarget() : null);
         IoSockets.copy(input, output);
     }
 
     @Override
-    public void move(Path source, Path target, CopyOption... options)
-    throws IOException {
+    public void move(Path source, Path target, CopyOption... options) throws IOException {
         move(promote(source), promote(target), options);
     }
 
-    private static void move(TPath source, TPath target, CopyOption... options)
-    throws IOException {
+    private static void move(TPath source, TPath target, CopyOption... options) throws IOException {
         copy(source, target, StandardCopyOption.COPY_ATTRIBUTES);
         source.delete();
     }
@@ -381,12 +381,12 @@ public final class TFileSystemProvider extends FileSystemProvider {
     }
 
     @Override
-    public boolean isHidden(Path path) throws IOException {
+    public boolean isHidden(Path path) {
         return promote(path).getFileName().toString().startsWith(".");
     }
 
     @Override
-    public FileStore getFileStore(Path path) throws IOException {
+    public FileStore getFileStore(Path path) {
         throw new UnsupportedOperationException("Not supported yet.");
     }
 
@@ -414,12 +414,12 @@ public final class TFileSystemProvider extends FileSystemProvider {
     }
 
     @Override
-    public Map<String, Object> readAttributes(Path path, String attributes, LinkOption... options) throws IOException {
+    public Map<String, Object> readAttributes(Path path, String attributes, LinkOption... options) {
         throw new UnsupportedOperationException("Not supported yet.");
     }
 
     @Override
-    public void setAttribute(Path path, String attribute, Object value, LinkOption... options) throws IOException {
+    public void setAttribute(Path path, String attribute, Object value, LinkOption... options) {
         throw new UnsupportedOperationException("Not supported yet.");
     }
 

@@ -4,9 +4,9 @@
  */
 package global.namespace.truevfs.comp.zip;
 
-import global.namespace.truevfs.comp.key.spec.common.AesKeyStrength;
+import global.namespace.truevfs.comp.key.api.common.AesKeyStrength;
 
-import static global.namespace.truevfs.comp.key.spec.common.AesKeyStrength.BITS_128;
+import static global.namespace.truevfs.comp.key.api.common.AesKeyStrength.BITS_128;
 import static global.namespace.truevfs.comp.zip.LittleEndian.readUShort;
 import static global.namespace.truevfs.comp.zip.LittleEndian.writeShort;
 

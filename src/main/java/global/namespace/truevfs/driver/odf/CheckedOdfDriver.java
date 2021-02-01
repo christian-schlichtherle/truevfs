@@ -5,7 +5,7 @@
 package global.namespace.truevfs.driver.odf;
 
 import global.namespace.truevfs.comp.zipdriver.JarDriverEntry;
-import global.namespace.truevfs.comp.zipdriver.ZipInputService;
+import global.namespace.truevfs.comp.zipdriver.ZipInputContainer;
 
 /**
  * An archive driver for ODF files which checks the CRC32 value for all ZIP
@@ -33,7 +33,7 @@ public class CheckedOdfDriver extends OdfDriver {
      * @return {@code true}
      */
     @Override
-    public boolean check(JarDriverEntry local, ZipInputService<JarDriverEntry> input) {
+    public boolean check(JarDriverEntry local, ZipInputContainer<JarDriverEntry> input) {
         return true;
     }
 }

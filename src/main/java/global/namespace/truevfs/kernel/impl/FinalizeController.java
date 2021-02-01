@@ -36,13 +36,10 @@ abstract class FinalizeController implements FsDelegatingController {
 
     @Override
     public InputSocket<? extends Entry> input(BitField<FsAccessOption> options, FsNodeName name) {
-        return new DelegatingInputSocket<Entry>() {
+        return new DecoratingInputSocket<Entry>() {
 
-            final InputSocket<? extends Entry> socket = getController().input(options, name);
-
-            @Override
-            protected InputSocket<? extends Entry> socket() throws IOException {
-                return socket;
+            {
+                socket = getController().input(options, name);
             }
 
             @Override
@@ -60,13 +57,10 @@ abstract class FinalizeController implements FsDelegatingController {
 
     @Override
     public OutputSocket<? extends Entry> output(BitField<FsAccessOption> options, FsNodeName name, Optional<? extends Entry> template) {
-        return new DelegatingOutputSocket<Entry>() {
+        return new DecoratingOutputSocket<Entry>() {
 
-            final OutputSocket<? extends Entry> socket = getController().output(options, name, template);
-
-            @Override
-            protected OutputSocket<? extends Entry> socket() {
-                return socket;
+            {
+                socket = getController().output(options, name, template);
             }
 
             @Override
@@ -154,13 +148,13 @@ abstract class FinalizeController implements FsDelegatingController {
         }
     }
 
+    @SuppressWarnings("OptionalUsedAsFieldOrParameterType")
     private static final class FinalizeCloseable implements Closeable {
 
         final Closeable closeable;
 
         // Accessed by finalizer thread:
-        @CheckForNull
-        volatile Optional<IOException> ioException;
+        volatile @CheckForNull Optional<IOException> ioException;
 
         FinalizeCloseable(final Closeable closeable) {
             this.closeable = closeable;

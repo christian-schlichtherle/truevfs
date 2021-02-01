@@ -123,10 +123,9 @@ public final class TVFS {
             //return tree.getNodePath().getMountPoint(); // slow path
         }
         try {
-            return new FsMountPoint(new URI(tree.getFile().toURI() + "/"),
-                                    CANONICALIZE);
-        } catch (final URISyntaxException ex) {
-            throw new AssertionError(ex);
+            return new FsMountPoint(new URI(tree.getFile().toURI() + "/"), CANONICALIZE);
+        } catch (URISyntaxException e) {
+            throw new AssertionError(e);
         }
     }
 

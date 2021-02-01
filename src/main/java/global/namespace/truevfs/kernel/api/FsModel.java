@@ -4,8 +4,6 @@
  */
 package global.namespace.truevfs.kernel.api;
 
-import global.namespace.truevfs.comp.shed.ImplementationsShouldExtend;
-
 import java.util.Optional;
 
 /**
@@ -13,11 +11,10 @@ import java.util.Optional;
  * <p>
  * Implementations should be safe for multi-threaded access.
  *
- * @see    FsController
- * @see    FsManager
  * @author Christian Schlichtherle
+ * @see FsController
+ * @see FsManager
  */
-@ImplementationsShouldExtend(FsAbstractModel.class)
 public interface FsModel {
 
     /**
@@ -49,9 +46,9 @@ public interface FsModel {
      * file system controller is stateless.
      *
      * @return {@code true} if and only if some state associated with the
-     *         federated file system has been modified so that the
-     *         corresponding {@link FsController} must not get discarded until
-     *         the next {@link FsController#sync sync}.
+     * federated file system has been modified so that the
+     * corresponding {@link FsController} must not get discarded until
+     * the next {@link FsController#sync sync}.
      */
     boolean isMounted();
 
@@ -72,7 +69,7 @@ public interface FsModel {
      * <p>
      * Implementations should be safe for multi-threaded access.
      *
-     * @param  <Context> The type of the calling context.
+     * @param <Context> The type of the calling context.
      * @author Christian Schlichtherle
      */
     @SuppressWarnings("OptionalUsedAsFieldOrParameterType")
@@ -85,14 +82,11 @@ public interface FsModel {
          * When called, you may assert the following precondition:
          * {@code assert mountPoint.getParent().equals(parent.map(FsModel::getMountPoint));}
          *
-         * @param  context the calling context.
-         * @param  mountPoint the mount point of the file system.
-         * @param  parent the nullable parent file system model.
+         * @param context    the calling context.
+         * @param mountPoint the mount point of the file system.
+         * @param parent     the nullable parent file system model.
          * @return A new file system model for the given mount point.
          */
-        FsModel newModel(
-                Context context,
-                FsMountPoint mountPoint,
-                Optional<? extends FsModel> parent);
+        FsModel newModel(Context context, FsMountPoint mountPoint, Optional<? extends FsModel> parent);
     }
 }

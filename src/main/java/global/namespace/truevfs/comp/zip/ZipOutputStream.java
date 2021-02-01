@@ -11,10 +11,7 @@ import javax.annotation.Nullable;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.nio.charset.Charset;
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
 
 /**
  * Replacement for
@@ -147,9 +144,8 @@ public class ZipOutputStream extends AbstractZipOutputStream<ZipEntry> {
      *         if no entry with this name exists in this ZIP file.
      */
     @Override
-    public ZipEntry entry(String name) {
-        final ZipEntry entry = super.entry(name);
-        return entry != null ? entry.clone() : null;
+    public Optional<ZipEntry> entry(String name) {
+        return super.entry(name).map(ZipEntry::clone);
     }
 
     @Override

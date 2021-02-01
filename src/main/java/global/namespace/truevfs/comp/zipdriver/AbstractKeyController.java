@@ -6,8 +6,8 @@ package global.namespace.truevfs.comp.zipdriver;
 
 import global.namespace.truevfs.comp.cio.Entry;
 import global.namespace.truevfs.comp.cio.Entry.Access;
-import global.namespace.truevfs.comp.key.spec.KeyManager;
-import global.namespace.truevfs.comp.key.spec.KeyManagerMap;
+import global.namespace.truevfs.comp.key.api.KeyManager;
+import global.namespace.truevfs.comp.key.api.KeyManagerMap;
 import global.namespace.truevfs.comp.shed.BitField;
 import global.namespace.truevfs.comp.shed.ControlFlowException;
 import global.namespace.truevfs.kernel.api.*;

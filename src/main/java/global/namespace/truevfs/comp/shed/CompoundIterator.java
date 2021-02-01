@@ -16,6 +16,7 @@ import static java.util.Objects.requireNonNull;
  * @author Christian Schlichtherle
  */
 public final class CompoundIterator<E> implements Iterator<E> {
+
     private Iterator<? extends E> first, second;
 
     public CompoundIterator(final Iterator<? extends E> first, final Iterator<? extends E> second) {

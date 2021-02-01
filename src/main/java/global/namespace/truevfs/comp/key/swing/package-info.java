@@ -4,7 +4,7 @@
  */
 /**
  * Provides the Swing based implementation of the interface
- * {@link global.namespace.truevfs.comp.key.spec.prompting.PromptingKey.View}.
+ * {@link global.namespace.truevfs.comp.key.api.prompting.PromptingKey.View}.
  * If a key file is used for authentication instead of a password, then the
  * file size must be 512 bytes or more, of which only the first 512 bytes are
  * used.

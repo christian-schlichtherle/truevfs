@@ -7,7 +7,7 @@ package global.namespace.truevfs.comp.zip;
 import global.namespace.truevfs.comp.io.DecoratingOutputStream;
 import global.namespace.truevfs.comp.io.LittleEndianOutputStream;
 import global.namespace.truevfs.comp.io.Sink;
-import global.namespace.truevfs.comp.key.spec.common.AesKeyStrength;
+import global.namespace.truevfs.comp.key.api.common.AesKeyStrength;
 import global.namespace.truevfs.comp.shed.HashMaps;
 import org.apache.commons.compress.compressors.bzip2.BZip2CompressorOutputStream;
 
@@ -16,10 +16,7 @@ import javax.annotation.Nullable;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.nio.charset.Charset;
-import java.util.Collections;
-import java.util.Iterator;
-import java.util.LinkedHashMap;
-import java.util.Map;
+import java.util.*;
 import java.util.zip.Deflater;
 import java.util.zip.ZipException;
 
@@ -43,8 +40,7 @@ import static global.namespace.truevfs.comp.zip.ZipParametersUtils.parameters;
  * @see AbstractZipFile
  */
 public abstract class AbstractZipOutputStream<E extends ZipEntry>
-        extends DecoratingOutputStream
-        implements Iterable<E> {
+        extends DecoratingOutputStream implements Iterable<E> {
 
     private final LittleEndianOutputStream leos;
 
@@ -162,22 +158,21 @@ public abstract class AbstractZipOutputStream<E extends ZipEntry>
     }
 
     /**
-     * Returns the number of ZIP entries written so far.
-     */
-    public int size() {
-        return entries.size();
-    }
-
-    /**
-     * Returns an iteration of all entries written to this ZIP file so
-     * far.
+     * Returns an iteration of all entries written to this ZIP file so far.
      * Note that the iterated entries are shared with this instance.
-     * It is illegal to put more entries into this ZIP output stream
-     * concurrently or modify the state of the iterated entries.
+     * It is illegal to put more entries into this ZIP output stream concurrently or modify the state of the iterated
+     * entries.
      */
     @Override
     public Iterator<E> iterator() {
         return Collections.unmodifiableCollection(entries.values()).iterator();
+    }
+
+    /**
+     * Returns the number of ZIP entries written so far.
+     */
+    public int size() {
+        return entries.size();
     }
 
     /**
@@ -190,8 +185,8 @@ public abstract class AbstractZipOutputStream<E extends ZipEntry>
      * @return The entry for the given {@code name} or {@code null} if no entry
      * with this name exists in this ZIP file.
      */
-    public E entry(String name) {
-        return entries.get(name);
+    public Optional<E> entry(String name) {
+        return Optional.ofNullable(entries.get(name));
     }
 
     /**

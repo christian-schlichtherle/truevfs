@@ -6,7 +6,7 @@ package global.namespace.truevfs.comp.cio;
 
 import global.namespace.truevfs.comp.shed.BitField;
 
-import javax.annotation.Nullable;
+import java.util.Optional;
 
 import static global.namespace.truevfs.comp.cio.Entry.Access.*;
 import static global.namespace.truevfs.comp.cio.Entry.Type.*;
@@ -19,17 +19,19 @@ import static global.namespace.truevfs.comp.cio.Entry.Type.*;
  * <p>
  * Some constants of this interface are unmodifiable sets of enums.
  * These are convenient to use for loops like this:
- * <pre><code>
+ * <pre>{@code
  * for (Type type : ALL_TYPES)
  *     ...;
- * </code></pre>
+ * }</pre>
  *
- * @see    MutableEntry
  * @author Christian Schlichtherle
+ * @see MutableEntry
  */
 public interface Entry {
 
-    /** The unknown value for numeric properties, which is {@value}. */
+    /**
+     * The unknown value for numeric properties, which is {@value}.
+     */
     byte UNKNOWN = -1;
 
     /**
@@ -58,7 +60,9 @@ public interface Entry {
      */
     String getName();
 
-    /** Defines the type of an entry. */
+    /**
+     * Defines the type of an entry.
+     */
     @SuppressWarnings("PublicInnerClass")
     enum Type {
 
@@ -90,30 +94,48 @@ public interface Entry {
         SPECIAL,
     }
 
-    /** A bit field of no enums in {@link Type}. */
+    /**
+     * A bit field of no enums in {@link Type}.
+     */
     BitField<Type> NO_TYPES = BitField.noneOf(Type.class);
-    /** A bit field of all enums in {@link Type}. */
+    /**
+     * A bit field of all enums in {@link Type}.
+     */
     BitField<Type> ALL_TYPES = BitField.allOf(Type.class);
 
-    /** A bit field of just {@link Type#FILE}. */
+    /**
+     * A bit field of just {@link Type#FILE}.
+     */
     BitField<Type> FILE_TYPE = BitField.of(FILE);
-    /** A bit field of just {@link Type#DIRECTORY}. */
+    /**
+     * A bit field of just {@link Type#DIRECTORY}.
+     */
     BitField<Type> DIRECTORY_TYPE = BitField.of(DIRECTORY);
-    /** A bit field of just {@link Type#SYMLINK}. */
+    /**
+     * A bit field of just {@link Type#SYMLINK}.
+     */
     BitField<Type> SYMLINK_TYPE = BitField.of(SYMLINK);
-    /** A bit field of just {@link Type#SPECIAL}. */
+    /**
+     * A bit field of just {@link Type#SPECIAL}.
+     */
     BitField<Type> SPECIAL_TYPE = BitField.of(SPECIAL);
 
-    /** Defines the type of size information for an entry. */
+    /**
+     * Defines the type of size information for an entry.
+     */
     @SuppressWarnings("PublicInnerClass")
     enum Size {
         DATA,
         STORAGE,
     }
 
-    /** A bit field of no enums in {@link Size}. */
+    /**
+     * A bit field of no enums in {@link Size}.
+     */
     BitField<Size> NO_SIZES = BitField.noneOf(Size.class);
-    /** A bit field of all enums in {@link Size}. */
+    /**
+     * A bit field of all enums in {@link Size}.
+     */
     BitField<Size> ALL_SIZES = BitField.allOf(Size.class);
 
     /**
@@ -121,35 +143,51 @@ public interface Entry {
      * {@link #UNKNOWN} if not defined or the type is not supported.
      * This method may not be meaningful for non-{@link Type#FILE} entries.
      *
-     * @param  type the type of the size.
+     * @param type the type of the size.
      * @return The size of the given {@code type} for this entry in bytes or
-     *         {@link #UNKNOWN} if not defined or the type is not supported.
+     * {@link #UNKNOWN} if not defined or the type is not supported.
      */
     long getSize(Size type);
 
-    /** Defines the type of access information for an entry. */
+    /**
+     * Defines the type of access information for an entry.
+     */
     @SuppressWarnings("PublicInnerClass")
     enum Access {
 
-        /** Create or overwrite the entry. */
+        /**
+         * Create or overwrite the entry.
+         */
         CREATE,
 
-        /** Read the entry. */
+        /**
+         * Read the entry.
+         */
         READ,
 
-        /** Write the entry. */
+        /**
+         * Write the entry.
+         */
         WRITE,
 
-        /** Execute the entry. */
+        /**
+         * Execute the entry.
+         */
         EXECUTE,
 
-        /** Delete the entry. */
+        /**
+         * Delete the entry.
+         */
         DELETE,
     }
 
-    /** A bit field of no enums in {@link Access}. */
+    /**
+     * A bit field of no enums in {@link Access}.
+     */
     BitField<Access> NO_ACCESS = BitField.noneOf(Access.class);
-    /** A bit field of all enums in {@link Access}. */
+    /**
+     * A bit field of all enums in {@link Access}.
+     */
     BitField<Access> ALL_ACCESS = BitField.allOf(Access.class);
 
     /**
@@ -163,42 +201,49 @@ public interface Entry {
      * milliseconds since the epoch or {@value #UNKNOWN} if not
      * defined or the type is not supported.
      *
-     * @param  type the type of the access.
+     * @param type the type of the access.
      * @return The time of the given access {@code type} for this entry in
-     *         milliseconds since the epoch or {@value #UNKNOWN} if not
-     *         defined or the type is not supported.
+     * milliseconds since the epoch or {@value #UNKNOWN} if not
+     * defined or the type is not supported.
      */
     long getTime(Access type);
 
-    /** Defines access entities. */
+    /**
+     * Defines access entities.
+     */
     @SuppressWarnings({"MarkerInterface", "PublicInnerClass"})
     interface Entity {
-    } // Entity
+    }
 
-    /** Defines access entities for POSIX systems. */
+    /**
+     * Defines access entities for POSIX systems.
+     */
     @SuppressWarnings("PublicInnerClass")
     enum PosixEntity implements Entity {
         USER,
         GROUP,
         OTHER,
-    } // Entity
+    }
 
-    /** A bit field of no enums in {@link PosixEntity}. */
+    /**
+     * A bit field of no enums in {@link PosixEntity}.
+     */
     BitField<PosixEntity> NO_POSIX_ENTITIES = BitField.noneOf(PosixEntity.class);
-    /** A bit field of all enums in {@link PosixEntity}. */
+
+    /**
+     * A bit field of all enums in {@link PosixEntity}.
+     */
     BitField<PosixEntity> ALL_POSIX_ENTITIES = BitField.allOf(PosixEntity.class);
 
     /**
-     * Returns {@code true} or {@code false} if the given access {@code type}
-     * to this entry for the given {@code entity} is respectively permitted or
-     * denied.
-     * Returns {@code null} if not defined or the access type or entity is
-     * not supported.
+     * Returns {@code true} or {@code false} if the given access {@code type} to this entry for the given
+     * {@code entity} is respectively permitted or denied.
+     * Returns empty if not defined or the access type or entity is not supported.
      *
-     * @param  type the type of the access.
-     * @param  entity the entity which desires access.
-     * @return {@code true} if and only if the given access {@code type} to
-     *         this entry is permitted for the given {@code entity}.
+     * @param type   the type of the access.
+     * @param entity the entity which desires access.
+     * @return {@code true} if and only if the given access {@code type} to this entry is permitted for the given
+     * {@code entity}.
      */
-    @Nullable Boolean isPermitted(Access type, Entity entity);
+    Optional<Boolean> isPermitted(Access type, Entity entity);
 }

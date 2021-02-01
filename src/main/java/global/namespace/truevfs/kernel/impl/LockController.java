@@ -4,11 +4,14 @@
  */
 package global.namespace.truevfs.kernel.impl;
 
-import global.namespace.truevfs.comp.cio.*;
+import global.namespace.truevfs.comp.cio.Entry;
+import global.namespace.truevfs.comp.cio.InputSocket;
+import global.namespace.truevfs.comp.cio.OutputSocket;
 import global.namespace.truevfs.comp.io.DecoratingInputStream;
 import global.namespace.truevfs.comp.io.DecoratingOutputStream;
 import global.namespace.truevfs.comp.io.DecoratingSeekableChannel;
 import global.namespace.truevfs.comp.shed.BitField;
+import global.namespace.truevfs.comp.shed.Operation;
 import global.namespace.truevfs.kernel.api.*;
 
 import java.io.IOException;
@@ -42,187 +45,115 @@ abstract class LockController<E extends FsArchiveEntry> implements DelegatingArc
 
     @Override
     public Optional<? extends FsNode> node(BitField<FsAccessOption> options, FsNodeName name) throws IOException {
-        return timedReadOrWriteLocked(new Op<Optional<? extends FsNode>, IOException>() {
-
-            @Override
-            public Optional<? extends FsNode> call() throws IOException {
-                return getController().node(options, name);
-            }
-        });
+        return timedReadOrWriteLocked(() -> getController().node(options, name));
     }
 
     @Override
     public void checkAccess(BitField<FsAccessOption> options, FsNodeName name, BitField<Entry.Access> types) throws IOException {
-        timedReadOrWriteLocked(new Op<Void, IOException>() {
-
-            @Override
-            public Void call() throws IOException {
-                getController().checkAccess(options, name, types);
-                return null;
-            }
+        timedReadOrWriteLocked(() -> {
+            getController().checkAccess(options, name, types);
+            return null;
         });
     }
 
     @Override
     public void setReadOnly(BitField<FsAccessOption> options, FsNodeName name) throws IOException {
-        timedLocked.using(writeLock()).call(new Op<Void, IOException>() {
-
-            @Override
-            public Void call() throws IOException {
-                getController().setReadOnly(options, name);
-                return null;
-            }
+        timedLocked.using(getWriteLock()).call(() -> {
+            getController().setReadOnly(options, name);
+            return null;
         });
     }
 
     @Override
     public boolean setTime(BitField<FsAccessOption> options, FsNodeName name, Map<Entry.Access, Long> times) throws IOException {
-        return timedLocked.using(writeLock()).call(new Op<Boolean, IOException>() {
-
-            @Override
-            public Boolean call() throws IOException {
-                return getController().setTime(options, name, times);
-            }
-        });
+        return timedLocked.using(getWriteLock()).call(() -> getController().setTime(options, name, times));
     }
 
     @Override
     public boolean setTime(BitField<FsAccessOption> options, FsNodeName name, BitField<Entry.Access> types, long time) throws IOException {
-        return timedLocked.using(writeLock()).call(new Op<Boolean, IOException>() {
-
-            @Override
-            public Boolean call() throws IOException {
-                return getController().setTime(options, name, types, time);
-            }
-        });
+        return timedLocked.using(getWriteLock()).call(() -> getController().setTime(options, name, types, time));
     }
 
     @Override
     public InputSocket<? extends Entry> input(BitField<FsAccessOption> options, FsNodeName name) {
-        return new AbstractInputSocket<Entry>() {
+        return new InputSocket<Entry>() {
 
             final InputSocket<? extends Entry> socket = getController().input(options, name);
 
             @Override
-            public Entry target() throws IOException {
-                return fastLocked.using(writeLock()).call(new Op<Entry, IOException>() {
-                    @Override
-                    public Entry call() throws IOException {
-                        return socket.target();
-                    }
-                });
+            public Entry getTarget() throws IOException {
+                return fastLocked.using(getWriteLock()).call(socket::getTarget);
             }
 
             @Override
             public InputStream stream(Optional<? extends OutputSocket<? extends Entry>> peer) throws IOException {
-                return timedLocked.using(writeLock()).call(new Op<InputStream, IOException>() {
-
-                    @Override
-                    public InputStream call() throws IOException {
-                        return new LockInputStream(socket.stream(peer));
-                    }
-                });
+                return timedLocked.using(getWriteLock()).call(() -> new LockInputStream(socket.stream(peer)));
             }
 
             @Override
             public SeekableByteChannel channel(Optional<? extends OutputSocket<? extends Entry>> peer)
                     throws IOException {
-                return timedLocked.using(writeLock()).call(new Op<SeekableByteChannel, IOException>() {
-
-                    @Override
-                    public SeekableByteChannel call() throws IOException {
-                        return new LockSeekableChannel(socket.channel(peer));
-                    }
-                });
+                return timedLocked.using(getWriteLock()).call(() -> new LockSeekableChannel(socket.channel(peer)));
             }
         };
     }
 
     @Override
     public OutputSocket<? extends Entry> output(BitField<FsAccessOption> options, FsNodeName name, Optional<? extends Entry> template) {
-        return new AbstractOutputSocket<Entry>() {
+        return new OutputSocket<Entry>() {
 
             final OutputSocket<? extends Entry> socket = getController().output(options, name, template);
 
             @Override
-            public Entry target() throws IOException {
-                return fastLocked.using(writeLock()).call(new Op<Entry, IOException>() {
-                    @Override
-                    public Entry call() throws IOException {
-                        return socket.target();
-                    }
-                });
+            public Entry getTarget() throws IOException {
+                return fastLocked.using(getWriteLock()).call(socket::getTarget);
             }
 
             @Override
             public OutputStream stream(Optional<? extends InputSocket<? extends Entry>> peer) throws IOException {
-                return timedLocked.using(writeLock()).call(new Op<OutputStream, IOException>() {
-
-                    @Override
-                    public OutputStream call() throws IOException {
-                        return new LockOutputStream(socket.stream(peer));
-                    }
-                });
+                return timedLocked.using(getWriteLock()).call(() -> new LockOutputStream(socket.stream(peer)));
             }
 
             @Override
             public SeekableByteChannel channel(Optional<? extends InputSocket<? extends Entry>> peer)
                     throws IOException {
-                return timedLocked.using(writeLock()).call(new Op<SeekableByteChannel, IOException>() {
-
-                    @Override
-                    public SeekableByteChannel call() throws IOException {
-                        return new LockSeekableChannel(socket.channel(peer));
-                    }
-                });
+                return timedLocked.using(getWriteLock()).call(() -> new LockSeekableChannel(socket.channel(peer)));
             }
         };
     }
 
     @Override
     public void make(BitField<FsAccessOption> options, FsNodeName name, Entry.Type type, Optional<? extends Entry> template) throws IOException {
-        timedLocked.using(writeLock()).call(new Op<Void, IOException>() {
-
-            @Override
-            public Void call() throws IOException {
-                getController().make(options, name, type, template);
-                return null;
-            }
+        timedLocked.using(getWriteLock()).call(() -> {
+            getController().make(options, name, type, template);
+            return null;
         });
     }
 
     @Override
     public void unlink(BitField<FsAccessOption> options, FsNodeName name) throws IOException {
-        timedLocked.using(writeLock()).call(new Op<Void, IOException>() {
-
-            @Override
-            public Void call() throws IOException {
-                getController().unlink(options, name);
-                return null;
-            }
+        timedLocked.using(getWriteLock()).call(() -> {
+            getController().unlink(options, name);
+            return null;
         });
     }
 
     @Override
     public void sync(BitField<FsSyncOption> options) throws FsSyncException {
-        timedLocked.using(writeLock()).call(new Op<Void, FsSyncException>() {
-
-            @Override
-            public Void call() throws FsSyncException {
-                getController().sync(options);
-                return null;
-            }
+        timedLocked.using(getWriteLock()).call(() -> {
+            getController().sync(options);
+            return null;
         });
     }
 
-    private <T> T timedReadOrWriteLocked(final Op<T, IOException> op) throws IOException {
+    private <T> T timedReadOrWriteLocked(final Operation<T, IOException> op) throws IOException {
         try {
-            return timedLocked.using(readLock()).call(op);
+            return timedLocked.using(getReadLock()).call(op);
         } catch (NeedsWriteLockException e) {
-            if (readLockedByCurrentThread()) {
+            if (isReadLockedByCurrentThread()) {
                 throw e;
             }
-            return timedLocked.using(writeLock()).call(op);
+            return timedLocked.using(getWriteLock()).call(op);
         }
     }
 
@@ -234,13 +165,9 @@ abstract class LockController<E extends FsArchiveEntry> implements DelegatingArc
 
         @Override
         public void close() throws IOException {
-            deadLocked.using(writeLock()).call(new Op<Void, IOException>() {
-
-                @Override
-                public Void call() throws IOException {
-                    in.close();
-                    return null;
-                }
+            deadLocked.using(getWriteLock()).call(() -> {
+                in.close();
+                return null;
             });
         }
     }
@@ -253,13 +180,9 @@ abstract class LockController<E extends FsArchiveEntry> implements DelegatingArc
 
         @Override
         public void close() throws IOException {
-            deadLocked.using(writeLock()).call(new Op<Void, IOException>() {
-
-                @Override
-                public Void call() throws IOException {
-                    out.close();
-                    return null;
-                }
+            deadLocked.using(getWriteLock()).call(() -> {
+                out.close();
+                return null;
             });
         }
     }
@@ -272,13 +195,9 @@ abstract class LockController<E extends FsArchiveEntry> implements DelegatingArc
 
         @Override
         public void close() throws IOException {
-            deadLocked.using(writeLock()).call(new Op<Void, IOException>() {
-
-                @Override
-                public Void call() throws IOException {
-                    channel.close();
-                    return null;
-                }
+            deadLocked.using(getWriteLock()).call(() -> {
+                channel.close();
+                return null;
             });
         }
     }

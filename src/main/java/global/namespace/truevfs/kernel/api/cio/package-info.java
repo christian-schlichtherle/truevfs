@@ -4,7 +4,7 @@
  */
 /**
  * Provides a
- * {@link global.namespace.truevfs.kernel.api.cio.MultiplexingOutputService}.
+ * {@link global.namespace.truevfs.kernel.api.cio.MultiplexingOutputContainer}.
  *
  * @author Christian Schlichtherle
  */

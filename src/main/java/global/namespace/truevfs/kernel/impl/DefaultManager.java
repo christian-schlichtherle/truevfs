@@ -6,11 +6,15 @@ package global.namespace.truevfs.kernel.impl;
 
 import global.namespace.truevfs.comp.shed.Filter;
 import global.namespace.truevfs.comp.shed.Link;
+import global.namespace.truevfs.comp.shed.Operation;
 import global.namespace.truevfs.comp.shed.Visitor;
 import global.namespace.truevfs.kernel.api.*;
 import lombok.val;
 
-import java.util.*;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Optional;
+import java.util.WeakHashMap;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 import java.util.stream.Collectors;
 
@@ -61,24 +65,12 @@ final class DefaultManager extends FsAbstractManager implements ReentrantReadWri
     @Override
     public FsController controller(final FsCompositeDriver driver, final FsMountPoint mountPoint) {
         try {
-            return readLocked(new Op<FsController, RuntimeException>() {
-
-                @Override
-                public FsController call() throws RuntimeException {
-                    return controller0(driver, mountPoint);
-                }
-            });
+            return runReadLocked(() -> controller0(driver, mountPoint));
         } catch (NeedsWriteLockException ex) {
-            if (readLockedByCurrentThread()) {
+            if (isReadLockedByCurrentThread()) {
                 throw ex;
             }
-            return writeLocked(new Op<FsController, RuntimeException>() {
-
-                @Override
-                public FsController call() throws RuntimeException {
-                    return controller0(driver, mountPoint);
-                }
-            });
+            return runWriteLocked(() -> controller0(driver, mountPoint));
         }
     }
 
@@ -101,31 +93,26 @@ final class DefaultManager extends FsAbstractManager implements ReentrantReadWri
 
     @Override
     public <X extends Exception, V extends Visitor<? super FsController, X>> V accept(final Filter<? super FsController> filter, final V visitor) throws X {
-        return new Op<V, X>() {
+        return new Operation<V, X>() {
 
             boolean allUnmounted = true;
 
             @Override
-            public V call() throws X {
+            public V run() throws X {
                 try {
-                    for (val controller : readLocked(new Op<List<FsController>, RuntimeException>() {
-
-                        @Override
-                        public List<FsController> call() throws RuntimeException {
-                            return controllers
-                                    .values()
-                                    .stream()
-                                    .map(Link::get)
-                                    .filter(Objects::nonNull)
-                                    .filter(c -> {
-                                        val accepted = filter.accept(c);
-                                        allUnmounted &= accepted;
-                                        return accepted;
-                                    })
-                                    .sorted(new FsControllerComparator())
-                                    .collect(Collectors.toList());
-                        }
-                    })) {
+                    for (final FsController controller : runReadLocked(() -> controllers
+                            .values()
+                            .stream()
+                            .map(Link::get)
+                            .filter(Objects::nonNull)
+                            .filter(c -> {
+                                val accepted = filter.accept(c);
+                                allUnmounted &= accepted;
+                                return accepted;
+                            })
+                            .sorted(new FsControllerComparator())
+                            .collect(Collectors.toList()))
+                    ) {
                         try {
                             visitor.visit(controller);
                         } finally {
@@ -139,7 +126,7 @@ final class DefaultManager extends FsAbstractManager implements ReentrantReadWri
                 }
                 return visitor;
             }
-        }.call();
+        }.run();
     }
 
     /**
@@ -166,24 +153,20 @@ final class DefaultManager extends FsAbstractManager implements ReentrantReadWri
          */
         @Override
         public void setMounted(boolean mounted) {
-            writeLocked(new Op<Void, RuntimeException>() {
-
-                @Override
-                public Void call() throws RuntimeException {
-                    if (model.isMounted() != mounted) {
-                        if (mounted) {
-                            syncOnShutdown.arm();
-                        }
-                        ManagedModel.this.schedule(mounted);
-                        model.setMounted(mounted);
+            runWriteLocked(() -> {
+                if (model.isMounted() != mounted) {
+                    if (mounted) {
+                        syncOnShutdown.arm();
                     }
-                    return null;
+                    ManagedModel.this.schedule(mounted);
+                    model.setMounted(mounted);
                 }
+                return null;
             });
         }
 
         void schedule(final boolean mandatory) {
-            assert writeLockedByCurrentThread();
+            assert isWriteLockedByCurrentThread();
             controllers.put(getMountPoint(), (mandatory ? STRONG : WEAK).newLink(_controller));
         }
     }

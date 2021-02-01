@@ -38,7 +38,7 @@ final class ReadOnlyArchiveFileSystem<E extends FsArchiveEntry> extends ArchiveF
             final Container<E> archive,
             final Entry rootTemplate,
             final Supplier<? extends Throwable> cause
-    ) {
+    ) throws IOException {
         super(model, archive, rootTemplate);
         this.cause = cause;
     }

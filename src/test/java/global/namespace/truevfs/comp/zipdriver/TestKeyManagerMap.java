@@ -4,12 +4,13 @@
  */
 package global.namespace.truevfs.comp.zipdriver;
 
+import global.namespace.truevfs.comp.key.api.AbstractKeyManagerMap;
+import global.namespace.truevfs.comp.key.api.KeyManager;
+import global.namespace.truevfs.comp.key.api.common.AesPbeParameters;
+import global.namespace.truevfs.comp.key.api.prompting.TestView;
+
 import java.util.Collections;
 import java.util.Map;
-import global.namespace.truevfs.comp.key.spec.AbstractKeyManagerMap;
-import global.namespace.truevfs.comp.key.spec.KeyManager;
-import global.namespace.truevfs.comp.key.spec.common.AesPbeParameters;
-import global.namespace.truevfs.comp.key.spec.prompting.TestView;
 
 /**
  * @author Christian Schlichtherle

@@ -6,7 +6,7 @@ package global.namespace.truevfs.driver.zip.raes.crypto;
 
 import global.namespace.truevfs.comp.io.DecoratingOutputStream;
 import global.namespace.truevfs.comp.io.Sink;
-import global.namespace.truevfs.comp.key.spec.KeyStrength;
+import global.namespace.truevfs.comp.key.api.KeyStrength;
 import org.bouncycastle.crypto.Mac;
 
 import java.io.IOException;

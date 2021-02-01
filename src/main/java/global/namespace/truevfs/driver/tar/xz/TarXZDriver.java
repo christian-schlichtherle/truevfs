@@ -4,15 +4,15 @@
  */
 package global.namespace.truevfs.driver.tar.xz;
 
-import global.namespace.truevfs.comp.cio.InputService;
-import global.namespace.truevfs.comp.cio.OutputService;
+import global.namespace.truevfs.comp.cio.InputContainer;
+import global.namespace.truevfs.comp.cio.OutputContainer;
 import global.namespace.truevfs.comp.io.AbstractSink;
 import global.namespace.truevfs.comp.io.AbstractSource;
 import global.namespace.truevfs.comp.io.Streams;
 import global.namespace.truevfs.comp.shed.BitField;
 import global.namespace.truevfs.comp.tardriver.*;
 import global.namespace.truevfs.kernel.api.*;
-import global.namespace.truevfs.kernel.api.cio.MultiplexingOutputService;
+import global.namespace.truevfs.kernel.api.cio.MultiplexingOutputContainer;
 import org.tukaani.xz.LZMA2Options;
 import org.tukaani.xz.XZInputStream;
 import org.tukaani.xz.XZOutputStream;
@@ -59,7 +59,7 @@ public class TarXZDriver extends TarDriver {
     }
 
     @Override
-    protected InputService<TarDriverEntry> newInput(
+    protected InputContainer<TarDriverEntry> newInput(
             final FsModel model,
             final FsInputSocketSource source)
             throws IOException {
@@ -83,14 +83,14 @@ public class TarXZDriver extends TarDriver {
             }
         }
 
-        return new TarInputService(model, new Source(), this);
+        return new TarInputContainer(model, new Source(), this);
     }
 
     @Override
-    protected OutputService<TarDriverEntry> newOutput(
+    protected OutputContainer<TarDriverEntry> newOutput(
             final FsModel model,
             final FsOutputSocketSink sink,
-            final @CheckForNull InputService<TarDriverEntry> input)
+            final @CheckForNull InputContainer<TarDriverEntry> input)
             throws IOException {
 
         class Sink extends AbstractSink {
@@ -113,7 +113,7 @@ public class TarXZDriver extends TarDriver {
             }
         }
 
-        return new MultiplexingOutputService<>(getPool(), new TarOutputService(model, new Sink(), this));
+        return new MultiplexingOutputContainer<>(getPool(), new TarOutputContainer(model, new Sink(), this));
     }
 
     /**

@@ -30,7 +30,7 @@ public class CheckedJarDriver extends JarDriver {
      * @return {@code true}
      */
     @Override
-    public boolean check(JarDriverEntry local, ZipInputService<JarDriverEntry> input) {
+    public boolean check(JarDriverEntry local, ZipInputContainer<JarDriverEntry> input) {
         return true;
     }
 }

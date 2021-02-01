@@ -8,12 +8,12 @@ import global.namespace.truevfs.comp.cio.Entry;
 import global.namespace.truevfs.comp.cio.Entry.Access;
 import global.namespace.truevfs.comp.cio.Entry.PosixEntity;
 import global.namespace.truevfs.comp.cio.Entry.Type;
-import global.namespace.truevfs.comp.cio.InputService;
+import global.namespace.truevfs.comp.cio.InputContainer;
 import global.namespace.truevfs.comp.cio.IoBufferPool;
-import global.namespace.truevfs.comp.cio.OutputService;
+import global.namespace.truevfs.comp.cio.OutputContainer;
 import global.namespace.truevfs.comp.shed.BitField;
 import global.namespace.truevfs.kernel.api.*;
-import global.namespace.truevfs.kernel.api.cio.MultiplexingOutputService;
+import global.namespace.truevfs.kernel.api.cio.MultiplexingOutputContainer;
 import global.namespace.truevfs.kernel.api.sl.IoBufferPoolLocator;
 import org.apache.commons.compress.archivers.tar.TarArchiveEntry;
 import org.apache.commons.compress.archivers.tar.TarArchiveOutputStream;
@@ -115,9 +115,9 @@ public class TarDriver extends FsArchiveDriver<TarDriverEntry> {
      * {@inheritDoc}
      *
      * @return The implementation in the class {@link TarDriver} returns
-     *         {@code true} because when reading a TAR file sequentially,
-     *         each TAR entry should &quot;override&quot; any previously read
-     *         TAR entry with an equal name.
+     * {@code true} because when reading a TAR file sequentially,
+     * each TAR entry should &quot;override&quot; any previously read
+     * TAR entry with an equal name.
      */
     @Override
     public boolean getRedundantContentSupport() {
@@ -125,20 +125,20 @@ public class TarDriver extends FsArchiveDriver<TarDriverEntry> {
     }
 
     @Override
-    protected InputService<TarDriverEntry> newInput(
+    protected InputContainer<TarDriverEntry> newInput(
             final FsModel model,
             final FsInputSocketSource source)
-    throws IOException {
-        return new TarInputService(model, source, this);
+            throws IOException {
+        return new TarInputContainer(model, source, this);
     }
 
     @Override
-    protected OutputService<TarDriverEntry> newOutput(
+    protected OutputContainer<TarDriverEntry> newOutput(
             FsModel model,
             FsOutputSocketSink sink,
-            @CheckForNull InputService<TarDriverEntry> input)
-    throws IOException {
-        return new MultiplexingOutputService<>(getPool(), new TarOutputService(model, sink, this));
+            @CheckForNull InputContainer<TarDriverEntry> input)
+            throws IOException {
+        return new MultiplexingOutputContainer<>(getPool(), new TarOutputContainer(model, sink, this));
     }
 
     /**
@@ -187,9 +187,11 @@ public class TarDriver extends FsArchiveDriver<TarDriverEntry> {
             if (null != template) {
                 entry.setModTime(template.getTime(WRITE));
                 entry.setSize(template.getSize(DATA));
-                for (final Access access : ALL_POSIX_ACCESS)
-                    for (final PosixEntity entity : ALL_POSIX_ENTITIES)
+                for (Access access : ALL_POSIX_ACCESS) {
+                    for (PosixEntity entity : ALL_POSIX_ENTITIES) {
                         entry.setPermitted(access, entity, template.isPermitted(access, entity));
+                    }
+                }
             }
         }
         return entry;

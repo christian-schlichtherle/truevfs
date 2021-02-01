@@ -6,7 +6,7 @@ package global.namespace.truevfs.comp.zip;
 
 import global.namespace.truevfs.comp.io.DecoratingOutputStream;
 import global.namespace.truevfs.comp.io.LittleEndianOutputStream;
-import global.namespace.truevfs.comp.key.spec.KeyStrength;
+import global.namespace.truevfs.comp.key.api.KeyStrength;
 import global.namespace.truevfs.comp.zip.crypto.BufferedPartialBlockCipher;
 import global.namespace.truevfs.comp.zip.crypto.CipherOutputStream;
 import org.bouncycastle.crypto.BufferedBlockCipher;

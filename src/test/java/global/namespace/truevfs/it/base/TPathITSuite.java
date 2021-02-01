@@ -43,14 +43,13 @@ import static org.junit.Assert.*;
  * Tests a particular {@link FsArchiveDriver} using the API of the module
  * TrueVFS Access.
  *
- * @param  <D> the type of the archive driver.
- * @see    TFileITSuite
+ * @param <D> the type of the archive driver.
  * @author Christian Schlichtherle
+ * @see TFileITSuite
  */
 public abstract class TPathITSuite<D extends FsArchiveDriver<?>> extends ConfiguredClientTestBase<D> {
 
-    private static final Logger
-            logger = LoggerFactory.getLogger(TPathITSuite.class);
+    private static final Logger logger = LoggerFactory.getLogger(TPathITSuite.class);
 
     /**
      * The prefix for temporary files, which is {@value}.
@@ -92,12 +91,16 @@ public abstract class TPathITSuite<D extends FsArchiveDriver<?>> extends Configu
         }
     }
 
-    /** Returns the current archive file. */
+    /**
+     * Returns the current archive file.
+     */
     protected final TPath getArchive() {
         return archive;
     }
 
-    /** Unmounts the {@linkplain #getArchive() current archive file}. */
+    /**
+     * Unmounts the {@linkplain #getArchive() current archive file}.
+     */
     protected final void umount() throws FsSyncException {
         if (null != archive) archive.getFileSystem().close();
     }
@@ -124,36 +127,18 @@ public abstract class TPathITSuite<D extends FsArchiveDriver<?>> extends Configu
     }
 
     @Test
-    public void testArchiveControllerStateWithInputStream()
-    throws IOException, InterruptedException {
-        assertArchiveControllerStateWithResource(
-                new Factory<InputStream, String, IOException>() {
-            @Override
-            public InputStream create(String entry) throws IOException {
-                return newInputStream(new TPath(entry));
-            }
-        });
+    public void testArchiveControllerStateWithInputStream() throws IOException, InterruptedException {
+        assertArchiveControllerStateWithResource(entry -> newInputStream(new TPath(entry)));
     }
 
     @Test
-    public void testArchiveControllerStateWithOutputStream()
-    throws IOException, InterruptedException {
-        assertArchiveControllerStateWithResource(
-                new Factory<OutputStream, String, IOException>() {
-            @Override
-            public OutputStream create(String entry) throws IOException {
-                return newOutputStream(new TPath(entry));
-            }
-        });
-    }
-
-    private interface Factory<O, P, E extends Exception> {
-        O create(P param) throws E;
+    public void testArchiveControllerStateWithOutputStream() throws IOException, InterruptedException {
+        assertArchiveControllerStateWithResource(entry -> newOutputStream(new TPath(entry)));
     }
 
     private void assertArchiveControllerStateWithResource(
-            final Factory<? extends Closeable, ? super String, ? extends IOException> factory)
-    throws IOException, InterruptedException {
+            final Factory<? extends Closeable, ? super String, ? extends IOException> factory
+    ) throws IOException, InterruptedException {
         final String entry = archive + "/entry";
         archive = null;
         createFile(new TPath(entry));
@@ -177,8 +162,8 @@ public abstract class TPathITSuite<D extends FsArchiveDriver<?>> extends Configu
     private Reference<FsController> assertReferenceForResource(
             final Factory<? extends Closeable, ? super String, ? extends IOException> factory,
             final String entry,
-            final ReferenceQueue<FsController> queue)
-    throws IOException, InterruptedException {
+            final ReferenceQueue<FsController> queue
+    ) throws IOException, InterruptedException {
         final Reference<FsController> reference;
         try (Closeable ignored = factory.create(entry)) {
             reference = new WeakReference<>(controller(new TPath(entry).getNodePath()), queue);
@@ -226,8 +211,8 @@ public abstract class TPathITSuite<D extends FsArchiveDriver<?>> extends Configu
         try (final InputStream in = newInputStream(file)) {
             byte[] buf = new byte[getDataLength()];
             final int read = in.read(buf);
-            assertEquals(   ByteBuffer.wrap(getData(), 0, read),
-                            ByteBuffer.wrap(buf, 0, read));
+            assertEquals(ByteBuffer.wrap(getData(), 0, read),
+                    ByteBuffer.wrap(buf, 0, read));
         }
         assertRm(file);
 
@@ -302,7 +287,7 @@ public abstract class TPathITSuite<D extends FsArchiveDriver<?>> extends Configu
     }
 
     @Test
-    public void testCreateNewFile() throws IOException{
+    public void testCreateNewFile() throws IOException {
         assertCreateNewPlainFile();
         assertCreateNewEnhancedFile();
     }
@@ -335,10 +320,10 @@ public abstract class TPathITSuite<D extends FsArchiveDriver<?>> extends Configu
         assertCreateNewFile(archive, file1, file2);
     }
 
-    private void assertCreateNewFile(   final Path dir,
-                                        final Path file1,
-                                        final Path file2)
-    throws IOException {
+    private void assertCreateNewFile(final Path dir,
+                                     final Path file1,
+                                     final Path file2)
+            throws IOException {
         assertFalse(exists(dir));
 
         createDirectory(dir);
@@ -388,8 +373,8 @@ public abstract class TPathITSuite<D extends FsArchiveDriver<?>> extends Configu
     public void testIllegalDirectoryOperations() throws IOException {
         try {
             final String[] names = {
-                "inner" + getExtension(),
-                "dir",
+                    "inner" + getExtension(),
+                    "dir",
             };
             TPath file = archive;
             for (int i = 0; i <= names.length; i++) {
@@ -408,7 +393,7 @@ public abstract class TPathITSuite<D extends FsArchiveDriver<?>> extends Configu
     }
 
     private void assertIllegalDirectoryOperations(final TPath dir)
-    throws IOException {
+            throws IOException {
         assert isDirectory(dir);
         try {
             newInputStream(dir).close();
@@ -520,7 +505,7 @@ public abstract class TPathITSuite<D extends FsArchiveDriver<?>> extends Configu
     @SuppressWarnings("ResultOfObjectAllocationIgnored")
     @Test
     public void testBusyFileInputStream()
-    throws IOException, InterruptedException {
+            throws IOException, InterruptedException {
         final TPath file1 = archive.resolve("file1");
         final TPath file2 = archive.resolve("file2");
 
@@ -588,7 +573,7 @@ public abstract class TPathITSuite<D extends FsArchiveDriver<?>> extends Configu
     @SuppressWarnings("ResultOfObjectAllocationIgnored")
     @Test
     public void testBusyFileOutputStream()
-    throws IOException, InterruptedException {
+            throws IOException, InterruptedException {
         TPath file1 = archive.resolve("file1");
         TPath file2 = archive.resolve("file2");
 
@@ -626,7 +611,7 @@ public abstract class TPathITSuite<D extends FsArchiveDriver<?>> extends Configu
                 throw ex;
             logger.info(
                     getArchiveDriver().getClass()
-                        + " does not support concurrent writing of different entries in the same archive file.",
+                            + " does not support concurrent writing of different entries in the same archive file.",
                     ex);
         }
 
@@ -778,7 +763,7 @@ public abstract class TPathITSuite<D extends FsArchiveDriver<?>> extends Configu
     }
 
     private void assertDirectoryTree(TPath basePath, TPath reversePath)
-    throws IOException {
+            throws IOException {
         if (reversePath == null) {
             // We're at the leaf of the directory tree.
             final TPath test = basePath.resolve("test.txt");
@@ -893,7 +878,7 @@ public abstract class TPathITSuite<D extends FsArchiveDriver<?>> extends Configu
     }
 
     private void assertCopyContainingOrSameFiles0(final TPath a, final TPath b)
-    throws IOException {
+            throws IOException {
         assertCopyContainingOrSameFiles1(a, b);
         assertCopyContainingOrSameFiles1(a.toRealPath(), b);
         assertCopyContainingOrSameFiles1(a, b.toRealPath());
@@ -901,7 +886,7 @@ public abstract class TPathITSuite<D extends FsArchiveDriver<?>> extends Configu
     }
 
     private void assertCopyContainingOrSameFiles1(final TPath a, final TPath b)
-    throws IOException {
+            throws IOException {
         try {
             copy(a, a, StandardCopyOption.REPLACE_EXISTING);
             fail();
@@ -927,9 +912,9 @@ public abstract class TPathITSuite<D extends FsArchiveDriver<?>> extends Configu
     @Test
     public void testCopyDelete() throws IOException {
         final String[] names = {
-            "0" + getExtension(),
-            "1" + getExtension(),
-            //"2" + getExtension(),
+                "0" + getExtension(),
+                "1" + getExtension(),
+                //"2" + getExtension(),
         };
 
         createDirectory(archive); // create valid archive file
@@ -942,7 +927,7 @@ public abstract class TPathITSuite<D extends FsArchiveDriver<?>> extends Configu
     }
 
     private void assertCopyDelete(final TPath parent, String[] names, int off)
-    throws IOException {
+            throws IOException {
         if (off >= names.length)
             return;
 
@@ -960,7 +945,7 @@ public abstract class TPathITSuite<D extends FsArchiveDriver<?>> extends Configu
     }
 
     private void assertCopyDelete(final TPath parent, final TPath dir)
-    throws IOException {
+            throws IOException {
         final TPath parentFile = parent.resolve("file");
         final TPath parentArchive = parent.resolve("archive" + getExtension());
         final TPath dirFile = dir.resolve("file");
@@ -988,10 +973,10 @@ public abstract class TPathITSuite<D extends FsArchiveDriver<?>> extends Configu
         assertCopyDelete0(a, b, 2000 + 2000);
     }
 
-    private void assertCopyDelete0( final TPath a,
-                                    final TPath b,
-                                    final long granularity)
-    throws IOException {
+    private void assertCopyDelete0(final TPath a,
+                                   final TPath b,
+                                   final long granularity)
+            throws IOException {
         // Create a file with an old timestamp.
         final long time = System.currentTimeMillis();
         createTestFile(a);
@@ -1034,7 +1019,7 @@ public abstract class TPathITSuite<D extends FsArchiveDriver<?>> extends Configu
 
     @Test
     public void testIllegalDeleteOfEntryWithOpenStream()
-    throws IOException {
+            throws IOException {
         final TPath entry1 = archive.resolve("entry1");
         final TPath entry2 = archive.resolve("entry2");
         try (final OutputStream out1 = newOutputStream(entry1)) {
@@ -1099,7 +1084,7 @@ public abstract class TPathITSuite<D extends FsArchiveDriver<?>> extends Configu
     @Test
     public void testRenameValidArchive() throws IOException {
         try (final PrintStream out = new PrintStream(
-                     newOutputStream(archive.resolve("entry")))) {
+                newOutputStream(archive.resolve("entry")))) {
             out.println("Hello World!");
         }
         assertRenameArchiveToTemp(archive);
@@ -1122,7 +1107,7 @@ public abstract class TPathITSuite<D extends FsArchiveDriver<?>> extends Configu
     }
 
     private void assertRenameArchiveToTemp(final TPath archive)
-    throws IOException {
+            throws IOException {
         assert archive.isArchive(); // regular archive or false positive
         assert !archive.isEntry(); // not contained in another archive file
 
@@ -1196,9 +1181,9 @@ public abstract class TPathITSuite<D extends FsArchiveDriver<?>> extends Configu
     }
 
     private static final String[] MEMBERS = {
-        "A directory member",
-        "Another directory member",
-        "Yet another directory member",
+            "A directory member",
+            "Another directory member",
+            "Yet another directory member",
     };
 
     @Test
@@ -1230,7 +1215,7 @@ public abstract class TPathITSuite<D extends FsArchiveDriver<?>> extends Configu
     }
 
     private void assertList(final Path[] expected, final TPath dir)
-    throws IOException {
+            throws IOException {
         final Path[] got = listFiles(dir);
         Arrays.sort(got);
         assertEquals(expected.length, got.length);
@@ -1245,14 +1230,14 @@ public abstract class TPathITSuite<D extends FsArchiveDriver<?>> extends Configu
 
     @Test
     public void testMultithreadedSingleArchiveMultipleEntriesReading()
-    throws Exception {
+            throws Exception {
         assertMultithreadedSingleArchiveMultipleEntriesReading(NUM_IO_THREADS, NUM_IO_THREADS);
     }
 
     private void assertMultithreadedSingleArchiveMultipleEntriesReading(
             final int nEntries,
             final int nThreads)
-    throws Exception {
+            throws Exception {
         // Create test archive file.
         createTestArchive(nEntries);
 
@@ -1284,7 +1269,7 @@ public abstract class TPathITSuite<D extends FsArchiveDriver<?>> extends Configu
     }
 
     private void assertArchiveEntries(final TPath archive, int nEntries)
-    throws IOException {
+            throws IOException {
         // Retrieve list of entries and shuffle their order.
         final List<Path> entries = Arrays.asList(listFiles(archive));
         assert entries.size() == nEntries; // this would be a programming error in the test class itself - not the class under test!
@@ -1302,8 +1287,8 @@ public abstract class TPathITSuite<D extends FsArchiveDriver<?>> extends Configu
                     if (0 > read)
                         break;
                     assertTrue(read > 0);
-                    assertEquals(   ByteBuffer.wrap(getData(), off, read),
-                                    ByteBuffer.wrap(buf, 0, read));
+                    assertEquals(ByteBuffer.wrap(getData(), off, read),
+                            ByteBuffer.wrap(buf, 0, read));
                     off += read;
                 }
                 assertEquals(-1, read);
@@ -1315,14 +1300,14 @@ public abstract class TPathITSuite<D extends FsArchiveDriver<?>> extends Configu
 
     @Test
     public void testMultithreadedSingleArchiveMultipleEntriesWriting()
-    throws Exception {
+            throws Exception {
         assertMultithreadedSingleArchiveMultipleEntriesWriting(false);
         assertMultithreadedSingleArchiveMultipleEntriesWriting(true);
     }
 
     private void assertMultithreadedSingleArchiveMultipleEntriesWriting(
             final boolean wait)
-    throws Exception {
+            throws Exception {
         assert TConfig.current().isLenient();
 
         class WriteFactory implements TaskFactory {
@@ -1369,14 +1354,14 @@ public abstract class TPathITSuite<D extends FsArchiveDriver<?>> extends Configu
 
     @Test
     public void testMultithreadedMultipleArchivesSingleEntryWriting()
-    throws Exception {
+            throws Exception {
         assertMultithreadedMultipleArchivesSingleEntryWriting(false);
         assertMultithreadedMultipleArchivesSingleEntryWriting(true);
     }
 
     private void assertMultithreadedMultipleArchivesSingleEntryWriting(
             final boolean syncIndividually)
-    throws Exception {
+            throws Exception {
         assert TConfig.current().isLenient();
 
         class Write implements Callable<Void> {
@@ -1424,7 +1409,9 @@ public abstract class TPathITSuite<D extends FsArchiveDriver<?>> extends Configu
         start(NUM_IO_THREADS, new WriteFactory()).join();
     }
 
-    /** Test for http://java.net/jira/browse/TRUEZIP-192 . */
+    /**
+     * Test for http://java.net/jira/browse/TRUEZIP-192 .
+     */
     @Test
     public void testMultithreadedMutualArchiveCopying() throws Exception {
         assert TConfig.current().isLenient();
