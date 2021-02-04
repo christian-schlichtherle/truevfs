@@ -5,18 +5,9 @@
 package global.namespace.truevfs.comp.shed;
 
 import org.junit.Test;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
-import java.beans.ExceptionListener;
-import java.beans.XMLDecoder;
-import java.beans.XMLEncoder;
-import java.io.*;
-import java.lang.reflect.UndeclaredThrowableException;
-import java.util.Arrays;
 import java.util.Iterator;
 
-import static global.namespace.truevfs.comp.shed.BitFieldTest.Dummy.*;
 import static org.hamcrest.CoreMatchers.*;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.Assert.*;
@@ -26,50 +17,47 @@ import static org.junit.Assert.*;
  */
 public class BitFieldTest {
 
-    private static final Logger
-            logger = LoggerFactory.getLogger(BitFieldTest.class);
-
     @Test
     public void testSetOne() {
-        BitField<Dummy> bits = BitField.noneOf(Dummy.class).set(ONE);
+        BitField<Dummy> bits = BitField.noneOf(Dummy.class).set(Dummy.ONE);
         assertFalse(bits.isEmpty());
         assertThat(bits.cardinality(), is(1));
-        assertTrue(bits.get(ONE));
-        assertTrue(bits.is(ONE));
+        assertTrue(bits.get(Dummy.ONE));
+        assertTrue(bits.is(Dummy.ONE));
         assertThat(BitField.copyOf(bits.toEnumSet()), equalTo(bits));
     }
 
     @Test
     public void testClearOne() {
-        BitField<Dummy> bits = BitField.of(ONE).clear(ONE);
+        BitField<Dummy> bits = BitField.of(Dummy.ONE).clear(Dummy.ONE);
         assertTrue(bits.isEmpty());
         assertThat(bits.cardinality(), is(0));
-        assertFalse(bits.get(ONE));
-        assertFalse(bits.is(ONE));
+        assertFalse(bits.get(Dummy.ONE));
+        assertFalse(bits.is(Dummy.ONE));
         assertThat(BitField.copyOf(bits.toEnumSet()), equalTo(bits));
     }
 
     @Test
     public void testSetTwo() {
-        BitField<Dummy> bits = BitField.of(ONE, TWO);
+        BitField<Dummy> bits = BitField.of(Dummy.ONE, Dummy.TWO);
         assertFalse(bits.isEmpty());
         assertThat(bits.cardinality(), is(2));
-        assertTrue(bits.get(ONE));
-        assertTrue(bits.is(ONE));
-        assertTrue(bits.get(TWO));
-        assertTrue(bits.is(TWO));
+        assertTrue(bits.get(Dummy.ONE));
+        assertTrue(bits.is(Dummy.ONE));
+        assertTrue(bits.get(Dummy.TWO));
+        assertTrue(bits.is(Dummy.TWO));
         assertThat(BitField.copyOf(bits.toEnumSet()), equalTo(bits));
     }
 
     @Test
     public void testClearTwo() {
-        BitField<Dummy> bits = BitField.of(ONE, TWO).clear(ONE).clear(TWO);
+        BitField<Dummy> bits = BitField.of(Dummy.ONE, Dummy.TWO).clear(Dummy.ONE).clear(Dummy.TWO);
         assertTrue(bits.isEmpty());
         assertThat(bits.cardinality(), is(0));
-        assertFalse(bits.get(ONE));
-        assertFalse(bits.is(ONE));
-        assertFalse(bits.get(TWO));
-        assertFalse(bits.is(TWO));
+        assertFalse(bits.get(Dummy.ONE));
+        assertFalse(bits.is(Dummy.ONE));
+        assertFalse(bits.get(Dummy.TWO));
+        assertFalse(bits.is(Dummy.TWO));
         assertThat(BitField.copyOf(bits.toEnumSet()), equalTo(bits));
     }
 
@@ -121,63 +109,5 @@ public class BitFieldTest {
         }
     }
 
-    @Test
-    public void testSerialization() throws IOException, ClassNotFoundException {
-        final ExceptionListener listener = new ExceptionListener() {
-            @Override
-            public void exceptionThrown(Exception ex) {
-                throw new UndeclaredThrowableException(ex);
-            }
-        };
-
-        for (final Dummy[] params : new Dummy[][]{
-                // { }, // Doesn't work in Sun's JDK 1.6.* - requires JDK 1.7.0-ea
-                {ONE,},
-                {ONE, TWO,},
-                {ONE, TWO, THREE,},
-        }) {
-            final BitField<Dummy> original
-                    = BitField.copyOf(Arrays.asList(params));
-
-            {
-                final ByteArrayOutputStream bos = new ByteArrayOutputStream();
-                try (final ObjectOutputStream oos = new ObjectOutputStream(bos)) {
-                    oos.writeObject(original);
-                }
-
-                logger.trace("Number of serialized bytes: {}", bos.size());
-
-                final ByteArrayInputStream bis = new ByteArrayInputStream(bos.toByteArray());
-                final Object clone;
-                try (final ObjectInputStream ois = new ObjectInputStream(bis)) {
-                    clone = ois.readObject();
-                }
-
-                assertThat(clone, not(sameInstance((Object) original)));
-                assertThat(clone, equalTo((Object) original));
-            }
-
-            {
-                final ByteArrayOutputStream bos = new ByteArrayOutputStream();
-                try (final XMLEncoder enc = new XMLEncoder(bos)) {
-                    enc.setExceptionListener(listener);
-                    enc.writeObject(original);
-                }
-
-                logger.trace("XML Output:\n{}", bos.toString("UTF-8"));
-
-                final ByteArrayInputStream bis = new ByteArrayInputStream(bos.toByteArray());
-                final Object clone;
-                try (final XMLDecoder dec = new XMLDecoder(bis)) {
-                    clone = dec.readObject();
-                }
-
-                assertThat(clone, not(sameInstance((Object) original)));
-                assertThat(clone, equalTo((Object) original));
-            }
-        }
-    }
-
-    @SuppressWarnings("PackageVisibleInnerClass")
-    enum Dummy {ONE, TWO, THREE}
+    private enum Dummy {ONE, TWO, THREE}
 }

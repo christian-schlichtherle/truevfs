@@ -4,7 +4,6 @@
  */
 package global.namespace.truevfs.comp.shed;
 
-import java.io.Serializable;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.EnumSet;
@@ -22,10 +21,7 @@ import java.util.Iterator;
  * @author Christian Schlichtherle
  */
 // TODO: Add more modifying methods.
-public final class BitField<E extends Enum<E>>
-implements Iterable<E>, Serializable {
-
-    private static final long serialVersionUID = 0;
+public final class BitField<E extends Enum<E>> implements Iterable<E> {
 
     private final EnumSet<E> bits;
 

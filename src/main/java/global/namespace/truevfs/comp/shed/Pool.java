@@ -11,8 +11,8 @@ package global.namespace.truevfs.comp.shed;
  * However, this does not necessarily apply to the implementation of its
  * managed resources.
  *
- * @param  <R> the type of the resources managed by this pool.
- * @param  <X> the type of the exceptions thrown by this pool.
+ * @param <R> the type of the resources managed by this pool.
+ * @param <X> the type of the exceptions thrown by this pool.
  * @author Christian Schlichtherle
  */
 public interface Pool<R, X extends Exception> {
@@ -31,11 +31,11 @@ public interface Pool<R, X extends Exception> {
     /**
      * Releases a previously allocated resource to this pool.
      *
-     * @param  resource a resource.
+     * @param resource a resource.
      * @throws IllegalArgumentException if the given resource has not been
-     *         allocated by this pool and the implementation cannot tolerate
-     *         this.
-     * @throws X if releasing the resource fails for any other reason.
+     *                                  allocated by this pool and the implementation cannot tolerate
+     *                                  this.
+     * @throws X                        if releasing the resource fails for any other reason.
      */
     void release(R resource) throws X;
 }

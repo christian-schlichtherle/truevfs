@@ -7,7 +7,7 @@ package global.namespace.truevfs.comp.shed;
 /**
  * A resource which can release itself to its associated {@link Pool}.
  *
- * @param  <X> The type of the exceptions thrown by this releasable.
+ * @param <X> The type of the exceptions thrown by this releasable.
  * @author Christian Schlichtherle
  */
 public interface Releasable<X extends Exception> {

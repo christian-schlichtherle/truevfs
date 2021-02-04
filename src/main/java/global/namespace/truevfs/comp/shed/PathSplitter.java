@@ -12,6 +12,7 @@ import java.util.Optional;
  *
  * @author Christian Schlichtherle
  */
+@SuppressWarnings("OptionalUsedAsFieldOrParameterType")
 public class PathSplitter {
 
     private final char separatorChar;
