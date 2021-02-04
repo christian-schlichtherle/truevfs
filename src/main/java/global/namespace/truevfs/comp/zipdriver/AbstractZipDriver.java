@@ -4,11 +4,8 @@
  */
 package global.namespace.truevfs.comp.zipdriver;
 
-import global.namespace.truevfs.comp.cio.Entry;
+import global.namespace.truevfs.comp.cio.*;
 import global.namespace.truevfs.comp.cio.Entry.Type;
-import global.namespace.truevfs.comp.cio.InputContainer;
-import global.namespace.truevfs.comp.cio.IoBufferPool;
-import global.namespace.truevfs.comp.cio.OutputContainer;
 import global.namespace.truevfs.comp.key.api.KeyManagerMap;
 import global.namespace.truevfs.comp.key.api.KeyProvider;
 import global.namespace.truevfs.comp.key.api.sl.KeyManagerMapLocator;
@@ -20,7 +17,6 @@ import global.namespace.truevfs.comp.zip.ZipEntry;
 import global.namespace.truevfs.comp.zip.ZipFileParameters;
 import global.namespace.truevfs.comp.zip.ZipOutputStreamParameters;
 import global.namespace.truevfs.kernel.api.*;
-import global.namespace.truevfs.kernel.api.cio.MultiplexingOutputContainer;
 import global.namespace.truevfs.kernel.api.sl.IoBufferPoolLocator;
 import org.slf4j.Logger;
 
@@ -43,12 +39,12 @@ import static global.namespace.truevfs.kernel.api.FsAccessOption.*;
  * <p>
  * Sub-classes must be thread-safe and should be immutable!
  *
- * @param  <E> the type of the ZIP driver entries.
+ * @param <E> the type of the ZIP driver entries.
  * @author Christian Schlichtherle
  */
 public abstract class AbstractZipDriver<E extends AbstractZipDriverEntry>
-extends FsArchiveDriver<E>
-implements ZipOutputStreamParameters, ZipFileParameters<E> {
+        extends FsArchiveDriver<E>
+        implements ZipOutputStreamParameters, ZipFileParameters<E> {
 
     private static final Logger
             logger = new LocalizedLogger(AbstractZipDriver.class);
@@ -60,7 +56,9 @@ implements ZipOutputStreamParameters, ZipFileParameters<E> {
      * {@code IoBufferPoolLocator.SINGLETON.get()}.
      */
     @Override
-    public IoBufferPool getPool() { return IoBufferPoolLocator.SINGLETON.get(); }
+    public IoBufferPool getPool() {
+        return IoBufferPoolLocator.SINGLETON.get();
+    }
 
     /**
      * Returns the map of key managers for accessing protected resources
@@ -70,15 +68,19 @@ implements ZipOutputStreamParameters, ZipFileParameters<E> {
      * object.
      *
      * @return {@link KeyManagerMapLocator#SINGLETON}, as by the implementation
-     *         in the class {@link ZipDriver}.
+     * in the class {@link ZipDriver}.
      */
-    public KeyManagerMap getKeyManagerMap() { return KeyManagerMapLocator.SINGLETON; }
+    public KeyManagerMap getKeyManagerMap() {
+        return KeyManagerMapLocator.SINGLETON;
+    }
 
-    final @CheckForNull ZipCryptoParameters zipCryptoParameters(ZipInputContainer<E> input) {
+    final @CheckForNull
+    ZipCryptoParameters zipCryptoParameters(ZipInputContainer<E> input) {
         return zipCryptoParameters(input.getModel(), input.getRawCharset());
     }
 
-    final @CheckForNull ZipCryptoParameters zipCryptoParameters(ZipOutputContainer<E> output) {
+    final @CheckForNull
+    ZipCryptoParameters zipCryptoParameters(ZipOutputContainer<E> output) {
         return zipCryptoParameters(output.getModel(), output.getRawCharset());
     }
 
@@ -91,13 +93,14 @@ implements ZipOutputStreamParameters, ZipFileParameters<E> {
      * The implementation in the class {@link ZipDriver} returns
      * {@code new KeyManagerZipCryptoParameters(this, model, charset)}.
      *
-     * @param  model the file system model.
-     * @param  charset charset the character set used for encoding entry names
-     *         and the file comment in the ZIP file.
+     * @param model   the file system model.
+     * @param charset charset the character set used for encoding entry names
+     *                and the file comment in the ZIP file.
      * @return The ZIP crypto parameters for the given file system model
-     *         and character set or {@code null} if not available.
+     * and character set or {@code null} if not available.
      */
-    protected @CheckForNull ZipCryptoParameters zipCryptoParameters(FsModel model, Charset charset) {
+    protected @CheckForNull
+    ZipCryptoParameters zipCryptoParameters(FsModel model, Charset charset) {
         return new KeyManagerZipCryptoParameters(this, model, charset);
     }
 
@@ -111,11 +114,13 @@ implements ZipOutputStreamParameters, ZipFileParameters<E> {
      * in order to improve the readability of the URI in comparison to the
      * expression {@code model.getMountPoint().getUri()}.
      *
-     * @param  model the file system model.
+     * @param model the file system model.
      * @return The URI which represents the file system model's mount point.
-     * @see    <a href="http://java.net/jira/browse/TRUEZIP-72">#TRUEZIP-72</a>
+     * @see <a href="http://java.net/jira/browse/TRUEZIP-72">#TRUEZIP-72</a>
      */
-    public URI mountPointUri(FsModel model) { return model.getMountPoint().toHierarchicalUri(); }
+    public URI mountPointUri(FsModel model) {
+        return model.getMountPoint().toHierarchicalUri();
+    }
 
     /**
      * A template method for resolving the resource URI which is required to
@@ -129,8 +134,8 @@ implements ZipOutputStreamParameters, ZipFileParameters<E> {
      * An alternative implementation in a sub-class could return the expression
      * {@code mountPointUri(model).resolve("/" + name)} instead.
      *
-     * @param  model the file system model.
-     * @param  name the entry name.
+     * @param model the file system model.
+     * @param name  the entry name.
      * @return The URI for looking up a {@link KeyProvider}.
      */
     public URI fileSystemUri(FsModel model, String name) {
@@ -142,11 +147,11 @@ implements ZipOutputStreamParameters, ZipFileParameters<E> {
      * {@inheritDoc}
      *
      * @return The implementation in the class {@link ZipDriver} returns
-     *         {@code true} because when reading a ZIP file sequentially,
-     *         each ZIP entry should &quot;override&quot; any previously read
-     *         ZIP entry with an equal name.
-     *         This holds true even if the central directory is used to access
-     *         the ZIP entries in random order.
+     * {@code true} because when reading a ZIP file sequentially,
+     * each ZIP entry should &quot;override&quot; any previously read
+     * ZIP entry with an equal name.
+     * This holds true even if the central directory is used to access
+     * the ZIP entries in random order.
      */
     @Override
     public boolean getRedundantContentSupport() {
@@ -157,11 +162,11 @@ implements ZipOutputStreamParameters, ZipFileParameters<E> {
      * {@inheritDoc}
      *
      * @return The implementation in the class {@link ZipDriver} returns
-     *         {@code true} because when reading a ZIP file sequentially,
-     *         each ZIP entry should &quot;override&quot; any previously read
-     *         ZIP entry with an equal name.
-     *         This holds true even if the central directory is used to access
-     *         the ZIP entries in random order.
+     * {@code true} because when reading a ZIP file sequentially,
+     * each ZIP entry should &quot;override&quot; any previously read
+     * ZIP entry with an equal name.
+     * This holds true even if the central directory is used to access
+     * the ZIP entries in random order.
      */
     @Override
     public boolean getRedundantMetaDataSupport() {
@@ -205,11 +210,11 @@ implements ZipOutputStreamParameters, ZipFileParameters<E> {
      * the typical case that the cipher keys of both targets are not the same.
      * Note that there is no safe way to explicitly test for this.
      *
-     * @param  input the input target entry for copying the contents.
-     * @param  output the output target entry for copying the contents.
+     * @param input  the input target entry for copying the contents.
+     * @param output the output target entry for copying the contents.
      * @return Whether the content to get copied from the input target entry
-     *         to the output target entry is eligible for Raw Data Copying
-     *         (RDC).
+     * to the output target entry is eligible for Raw Data Copying
+     * (RDC).
      */
     protected boolean rdc(AbstractZipDriverEntry input, AbstractZipDriverEntry output) {
         return !input.isEncrypted() && !output.isEncrypted();
@@ -290,20 +295,22 @@ implements ZipOutputStreamParameters, ZipFileParameters<E> {
      * passwords for WinZip AES encryption.
      */
     @Override
-    public FsController decorate(FsController controller) { return new ZipKeyController(controller, this); }
+    public FsController decorate(FsController controller) {
+        return new ZipKeyController(controller, this);
+    }
 
     @Override
     protected final ZipInputContainer<E> newInput(
             final FsModel model,
             final FsInputSocketSource source)
-    throws IOException {
+            throws IOException {
         final ZipInputContainer<E> zis = newZipInput(Objects.requireNonNull(model), source);
         try {
             zis.recoverLostEntries();
         } catch (final IOException ex) {
             logger.warn("junkInTheTrunk.warn",
-                mountPointUri(model),
-                zis.getPostambleLength());
+                    mountPointUri(model),
+                    zis.getPostambleLength());
             logger.trace("junkInTheTrunk.trace", ex);
         }
         return zis;
@@ -318,7 +325,7 @@ implements ZipOutputStreamParameters, ZipFileParameters<E> {
             FsModel model,
             FsOutputSocketSink sink,
             final @CheckForNull InputContainer<E> input)
-    throws IOException {
+            throws IOException {
         final ZipInputContainer<E> zis = (ZipInputContainer<E>) input;
         return new MultiplexingOutputContainer<>(getPool(),
                 new ZipOutputContainer<>(model, sink, zis, this));
@@ -388,7 +395,7 @@ implements ZipOutputStreamParameters, ZipFileParameters<E> {
     /**
      * Returns a new ZIP driver entry with the given {@code name}.
      *
-     * @param  name the entry name.
+     * @param name the entry name.
      * @return A new abstract ZIP driver entry.
      */
     @Override
@@ -398,8 +405,8 @@ implements ZipOutputStreamParameters, ZipFileParameters<E> {
      * Returns a new ZIP driver entry with the given {@code name} and all
      * other properties copied from the given template.
      *
-     * @param  name the entry name.
-     * @param  template the template entry.
+     * @param name     the entry name.
+     * @param template the template entry.
      * @return A new ZIP driver entry.
      */
     public abstract E newEntry(String name, ZipEntry template);

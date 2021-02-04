@@ -11,8 +11,6 @@ import global.namespace.truevfs.comp.io.DecoratingOutputStream;
 import global.namespace.truevfs.comp.shed.HashMaps;
 import global.namespace.truevfs.kernel.api.FsTestConfig;
 import global.namespace.truevfs.kernel.api.FsThrowManager;
-import global.namespace.truevfs.kernel.api.cio.ThrowingInputContainer;
-import global.namespace.truevfs.kernel.api.cio.ThrowingOutputContainer;
 
 import javax.annotation.CheckForNull;
 import java.io.IOException;

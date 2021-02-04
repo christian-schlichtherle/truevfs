@@ -19,8 +19,7 @@ import java.util.Arrays;
 import java.util.ResourceBundle;
 
 /**
- * This panel prompts the user for a key to create or overwrite a protected
- * resource.
+ * This panel prompts the user for a key to create or overwrite a protected resource.
  * It currently supports password and key file authentication.
  *
  * @author Christian Schlichtherle

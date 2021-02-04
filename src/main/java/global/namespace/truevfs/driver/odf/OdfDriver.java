@@ -6,6 +6,7 @@ package global.namespace.truevfs.driver.odf;
 
 import global.namespace.truevfs.comp.cio.InputContainer;
 import global.namespace.truevfs.comp.cio.IoBufferPool;
+import global.namespace.truevfs.comp.cio.MultiplexingOutputContainer;
 import global.namespace.truevfs.comp.cio.OutputContainer;
 import global.namespace.truevfs.comp.zipdriver.JarDriver;
 import global.namespace.truevfs.comp.zipdriver.JarDriverEntry;
@@ -13,7 +14,6 @@ import global.namespace.truevfs.comp.zipdriver.ZipInputContainer;
 import global.namespace.truevfs.comp.zipdriver.ZipOutputContainer;
 import global.namespace.truevfs.kernel.api.FsModel;
 import global.namespace.truevfs.kernel.api.FsOutputSocketSink;
-import global.namespace.truevfs.kernel.api.cio.MultiplexingOutputContainer;
 
 import javax.annotation.CheckForNull;
 import java.io.IOException;
@@ -37,11 +37,11 @@ import static global.namespace.truevfs.kernel.api.FsAccessOption.GROW;
  * <p>
  * Subclasses must be thread-safe and should be immutable!
  *
- * @see    <a href="http://docs.oasis-open.org/office/v1.0/OpenDocument-v1.0-os.pdf">Open Document Format for Office Applications (OpenDocument) v1.0; Section 17.4: MIME Type Stream</a>
- * @see    <a href="http://docs.oasis-open.org/office/v1.1/OS/OpenDocument-v1.1.pdf">Open Document Format for Office Applications (OpenDocument) v1.1; Section 17.4: MIME Type Stream</a>
- * @see    <a href="http://docs.oasis-open.org/office/v1.2/OpenDocument-v1.2-part3.pdf">Open Document Format for Office Applications (OpenDocument) Version 1.2; Part 3: Packages; Section 3.3: MIME Type Stream</a>
- * @see    OdfOutputContainer
  * @author Christian Schlichtherle
+ * @see <a href="http://docs.oasis-open.org/office/v1.0/OpenDocument-v1.0-os.pdf">Open Document Format for Office Applications (OpenDocument) v1.0; Section 17.4: MIME Type Stream</a>
+ * @see <a href="http://docs.oasis-open.org/office/v1.1/OS/OpenDocument-v1.1.pdf">Open Document Format for Office Applications (OpenDocument) v1.1; Section 17.4: MIME Type Stream</a>
+ * @see <a href="http://docs.oasis-open.org/office/v1.2/OpenDocument-v1.2-part3.pdf">Open Document Format for Office Applications (OpenDocument) Version 1.2; Part 3: Packages; Section 3.3: MIME Type Stream</a>
+ * @see OdfOutputContainer
  */
 public class OdfDriver extends JarDriver {
 
@@ -50,7 +50,7 @@ public class OdfDriver extends JarDriver {
             final FsModel model,
             final FsOutputSocketSink sink,
             final @CheckForNull InputContainer<JarDriverEntry> input)
-    throws IOException {
+            throws IOException {
         final ZipInputContainer<JarDriverEntry> zis = (ZipInputContainer<JarDriverEntry>) input;
         final ZipOutputContainer<JarDriverEntry> zos = new ZipOutputContainer<>(model, sink, zis, this);
         final IoBufferPool pool = getPool();

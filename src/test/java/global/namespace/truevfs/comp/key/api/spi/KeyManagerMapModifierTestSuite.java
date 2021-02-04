@@ -9,6 +9,7 @@ import global.namespace.truevfs.comp.key.api.KeyManager;
 import global.namespace.truevfs.comp.key.api.sl.KeyManagerMapLocator;
 import lombok.val;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 
 import java.util.Map;
@@ -42,6 +43,7 @@ public abstract class KeyManagerMapModifierTestSuite {
         assertTrue(modifier.getClass().getAnnotation(ServiceImplementation.class).priority() < 0);
     }
 
+    @Ignore
     @Test
     public void testIsLocatable() {
         val modified = modifier.apply(new KeyManagerMapFactory().get());

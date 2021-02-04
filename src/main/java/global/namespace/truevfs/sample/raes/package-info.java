@@ -3,7 +3,7 @@
  * All rights reserved. Use is subject to license terms.
  */
 /**
- * Sample code for encryption and decryption with RAES.
+ * Sample code for encryption and decryption using RAES.
  * 
  * @author Christian Schlichtherle
  */

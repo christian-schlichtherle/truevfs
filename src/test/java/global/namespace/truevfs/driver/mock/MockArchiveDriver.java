@@ -4,15 +4,11 @@
  */
 package global.namespace.truevfs.driver.mock;
 
-import global.namespace.truevfs.comp.cio.Entry;
+import global.namespace.truevfs.comp.cio.*;
 import global.namespace.truevfs.comp.cio.Entry.Type;
-import global.namespace.truevfs.comp.cio.InputContainer;
-import global.namespace.truevfs.comp.cio.IoBufferPool;
-import global.namespace.truevfs.comp.cio.OutputContainer;
 import global.namespace.truevfs.comp.shed.BitField;
 import global.namespace.truevfs.comp.shed.HashMaps;
 import global.namespace.truevfs.kernel.api.*;
-import global.namespace.truevfs.kernel.api.cio.MultiplexingOutputContainer;
 
 import javax.annotation.CheckForNull;
 import java.io.IOException;

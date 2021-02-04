@@ -44,7 +44,7 @@ trait MutableEntryAspect[E <: MutableEntry] extends GenEntryAspect[E] with Mutab
     new MutableIndexedProperty[Entity, Option[Boolean]] {
 
       def apply(entity: Entity): Option[Boolean] = {
-        Option(entry.isPermitted(tµpe, entity).orElse(null))
+        Option(entry.isPermitted(tµpe, entity).orElse(null)).map(Boolean.unbox)
       }
 
       override def update(entity: Entity, value: Option[Boolean]): Unit = {

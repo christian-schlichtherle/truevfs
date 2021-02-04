@@ -3,8 +3,8 @@
  * All rights reserved. Use is subject to license terms.
  */
 /**
- * Sample code using the TrueVFS Access API.
- * 
+ * Sample code using the TrueVFS Kernel API.
+ *
  * @author Christian Schlichtherle
  */
-package global.namespace.truevfs.sample.access;
+package global.namespace.truevfs.sample.kernel;

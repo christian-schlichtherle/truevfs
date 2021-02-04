@@ -20,17 +20,9 @@ import java.net.URI;
  */
 public interface TRex {
 
-    //
-    // Properties.
-    //
-
     /**
-     * Returns the {@link TArchiveDetector} which was used to detect any
-     * archive files in the path name of this object at construction time.
-     *
-     * @return The {@link TArchiveDetector} which was used to detect any
-     *         archive files in the path name of this object at construction
-     *         time.
+     * Returns the {@link TArchiveDetector} which was used to detect any archive files in the path name of this object
+     * at construction time.
      */
     TArchiveDetector getArchiveDetector();
 
@@ -39,8 +31,6 @@ public interface TRex {
      * Note that multiple calls to this method result in objects which are
      * required to compare {@linkplain Object#equals equal}, but are not
      * necessarily identical.
-     *
-     * @return the file system node path with an absolute URI.
      */
     FsNodePath getNodePath();
 
@@ -49,43 +39,28 @@ public interface TRex {
      * Note that multiple calls to this method result in objects which are
      * required to compare {@linkplain Object#equals equal}, but are not
      * necessarily identical.
-     *
-     * @return the file system mount point for this path.
      */
     FsMountPoint getMountPoint();
 
     /**
      * Returns the file system entry name.
-     * Note that multiple calls to this method result in objects which are
-     * required to compare {@linkplain Object#equals equal}, but are not
-     * necessarily identical.
-     *
-     * @return the file system entry name.
+     * Multiple calls to this method result in objects which are required to compare {@linkplain Object#equals equal},
+     * but are not necessarily identical.
      */
     FsNodeName getNodeName();
 
     /**
      * Returns the absolute URI for this object.
-     *
-     * @return the absolute URI for this object.
      */
     URI getUri();
 
-    //
-    // Conversions.
-    //
-
     /**
      * Returns a file representation of this object.
-     *
-     * @return A file representation of this object.
      */
     TFile toFile();
 
     /**
      * Returns a path representation of this object.
-     *
-     * @return A path representation of this object.
      */
     TPath toPath();
 }

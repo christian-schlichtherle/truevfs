@@ -5,6 +5,7 @@
 package global.namespace.truevfs.driver.tar.gzip;
 
 import global.namespace.truevfs.comp.cio.InputContainer;
+import global.namespace.truevfs.comp.cio.MultiplexingOutputContainer;
 import global.namespace.truevfs.comp.cio.OutputContainer;
 import global.namespace.truevfs.comp.io.AbstractSink;
 import global.namespace.truevfs.comp.io.AbstractSource;
@@ -15,7 +16,6 @@ import global.namespace.truevfs.comp.tardriver.TarDriverEntry;
 import global.namespace.truevfs.comp.tardriver.TarInputContainer;
 import global.namespace.truevfs.comp.tardriver.TarOutputContainer;
 import global.namespace.truevfs.kernel.api.*;
-import global.namespace.truevfs.kernel.api.cio.MultiplexingOutputContainer;
 
 import javax.annotation.CheckForNull;
 import java.io.IOException;

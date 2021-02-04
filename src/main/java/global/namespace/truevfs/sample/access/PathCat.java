@@ -14,23 +14,21 @@ import java.io.IOException;
  * for concatenating the contents of each parameter path name on the standard
  * output.
  *
- * @deprecated Use the Maven archetype for the module TrueVFS Access instead.
- *             Its group ID is {@code net.java.truevfs}.
- *             Its artifact ID is {@code truevfs-archetype-access}.
- * @see        <a href="http://www.gnu.org/software/wget/">GNU Cat - Home Page</a>
- * @author     Christian Schlichtherle
- * @version    $Id$
+ * @author Christian Schlichtherle
+ * @see <a href="http://www.gnu.org/software/wget/">GNU Cat - Home Page</a>
  */
-@Deprecated
 public final class PathCat extends TApplication<IOException> {
 
-    /** Equivalent to {@code System.exit(new PathCat().run(args));}. */
+    /**
+     * Equivalent to {@code System.exit(new PathCat().run(args));}.
+     */
     public static void main(String[] args) throws IOException {
         System.exit(new PathCat().run(args));
     }
 
     @Override
-    protected void setup() { }
+    protected void setup() {
+    }
 
     @Override
     protected int work(String[] args) throws IOException {
@@ -40,6 +38,7 @@ public final class PathCat extends TApplication<IOException> {
     }
 
 // START SNIPPET: cat
+
     /**
      * Copies the contents of the parameter resource to the standard output.
      * <p>
@@ -48,7 +47,7 @@ public final class PathCat extends TApplication<IOException> {
      * {@code TConfig.current().getArchiveDetector()}
      * and the respective file system driver providers on the class path.
      *
-     * @param  resource the path name string of the resource to copy.
+     * @param resource the path name string of the resource to copy.
      * @throws IOException if accessing the resource results in an I/O error.
      */
     static void pathCat(String resource) throws IOException {

@@ -4,16 +4,12 @@
  */
 package global.namespace.truevfs.comp.tardriver;
 
-import global.namespace.truevfs.comp.cio.Entry;
+import global.namespace.truevfs.comp.cio.*;
 import global.namespace.truevfs.comp.cio.Entry.Access;
 import global.namespace.truevfs.comp.cio.Entry.PosixEntity;
 import global.namespace.truevfs.comp.cio.Entry.Type;
-import global.namespace.truevfs.comp.cio.InputContainer;
-import global.namespace.truevfs.comp.cio.IoBufferPool;
-import global.namespace.truevfs.comp.cio.OutputContainer;
 import global.namespace.truevfs.comp.shed.BitField;
 import global.namespace.truevfs.kernel.api.*;
-import global.namespace.truevfs.kernel.api.cio.MultiplexingOutputContainer;
 import global.namespace.truevfs.kernel.api.sl.IoBufferPoolLocator;
 import org.apache.commons.compress.archivers.tar.TarArchiveEntry;
 import org.apache.commons.compress.archivers.tar.TarArchiveOutputStream;

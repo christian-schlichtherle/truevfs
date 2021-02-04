@@ -18,14 +18,8 @@ import java.util.Arrays;
 import java.util.ResourceBundle;
 
 /**
- * This panel prompts the user for a key to open an existing protected
- * resource.
+ * This panel prompts the user for a key to open an existing protected resource.
  * It currently supports password and key file authentication.
- * <p>
- * Note that the contents of the password and file path fields are stored in
- * a static field from which they are restored when a new panel is created.
- * This is very convenient for the user if she inadvertently entered a wrong
- * key or shares the same key for multiple protected resources.
  *
  * @author Christian Schlichtherle
  */
@@ -33,8 +27,7 @@ final class ReadKeyPanel extends KeyPanel {
 
     private static final long serialVersionUID = 0;
 
-    private static final ResourceBundle
-            resources = ResourceBundle.getBundle(ReadKeyPanel.class.getName());
+    private static final ResourceBundle resources = ResourceBundle.getBundle(ReadKeyPanel.class.getName());
 
     private final SwingPromptingPbeParametersView<?, ?> view;
     private final Color defaultForeground;

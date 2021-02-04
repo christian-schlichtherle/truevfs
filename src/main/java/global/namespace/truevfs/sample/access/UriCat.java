@@ -17,22 +17,20 @@ import java.net.URISyntaxException;
  * The URI must be file-based, i.e. the top level file system scheme must
  * be {@code file}.
  *
- * @deprecated Use the Maven archetype for the module TrueVFS Access instead.
- *             Its group ID is {@code net.java.truevfs}.
- *             Its artifact ID is {@code truevfs-archetype-access}.
- * @author     Christian Schlichtherle
- * @version    $Id$
+ * @author Christian Schlichtherle
  */
-@Deprecated
 public final class UriCat extends TApplication<Exception> {
 
-    /** Equivalent to {@code System.exit(new CatPath().run(args));}. */
+    /**
+     * Equivalent to {@code System.exit(new CatPath().run(args));}.
+     */
     public static void main(String[] args) throws Exception {
         System.exit(new UriCat().run(args));
     }
 
     @Override
-    protected void setup() { }
+    protected void setup() {
+    }
 
     @Override
     protected int work(String[] args) throws Exception {
@@ -42,6 +40,7 @@ public final class UriCat extends TApplication<Exception> {
     }
 
 // START SNIPPET: cat
+
     /**
      * Copies the contents of the parameter resource to the standard output.
      * <p>
@@ -50,12 +49,12 @@ public final class UriCat extends TApplication<Exception> {
      * {@code TConfig.current().getArchiveDetector()}
      * and the respective file system driver providers on the class path.
      *
-     * @param  resource the URI string of the resource to copy.
-     *         The URI must be file-based, i.e. the top level file system
-     *         scheme must be {@code file}.
-     * @throws IOException if accessing the resource results in an I/O error.
+     * @param resource the URI string of the resource to copy.
+     *                 The URI must be file-based, i.e. the top level file system
+     *                 scheme must be {@code file}.
+     * @throws IOException        if accessing the resource results in an I/O error.
      * @throws URISyntaxException if {@code resource} does not
-     *         conform to the syntax constraints for {@link URI}s.
+     *                            conform to the syntax constraints for {@link URI}s.
      */
     static void uriCat(String resource) throws IOException, URISyntaxException {
         URI uri = new URI(resource);

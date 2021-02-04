@@ -5,6 +5,7 @@
 package global.namespace.truevfs.driver.tar.xz;
 
 import global.namespace.truevfs.comp.cio.InputContainer;
+import global.namespace.truevfs.comp.cio.MultiplexingOutputContainer;
 import global.namespace.truevfs.comp.cio.OutputContainer;
 import global.namespace.truevfs.comp.io.AbstractSink;
 import global.namespace.truevfs.comp.io.AbstractSource;
@@ -12,7 +13,6 @@ import global.namespace.truevfs.comp.io.Streams;
 import global.namespace.truevfs.comp.shed.BitField;
 import global.namespace.truevfs.comp.tardriver.*;
 import global.namespace.truevfs.kernel.api.*;
-import global.namespace.truevfs.kernel.api.cio.MultiplexingOutputContainer;
 import org.tukaani.xz.LZMA2Options;
 import org.tukaani.xz.XZInputStream;
 import org.tukaani.xz.XZOutputStream;

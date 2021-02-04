@@ -69,6 +69,5 @@ private object TFile2Spec {
   val codecs = Table(
     "codec",
     BIOS.serialization,
-    BIOS.xml
   )
 }

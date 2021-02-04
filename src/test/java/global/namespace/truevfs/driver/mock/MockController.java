@@ -7,11 +7,11 @@ package global.namespace.truevfs.driver.mock;
 import global.namespace.truevfs.comp.cio.*;
 import global.namespace.truevfs.comp.cio.Entry.Access;
 import global.namespace.truevfs.comp.cio.Entry.Type;
+import global.namespace.truevfs.comp.io.ThrowingInputStream;
+import global.namespace.truevfs.comp.io.ThrowingOutputStream;
+import global.namespace.truevfs.comp.io.ThrowingSeekableChannel;
 import global.namespace.truevfs.comp.shed.BitField;
 import global.namespace.truevfs.kernel.api.*;
-import global.namespace.truevfs.kernel.api.io.ThrowingInputStream;
-import global.namespace.truevfs.kernel.api.io.ThrowingOutputStream;
-import global.namespace.truevfs.kernel.api.io.ThrowingSeekableChannel;
 
 import java.io.IOException;
 import java.io.InputStream;

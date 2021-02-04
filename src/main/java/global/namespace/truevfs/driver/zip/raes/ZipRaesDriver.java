@@ -7,6 +7,7 @@ package global.namespace.truevfs.driver.zip.raes;
 import global.namespace.truevfs.comp.cio.Entry;
 import global.namespace.truevfs.comp.cio.Entry.Type;
 import global.namespace.truevfs.comp.cio.InputContainer;
+import global.namespace.truevfs.comp.cio.MultiplexingOutputContainer;
 import global.namespace.truevfs.comp.cio.OutputContainer;
 import global.namespace.truevfs.comp.shed.BitField;
 import global.namespace.truevfs.comp.zipdriver.JarDriver;
@@ -17,7 +18,6 @@ import global.namespace.truevfs.driver.zip.raes.crypto.RaesOutputStream;
 import global.namespace.truevfs.driver.zip.raes.crypto.RaesParameters;
 import global.namespace.truevfs.driver.zip.raes.crypto.RaesReadOnlyChannel;
 import global.namespace.truevfs.kernel.api.*;
-import global.namespace.truevfs.kernel.api.cio.MultiplexingOutputContainer;
 
 import javax.annotation.CheckForNull;
 import java.io.IOException;
@@ -46,7 +46,9 @@ public abstract class ZipRaesDriver extends JarDriver {
      * @return {@code true}
      */
     @Override
-    public final boolean getPreambled() { return true; }
+    public final boolean getPreambled() {
+        return true;
+    }
 
     /**
      * Returns the RAES parameters for the given file system model.
@@ -54,12 +56,12 @@ public abstract class ZipRaesDriver extends JarDriver {
      * The implementation in the class {@link ZipRaesDriver} returns
      * {@code new KeyManagerRaesParameters(getKeyManagerMap().getKeyManager(AesPbeParameters.class), mountPointUri(model))}.
      *
-     * @param  model the file system model.
+     * @param model the file system model.
      * @return The RAES parameters for the given file system model.
      */
     protected RaesParameters raesParameters(FsModel model) {
         return new KeyManagerRaesParameters(getKeyManagerMap(),
-                                            mountPointUri(model));
+                mountPointUri(model));
     }
 
     /**
@@ -104,15 +106,19 @@ public abstract class ZipRaesDriver extends JarDriver {
      * passwords for RAES encryption.
      */
     @Override
-    public FsController decorate(FsController controller) { return new ZipRaesKeyController(controller, this); }
+    public FsController decorate(FsController controller) {
+        return new ZipRaesKeyController(controller, this);
+    }
 
     @Override
     protected ZipInputContainer<JarDriverEntry> newZipInput(
             final FsModel model,
             final FsInputSocketSource source)
-    throws IOException {
+            throws IOException {
         final class Source extends FsInputSocketSource {
-            Source() { super(source); }
+            Source() {
+                super(source);
+            }
 
             @Override
             public SeekableByteChannel channel() throws IOException {
@@ -140,7 +146,7 @@ public abstract class ZipRaesDriver extends JarDriver {
             final FsModel model,
             final FsOutputSocketSink sink,
             final @CheckForNull InputContainer<JarDriverEntry> input)
-    throws IOException {
+            throws IOException {
         final ZipInputContainer<JarDriverEntry> zis = (ZipInputContainer<JarDriverEntry>) input;
         return new MultiplexingOutputContainer<>(getPool(),
                 new ZipOutputContainer<>(model, new RaesSocketSink(model, sink), zis, this));
