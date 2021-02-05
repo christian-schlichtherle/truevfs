@@ -5,7 +5,7 @@
 package global.namespace.truevfs.driver.tar;
 
 import global.namespace.service.wight.annotation.ServiceImplementation;
-import global.namespace.truevfs.comp.tardriver.TarDriver;
+import global.namespace.truevfs.commons.tardriver.TarDriver;
 import global.namespace.truevfs.kernel.api.FsDriver;
 import global.namespace.truevfs.kernel.api.FsScheme;
 import global.namespace.truevfs.kernel.api.spi.FsDriverMapModifier;

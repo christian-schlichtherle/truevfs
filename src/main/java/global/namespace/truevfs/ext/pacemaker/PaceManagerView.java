@@ -4,13 +4,14 @@
  */
 package global.namespace.truevfs.ext.pacemaker;
 
-import global.namespace.truevfs.comp.jmx.JmxManagerView;
+import global.namespace.truevfs.commons.jmx.JmxManagerView;
 
 import javax.management.MBeanAttributeInfo;
 import javax.management.MBeanInfo;
 
 /**
  * A view for a {@link PaceManager}.
+ * <p>
  * This class is thread-safe.
  *
  * @author Christian Schlichtherle

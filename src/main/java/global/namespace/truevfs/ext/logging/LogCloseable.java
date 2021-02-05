@@ -4,8 +4,8 @@
  */
 package global.namespace.truevfs.ext.logging;
 
-import global.namespace.truevfs.comp.cio.Entry;
-import global.namespace.truevfs.comp.cio.IoSocket;
+import global.namespace.truevfs.commons.cio.Entry;
+import global.namespace.truevfs.commons.cio.IoSocket;
 
 import java.io.Closeable;
 import java.io.IOException;

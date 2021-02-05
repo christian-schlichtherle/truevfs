@@ -4,7 +4,7 @@
  */
 package global.namespace.truevfs.kernel.impl;
 
-import global.namespace.truevfs.comp.shed.BitField;
+import global.namespace.truevfs.commons.shed.BitField;
 import global.namespace.truevfs.kernel.api.FsAccessOption;
 import global.namespace.truevfs.kernel.api.FsArchiveEntry;
 
@@ -15,7 +15,7 @@ import java.util.Optional;
  * This abstract archive controller controls the mount state transition.
  * It is up to the sub-class to implement the actual mounting/unmounting strategy.
  * <p>
- * This controller is an emitter of {@link global.namespace.truevfs.comp.shed.ControlFlowException}s, for example
+ * This controller is an emitter of {@link global.namespace.truevfs.commons.shed.ControlFlowException}s, for example
  * when {@linkplain global.namespace.truevfs.kernel.impl.NeedsWriteLockException requiring a write lock}.
  *
  * @param <E> the type of the archive entries.

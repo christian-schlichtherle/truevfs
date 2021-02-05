@@ -4,7 +4,7 @@
  */
 package global.namespace.truevfs.ext.insight;
 
-import global.namespace.truevfs.comp.jmx.JmxComponent;
+import global.namespace.truevfs.commons.jmx.JmxComponent;
 import global.namespace.truevfs.ext.insight.stats.FsStats;
 import global.namespace.truevfs.ext.insight.stats.IoStats;
 import global.namespace.truevfs.ext.insight.stats.SyncStats;

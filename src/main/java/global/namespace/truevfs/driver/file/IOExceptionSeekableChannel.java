@@ -4,7 +4,7 @@
  */
 package global.namespace.truevfs.driver.file;
 
-import global.namespace.truevfs.comp.io.DecoratingSeekableChannel;
+import global.namespace.truevfs.commons.io.DecoratingSeekableChannel;
 
 import java.io.IOException;
 import java.nio.ByteBuffer;

@@ -4,12 +4,12 @@
  */
 package global.namespace.truevfs.kernel.api;
 
-import global.namespace.truevfs.comp.cio.Entry;
-import global.namespace.truevfs.comp.cio.Entry.Type;
-import global.namespace.truevfs.comp.cio.InputContainer;
-import global.namespace.truevfs.comp.cio.IoBufferPool;
-import global.namespace.truevfs.comp.cio.OutputContainer;
-import global.namespace.truevfs.comp.shed.BitField;
+import global.namespace.truevfs.commons.cio.Entry;
+import global.namespace.truevfs.commons.cio.Entry.Type;
+import global.namespace.truevfs.commons.cio.InputContainer;
+import global.namespace.truevfs.commons.cio.IoBufferPool;
+import global.namespace.truevfs.commons.cio.OutputContainer;
+import global.namespace.truevfs.commons.shed.BitField;
 
 import javax.annotation.CheckForNull;
 import java.io.CharConversionException;
@@ -18,8 +18,8 @@ import java.nio.charset.Charset;
 import java.nio.charset.CharsetEncoder;
 import java.util.Optional;
 
-import static global.namespace.truevfs.comp.cio.Entry.Type.DIRECTORY;
-import static global.namespace.truevfs.comp.shed.Paths.cutTrailingSeparators;
+import static global.namespace.truevfs.commons.cio.Entry.Type.DIRECTORY;
+import static global.namespace.truevfs.commons.shed.Paths.cutTrailingSeparators;
 import static global.namespace.truevfs.kernel.api.FsNodeName.SEPARATOR;
 import static global.namespace.truevfs.kernel.api.FsNodeName.SEPARATOR_CHAR;
 
@@ -171,7 +171,7 @@ extends FsDriver {
      * @param  name the node name of the target archive file in the parent
      *         file system.
      * @return A new input service for reading the target archive file.
-     *         Note that this service does <em>not</em> need to be thread-safe!
+     *         Note that this service does not need to be thread-safe.
      * @throws IOException on any I/O error.
      *         If the file system node for the given model exists in the
      *         parent file system and is <em>not</em> a {@link Type#SPECIAL}
@@ -199,7 +199,7 @@ extends FsDriver {
      * @param  model the file system model.
      * @param  source the source for reading the target archive file.
      * @return A new input service.
-     *         Note that this service does <em>not</em> need to be thread-safe!
+     *         Note that this service does not need to be thread-safe.
      * @throws IOException on any I/O error.
      * @see    #newInput(FsModel, BitField, FsController, FsNodeName)
      */
@@ -231,7 +231,7 @@ extends FsDriver {
      *         factory method
      *         {@link #newInput(FsModel, BitField, FsController, FsNodeName)}.
      * @return A new output service for writing the target archive file.
-     *         Note that this service does <em>not</em> need to be thread-safe!
+     *         Note that this service does not need to be thread-safe.
      * @throws IOException on any I/O error.
      */
     public OutputContainer<E> newOutput(
@@ -258,7 +258,7 @@ extends FsDriver {
      *         factory method
      *         {@link #newInput(FsModel, BitField, FsController, FsNodeName)}.
      * @return A new output service for writing the target archive file.
-     *         Note that this service does <em>not</em> need to be thread-safe!
+     *         Note that this service does not need to be thread-safe.
      * @throws IOException on any I/O error.
      * @see    #newOutput(FsModel, BitField, FsController, FsNodeName, InputContainer)
      */

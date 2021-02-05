@@ -4,7 +4,7 @@
  */
 package global.namespace.truevfs.kernel.api;
 
-import global.namespace.truevfs.comp.cio.MutableEntry;
+import global.namespace.truevfs.commons.cio.MutableEntry;
 
 /**
  * Represents an entry in an archive file.
@@ -12,7 +12,7 @@ import global.namespace.truevfs.comp.cio.MutableEntry;
  * client (i.e. archive controllers) to read and write archive entries from
  * and to archive files of their respective supported type.
  * <p>
- * Implementations do <em>not</em> need to be thread-safe.
+ * Implementations do not need to be thread-safe.
  * 
  * @author Christian Schlichtherle
  */

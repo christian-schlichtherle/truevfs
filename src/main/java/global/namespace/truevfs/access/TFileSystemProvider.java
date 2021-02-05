@@ -5,11 +5,11 @@
 package global.namespace.truevfs.access;
 
 import global.namespace.service.wight.annotation.ServiceImplementation;
-import global.namespace.truevfs.comp.cio.InputSocket;
-import global.namespace.truevfs.comp.cio.IoSockets;
-import global.namespace.truevfs.comp.cio.OutputSocket;
-import global.namespace.truevfs.comp.shed.BitField;
-import global.namespace.truevfs.comp.shed.UriBuilder;
+import global.namespace.truevfs.commons.cio.InputSocket;
+import global.namespace.truevfs.commons.cio.IoSockets;
+import global.namespace.truevfs.commons.cio.OutputSocket;
+import global.namespace.truevfs.commons.shed.BitField;
+import global.namespace.truevfs.commons.shed.UriBuilder;
 import global.namespace.truevfs.kernel.api.FsAccessOption;
 import global.namespace.truevfs.kernel.api.FsMountPoint;
 import global.namespace.truevfs.kernel.api.FsNodePath;
@@ -36,8 +36,8 @@ import java.util.Set;
 import java.util.WeakHashMap;
 
 import static global.namespace.truevfs.access.TUriHelper.hasAbsolutePath;
-import static global.namespace.truevfs.comp.cio.Entry.Type.DIRECTORY;
-import static global.namespace.truevfs.comp.cio.Entry.Type.FILE;
+import static global.namespace.truevfs.commons.cio.Entry.Type.DIRECTORY;
+import static global.namespace.truevfs.commons.cio.Entry.Type.FILE;
 import static global.namespace.truevfs.kernel.api.FsAccessOption.EXCLUSIVE;
 import static global.namespace.truevfs.kernel.api.FsNodeName.SEPARATOR;
 

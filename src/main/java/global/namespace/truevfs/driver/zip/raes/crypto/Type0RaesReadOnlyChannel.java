@@ -4,13 +4,13 @@
  */
 package global.namespace.truevfs.driver.zip.raes.crypto;
 
-import global.namespace.truevfs.comp.io.IntervalReadOnlyChannel;
-import global.namespace.truevfs.comp.io.MutableBuffer;
-import global.namespace.truevfs.comp.key.api.common.AesKeyStrength;
-import global.namespace.truevfs.comp.key.api.util.SuspensionPenalty;
-import global.namespace.truevfs.comp.zip.crypto.CipherReadOnlyChannel;
-import global.namespace.truevfs.comp.zip.crypto.CtrBlockCipher;
-import global.namespace.truevfs.comp.zip.crypto.SeekableBlockCipher;
+import global.namespace.truevfs.commons.io.IntervalReadOnlyChannel;
+import global.namespace.truevfs.commons.io.MutableBuffer;
+import global.namespace.truevfs.commons.key.api.common.AesKeyStrength;
+import global.namespace.truevfs.commons.key.api.util.SuspensionPenalty;
+import global.namespace.truevfs.commons.zip.crypto.CipherReadOnlyChannel;
+import global.namespace.truevfs.commons.zip.crypto.CtrBlockCipher;
+import global.namespace.truevfs.commons.zip.crypto.SeekableBlockCipher;
 import org.bouncycastle.crypto.Mac;
 import org.bouncycastle.crypto.PBEParametersGenerator;
 import org.bouncycastle.crypto.digests.SHA256Digest;

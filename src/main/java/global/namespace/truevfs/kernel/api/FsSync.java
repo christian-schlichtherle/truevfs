@@ -4,9 +4,9 @@
  */
 package global.namespace.truevfs.kernel.api;
 
-import global.namespace.truevfs.comp.shed.BitField;
-import global.namespace.truevfs.comp.shed.Filter;
-import global.namespace.truevfs.comp.shed.Visitor;
+import global.namespace.truevfs.commons.shed.BitField;
+import global.namespace.truevfs.commons.shed.Filter;
+import global.namespace.truevfs.commons.shed.Visitor;
 import global.namespace.truevfs.kernel.api.sl.FsManagerLocator;
 
 import java.util.function.Supplier;

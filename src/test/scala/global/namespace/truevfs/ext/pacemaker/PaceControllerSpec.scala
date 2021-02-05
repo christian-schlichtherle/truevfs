@@ -4,7 +4,7 @@
  */
 package global.namespace.truevfs.ext.pacemaker
 
-import global.namespace.truevfs.comp.cio.Entry
+import global.namespace.truevfs.commons.cio.Entry
 import global.namespace.truevfs.kernel.api._
 import org.mockito.Mockito
 import org.mockito.Mockito._

@@ -4,7 +4,7 @@
  */
 package global.namespace.truevfs.driver.zip.raes;
 
-import global.namespace.truevfs.comp.zipdriver.JarDriverEntry;
+import global.namespace.truevfs.commons.zipdriver.JarDriverEntry;
 import global.namespace.truevfs.it.base.FsArchiveDriverTestSuite;
 
 /**

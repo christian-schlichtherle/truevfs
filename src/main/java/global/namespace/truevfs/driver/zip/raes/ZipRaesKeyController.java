@@ -4,8 +4,8 @@
  */
 package global.namespace.truevfs.driver.zip.raes;
 
-import global.namespace.truevfs.comp.key.api.common.AesPbeParameters;
-import global.namespace.truevfs.comp.zipdriver.AbstractKeyController;
+import global.namespace.truevfs.commons.key.api.common.AesPbeParameters;
+import global.namespace.truevfs.commons.zipdriver.AbstractKeyController;
 import global.namespace.truevfs.driver.zip.raes.crypto.RaesKeyException;
 import global.namespace.truevfs.kernel.api.FsController;
 

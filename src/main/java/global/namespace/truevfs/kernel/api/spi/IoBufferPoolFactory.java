@@ -6,7 +6,7 @@ package global.namespace.truevfs.kernel.api.spi;
 
 import global.namespace.service.wight.annotation.ServiceImplementation;
 import global.namespace.service.wight.annotation.ServiceInterface;
-import global.namespace.truevfs.comp.cio.IoBufferPool;
+import global.namespace.truevfs.commons.cio.IoBufferPool;
 import global.namespace.truevfs.kernel.api.sl.IoBufferPoolLocator;
 
 import java.util.function.Supplier;

@@ -8,7 +8,7 @@ import bali.Cache;
 import bali.Lookup;
 import bali.Make;
 import bali.Module;
-import global.namespace.truevfs.comp.cio.IoBufferPool;
+import global.namespace.truevfs.commons.cio.IoBufferPool;
 import global.namespace.truevfs.kernel.api.FsArchiveDriver;
 import global.namespace.truevfs.kernel.api.FsArchiveEntry;
 import global.namespace.truevfs.kernel.api.FsController;

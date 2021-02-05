@@ -4,8 +4,8 @@
  */
 package global.namespace.truevfs.kernel.api;
 
-import global.namespace.truevfs.comp.shed.QuotedUriSyntaxException;
-import global.namespace.truevfs.comp.shed.UriBuilder;
+import global.namespace.truevfs.commons.shed.QuotedUriSyntaxException;
+import global.namespace.truevfs.commons.shed.UriBuilder;
 
 import java.net.URI;
 import java.net.URISyntaxException;

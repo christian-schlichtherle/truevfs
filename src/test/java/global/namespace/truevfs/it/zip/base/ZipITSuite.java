@@ -4,8 +4,8 @@
  */
 package global.namespace.truevfs.it.zip.base;
 
-import global.namespace.truevfs.comp.shed.ConcurrencyUtils.TaskFactory;
-import global.namespace.truevfs.comp.zip.*;
+import global.namespace.truevfs.commons.shed.ConcurrencyUtils.TaskFactory;
+import global.namespace.truevfs.commons.zip.*;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -20,9 +20,9 @@ import java.nio.file.Path;
 import java.util.*;
 import java.util.concurrent.Callable;
 
-import static global.namespace.truevfs.comp.shed.ConcurrencyUtils.NUM_IO_THREADS;
-import static global.namespace.truevfs.comp.shed.ConcurrencyUtils.start;
-import static global.namespace.truevfs.comp.shed.HashMaps.initialCapacity;
+import static global.namespace.truevfs.commons.shed.ConcurrencyUtils.NUM_IO_THREADS;
+import static global.namespace.truevfs.commons.shed.ConcurrencyUtils.start;
+import static global.namespace.truevfs.commons.shed.HashMaps.initialCapacity;
 import static java.nio.file.Files.*;
 import static java.nio.file.StandardOpenOption.APPEND;
 import static java.nio.file.StandardOpenOption.WRITE;

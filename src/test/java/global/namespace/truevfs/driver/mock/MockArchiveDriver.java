@@ -4,10 +4,10 @@
  */
 package global.namespace.truevfs.driver.mock;
 
-import global.namespace.truevfs.comp.cio.*;
-import global.namespace.truevfs.comp.cio.Entry.Type;
-import global.namespace.truevfs.comp.shed.BitField;
-import global.namespace.truevfs.comp.shed.HashMaps;
+import global.namespace.truevfs.commons.cio.*;
+import global.namespace.truevfs.commons.cio.Entry.Type;
+import global.namespace.truevfs.commons.shed.BitField;
+import global.namespace.truevfs.commons.shed.HashMaps;
 import global.namespace.truevfs.kernel.api.*;
 
 import javax.annotation.CheckForNull;

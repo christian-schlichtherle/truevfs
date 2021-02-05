@@ -12,7 +12,7 @@ package global.namespace.truevfs.driver.zip.raes.crypto;
  * Hence, for each type a separate parameter interface is used which extends
  * this marker interface.
  * <p>
- * Implementations do not need to be safe for multi-threading.
+ * Implementations do not need to be thread-safe.
  * 
  * @author  Christian Schlichtherle
  */

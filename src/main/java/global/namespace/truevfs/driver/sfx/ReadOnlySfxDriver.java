@@ -4,11 +4,11 @@
  */
 package global.namespace.truevfs.driver.sfx;
 
-import global.namespace.truevfs.comp.cio.InputContainer;
-import global.namespace.truevfs.comp.cio.OutputContainer;
-import global.namespace.truevfs.comp.shed.BitField;
-import global.namespace.truevfs.comp.zipdriver.ZipDriver;
-import global.namespace.truevfs.comp.zipdriver.ZipDriverEntry;
+import global.namespace.truevfs.commons.cio.InputContainer;
+import global.namespace.truevfs.commons.cio.OutputContainer;
+import global.namespace.truevfs.commons.shed.BitField;
+import global.namespace.truevfs.commons.zipdriver.ZipDriver;
+import global.namespace.truevfs.commons.zipdriver.ZipDriverEntry;
 import global.namespace.truevfs.kernel.api.*;
 
 import javax.annotation.CheckForNull;
@@ -20,7 +20,7 @@ import java.nio.charset.Charset;
  * but doesn't support to create or update them because this would spoil the
  * SFX code in its preamble.
  * <p>
- * Subclasses must be thread-safe and should be immutable!
+ * Subclasses must be thread-safe.
  * 
  * @author Christian Schlichtherle
  */

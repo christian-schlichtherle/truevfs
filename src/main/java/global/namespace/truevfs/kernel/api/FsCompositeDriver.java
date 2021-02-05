@@ -11,7 +11,7 @@ import java.util.ServiceConfigurationError;
  * Queries the scheme of the mount point of the given file system model in order to lookup the appropriate file system
  * driver which is then used to create the requested thread-safe file system controller.
  * <p>
- * Implementations should be immutable.
+ * Implementations need to be thread-safe.
  *
  * @see    FsDriver
  * @author Christian Schlichtherle

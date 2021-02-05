@@ -4,8 +4,8 @@
  */
 package global.namespace.truevfs.it.cio
 
-import global.namespace.truevfs.comp.cio.Entry
-import global.namespace.truevfs.comp.cio.Entry._
+import global.namespace.truevfs.commons.cio.Entry
+import global.namespace.truevfs.commons.cio.Entry._
 import global.namespace.truevfs.it.cio.FileSystemContainerSpec.DummyEntry
 import org.scalatest.wordspec.AnyWordSpec
 

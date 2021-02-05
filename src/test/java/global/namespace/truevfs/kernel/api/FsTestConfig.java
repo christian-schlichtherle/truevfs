@@ -4,10 +4,10 @@
  */
 package global.namespace.truevfs.kernel.api;
 
-import global.namespace.truevfs.comp.cio.IoBufferPool;
-import global.namespace.truevfs.comp.cio.MemoryBufferPool;
-import global.namespace.truevfs.comp.shed.InheritableThreadLocalStack;
-import global.namespace.truevfs.comp.shed.Resource;
+import global.namespace.truevfs.commons.cio.IoBufferPool;
+import global.namespace.truevfs.commons.cio.MemoryBufferPool;
+import global.namespace.truevfs.commons.shed.InheritableThreadLocalStack;
+import global.namespace.truevfs.commons.shed.Resource;
 
 import javax.annotation.CheckForNull;
 

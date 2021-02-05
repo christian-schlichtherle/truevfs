@@ -4,7 +4,7 @@
  */
 package global.namespace.truevfs.it.io;
 
-import global.namespace.truevfs.comp.io.IntervalReadOnlyChannel;
+import global.namespace.truevfs.commons.io.IntervalReadOnlyChannel;
 import org.junit.After;
 import org.junit.Before;
 

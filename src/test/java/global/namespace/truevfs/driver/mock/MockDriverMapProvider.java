@@ -4,8 +4,8 @@
  */
 package global.namespace.truevfs.driver.mock;
 
-import global.namespace.truevfs.comp.shed.ExtensionSet;
-import global.namespace.truevfs.comp.shed.HashMaps;
+import global.namespace.truevfs.commons.shed.ExtensionSet;
+import global.namespace.truevfs.commons.shed.HashMaps;
 import global.namespace.truevfs.kernel.api.FsDriver;
 import global.namespace.truevfs.kernel.api.FsScheme;
 

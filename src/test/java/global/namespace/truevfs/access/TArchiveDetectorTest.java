@@ -4,7 +4,7 @@
  */
 package global.namespace.truevfs.access;
 
-import global.namespace.truevfs.comp.shed.ExtensionSet;
+import global.namespace.truevfs.commons.shed.ExtensionSet;
 import global.namespace.truevfs.driver.mock.MockArchiveDriver;
 import global.namespace.truevfs.kernel.api.FsArchiveDriver;
 import global.namespace.truevfs.kernel.api.FsScheme;

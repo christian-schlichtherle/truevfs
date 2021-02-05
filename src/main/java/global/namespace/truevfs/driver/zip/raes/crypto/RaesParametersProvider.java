@@ -13,7 +13,7 @@ import javax.annotation.CheckForNull;
  * This enables implementations to retrieve RAES parameters on demand
  * rather than providing them upfront for any possible type.
  * <p>
- * Implementations do not need to be safe for multi-threading.
+ * Implementations do not need to be thread-safe.
  *
  * @author Christian Schlichtherle
  */

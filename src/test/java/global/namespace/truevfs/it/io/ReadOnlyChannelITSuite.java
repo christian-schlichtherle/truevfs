@@ -4,7 +4,7 @@
  */
 package global.namespace.truevfs.it.io;
 
-import global.namespace.truevfs.comp.io.PowerBuffer;
+import global.namespace.truevfs.commons.io.PowerBuffer;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;

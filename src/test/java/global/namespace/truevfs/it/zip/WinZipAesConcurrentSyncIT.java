@@ -5,7 +5,7 @@
 package global.namespace.truevfs.it.zip;
 
 import global.namespace.truevfs.access.TConfig;
-import global.namespace.truevfs.comp.zipdriver.TestWinZipAesDriver;
+import global.namespace.truevfs.commons.zipdriver.TestWinZipAesDriver;
 import global.namespace.truevfs.it.base.ConcurrentSyncITSuite;
 
 import java.io.IOException;

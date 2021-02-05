@@ -4,10 +4,10 @@
  */
 package global.namespace.truevfs.driver.file;
 
-import global.namespace.truevfs.comp.cio.Entry;
-import global.namespace.truevfs.comp.cio.InputSocket;
-import global.namespace.truevfs.comp.cio.OutputSocket;
-import global.namespace.truevfs.comp.shed.BitField;
+import global.namespace.truevfs.commons.cio.Entry;
+import global.namespace.truevfs.commons.cio.InputSocket;
+import global.namespace.truevfs.commons.cio.OutputSocket;
+import global.namespace.truevfs.commons.shed.BitField;
 import global.namespace.truevfs.kernel.api.FsAccessOption;
 
 import java.io.IOException;

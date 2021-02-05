@@ -4,9 +4,9 @@
  */
 package global.namespace.truevfs.access;
 
-import global.namespace.truevfs.comp.shed.Paths;
-import global.namespace.truevfs.comp.shed.QuotedUriSyntaxException;
-import global.namespace.truevfs.comp.shed.UriBuilder;
+import global.namespace.truevfs.commons.shed.Paths;
+import global.namespace.truevfs.commons.shed.QuotedUriSyntaxException;
+import global.namespace.truevfs.commons.shed.UriBuilder;
 
 import java.net.URI;
 import java.net.URISyntaxException;

@@ -4,7 +4,7 @@
  */
 package global.namespace.truevfs.it.io
 
-import global.namespace.truevfs.comp.io.{ByteBufferChannel, ReadOnlyChannel}
+import global.namespace.truevfs.commons.io.{ByteBufferChannel, ReadOnlyChannel}
 
 import java.nio._
 import java.nio.file._

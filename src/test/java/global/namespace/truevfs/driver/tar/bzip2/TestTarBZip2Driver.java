@@ -4,7 +4,7 @@
  */
 package global.namespace.truevfs.driver.tar.bzip2;
 
-import global.namespace.truevfs.comp.cio.IoBufferPool;
+import global.namespace.truevfs.commons.cio.IoBufferPool;
 import global.namespace.truevfs.kernel.api.FsTestConfig;
 import org.apache.commons.compress.compressors.bzip2.BZip2CompressorOutputStream;
 

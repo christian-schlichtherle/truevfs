@@ -4,7 +4,7 @@
  */
 package global.namespace.truevfs.kernel.api;
 
-import global.namespace.truevfs.comp.shed.Filter;
+import global.namespace.truevfs.commons.shed.Filter;
 
 import java.net.URI;
 

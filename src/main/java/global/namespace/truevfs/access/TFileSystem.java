@@ -4,12 +4,12 @@
  */
 package global.namespace.truevfs.access;
 
-import global.namespace.truevfs.comp.cio.Entry;
-import global.namespace.truevfs.comp.cio.Entry.Access;
-import global.namespace.truevfs.comp.cio.InputSocket;
-import global.namespace.truevfs.comp.cio.OutputSocket;
-import global.namespace.truevfs.comp.shed.BitField;
-import global.namespace.truevfs.comp.shed.FilteringIterator;
+import global.namespace.truevfs.commons.cio.Entry;
+import global.namespace.truevfs.commons.cio.Entry.Access;
+import global.namespace.truevfs.commons.cio.InputSocket;
+import global.namespace.truevfs.commons.cio.OutputSocket;
+import global.namespace.truevfs.commons.shed.BitField;
+import global.namespace.truevfs.commons.shed.FilteringIterator;
 import global.namespace.truevfs.kernel.api.*;
 import lombok.val;
 
@@ -25,10 +25,10 @@ import java.nio.file.DirectoryStream.Filter;
 import java.nio.file.attribute.*;
 import java.util.*;
 
-import static global.namespace.truevfs.comp.cio.Entry.Access.*;
-import static global.namespace.truevfs.comp.cio.Entry.Size.DATA;
-import static global.namespace.truevfs.comp.cio.Entry.Type.*;
-import static global.namespace.truevfs.comp.cio.Entry.UNKNOWN;
+import static global.namespace.truevfs.commons.cio.Entry.Access.*;
+import static global.namespace.truevfs.commons.cio.Entry.Size.DATA;
+import static global.namespace.truevfs.commons.cio.Entry.Type.*;
+import static global.namespace.truevfs.commons.cio.Entry.UNKNOWN;
 import static global.namespace.truevfs.kernel.api.FsAccessOption.CACHE;
 import static global.namespace.truevfs.kernel.api.FsAccessOption.EXCLUSIVE;
 import static global.namespace.truevfs.kernel.api.FsNodeName.SEPARATOR;

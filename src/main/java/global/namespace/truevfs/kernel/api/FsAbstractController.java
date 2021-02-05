@@ -4,8 +4,8 @@
  */
 package global.namespace.truevfs.kernel.api;
 
-import global.namespace.truevfs.comp.cio.Entry.Access;
-import global.namespace.truevfs.comp.shed.BitField;
+import global.namespace.truevfs.commons.cio.Entry.Access;
+import global.namespace.truevfs.commons.shed.BitField;
 
 import java.io.IOException;
 import java.util.Map;

@@ -4,7 +4,7 @@
  */
 package global.namespace.truevfs.kernel.api;
 
-import global.namespace.truevfs.comp.shed.BitField;
+import global.namespace.truevfs.commons.shed.BitField;
 
 import static global.namespace.truevfs.kernel.api.FsAccessOption.*;
 

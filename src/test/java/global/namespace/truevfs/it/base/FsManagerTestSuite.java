@@ -4,8 +4,8 @@
  */
 package global.namespace.truevfs.it.base;
 
-import global.namespace.truevfs.comp.shed.Filter;
-import global.namespace.truevfs.comp.shed.Visitor;
+import global.namespace.truevfs.commons.shed.Filter;
+import global.namespace.truevfs.commons.shed.Visitor;
 import global.namespace.truevfs.driver.mock.MockDriverMapProvider;
 import global.namespace.truevfs.kernel.api.*;
 import lombok.val;
@@ -17,8 +17,8 @@ import java.util.Arrays;
 import java.util.HashSet;
 import java.util.concurrent.atomic.AtomicInteger;
 
-import static global.namespace.truevfs.comp.shed.Filter.ACCEPT_ANY;
-import static global.namespace.truevfs.comp.shed.Filter.ACCEPT_NONE;
+import static global.namespace.truevfs.commons.shed.Filter.ACCEPT_ANY;
+import static global.namespace.truevfs.commons.shed.Filter.ACCEPT_NONE;
 import static org.hamcrest.CoreMatchers.*;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.Assert.*;

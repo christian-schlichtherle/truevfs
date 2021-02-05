@@ -4,9 +4,9 @@
  */
 package global.namespace.truevfs.driver.mock;
 
-import global.namespace.truevfs.comp.cio.Entry;
-import global.namespace.truevfs.comp.cio.IoBuffer;
-import global.namespace.truevfs.comp.cio.IoBufferPool;
+import global.namespace.truevfs.commons.cio.Entry;
+import global.namespace.truevfs.commons.cio.IoBuffer;
+import global.namespace.truevfs.commons.cio.IoBufferPool;
 import global.namespace.truevfs.kernel.api.FsArchiveEntries;
 import global.namespace.truevfs.kernel.api.FsArchiveEntry;
 

@@ -4,9 +4,9 @@
  */
 package global.namespace.truevfs.ext.insight;
 
+import global.namespace.truevfs.commons.inst.InstrumentingSeekableChannel;
+import global.namespace.truevfs.commons.jmx.JmxComponent;
 import lombok.val;
-import global.namespace.truevfs.comp.inst.InstrumentingSeekableChannel;
-import global.namespace.truevfs.comp.jmx.JmxComponent;
 
 import java.io.IOException;
 import java.nio.ByteBuffer;

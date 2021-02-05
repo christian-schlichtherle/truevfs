@@ -4,7 +4,7 @@
  */
 package global.namespace.truevfs.it.io;
 
-import global.namespace.truevfs.comp.io.BufferedReadOnlyChannel;
+import global.namespace.truevfs.commons.io.BufferedReadOnlyChannel;
 
 import java.io.IOException;
 import java.nio.channels.SeekableByteChannel;

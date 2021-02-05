@@ -4,7 +4,7 @@
  */
 package global.namespace.truevfs.driver.zip.raes.crypto;
 
-import global.namespace.truevfs.comp.key.api.common.AesKeyStrength;
+import global.namespace.truevfs.commons.key.api.common.AesKeyStrength;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

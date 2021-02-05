@@ -4,17 +4,17 @@
  */
 package global.namespace.truevfs.driver.odf;
 
-import global.namespace.truevfs.comp.cio.*;
-import global.namespace.truevfs.comp.zipdriver.JarDriverEntry;
-import global.namespace.truevfs.comp.zipdriver.ZipOutputContainer;
+import global.namespace.truevfs.commons.cio.*;
+import global.namespace.truevfs.commons.zipdriver.JarDriverEntry;
+import global.namespace.truevfs.commons.zipdriver.ZipOutputContainer;
 
 import java.io.IOException;
 import java.io.OutputStream;
 import java.util.Objects;
 import java.util.Optional;
 
-import static global.namespace.truevfs.comp.cio.Entry.UNKNOWN;
-import static global.namespace.truevfs.comp.zip.ZipEntry.STORED;
+import static global.namespace.truevfs.commons.cio.Entry.UNKNOWN;
+import static global.namespace.truevfs.commons.zip.ZipEntry.STORED;
 
 /**
  * Created by {@link OdfDriver} to meet the special requirements of

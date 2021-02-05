@@ -4,14 +4,14 @@
  */
 package global.namespace.truevfs.driver.odf;
 
-import global.namespace.truevfs.comp.cio.InputContainer;
-import global.namespace.truevfs.comp.cio.IoBufferPool;
-import global.namespace.truevfs.comp.cio.MultiplexingOutputContainer;
-import global.namespace.truevfs.comp.cio.OutputContainer;
-import global.namespace.truevfs.comp.zipdriver.JarDriver;
-import global.namespace.truevfs.comp.zipdriver.JarDriverEntry;
-import global.namespace.truevfs.comp.zipdriver.ZipInputContainer;
-import global.namespace.truevfs.comp.zipdriver.ZipOutputContainer;
+import global.namespace.truevfs.commons.cio.InputContainer;
+import global.namespace.truevfs.commons.cio.IoBufferPool;
+import global.namespace.truevfs.commons.cio.MultiplexingOutputContainer;
+import global.namespace.truevfs.commons.cio.OutputContainer;
+import global.namespace.truevfs.commons.zipdriver.JarDriver;
+import global.namespace.truevfs.commons.zipdriver.JarDriverEntry;
+import global.namespace.truevfs.commons.zipdriver.ZipInputContainer;
+import global.namespace.truevfs.commons.zipdriver.ZipOutputContainer;
 import global.namespace.truevfs.kernel.api.FsModel;
 import global.namespace.truevfs.kernel.api.FsOutputSocketSink;
 
@@ -35,7 +35,7 @@ import static global.namespace.truevfs.kernel.api.FsAccessOption.GROW;
  * achieve best performance, the {@code mimetype} entry should always get
  * written first in order to avoid temp file buffering of all other entries.
  * <p>
- * Subclasses must be thread-safe and should be immutable!
+ * Subclasses must be thread-safe.
  *
  * @author Christian Schlichtherle
  * @see <a href="http://docs.oasis-open.org/office/v1.0/OpenDocument-v1.0-os.pdf">Open Document Format for Office Applications (OpenDocument) v1.0; Section 17.4: MIME Type Stream</a>

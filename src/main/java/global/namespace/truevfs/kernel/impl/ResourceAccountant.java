@@ -4,9 +4,9 @@
   */
  package global.namespace.truevfs.kernel.impl;
 
- import global.namespace.truevfs.comp.shed.ExceptionHandler;
- import global.namespace.truevfs.comp.shed.HashMaps;
- import global.namespace.truevfs.comp.shed.LockAspect;
+ import global.namespace.truevfs.commons.shed.ExceptionHandler;
+ import global.namespace.truevfs.commons.shed.HashMaps;
+ import global.namespace.truevfs.commons.shed.LockAspect;
  import lombok.Value;
  import lombok.val;
 

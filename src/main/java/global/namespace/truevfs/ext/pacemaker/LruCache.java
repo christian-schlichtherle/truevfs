@@ -15,12 +15,13 @@ import java.util.concurrent.locks.ReentrantReadWriteLock;
 import java.util.function.Predicate;
 import java.util.function.Supplier;
 
-import static global.namespace.truevfs.comp.shed.HashMaps.initialCapacity;
+import static global.namespace.truevfs.commons.shed.HashMaps.initialCapacity;
 
 /**
  * A simple cache set with a least-recently-used (LRU) eviction strategy.
  * Note that unlike other caches whenever an item gets evicted, it gets added to a concurrent set which can get queried
  * using the {@link #evicted} method for further processing, e.g. to close resources.
+ * <p>
  * This class is thread-safe.
  *
  * @param <T> the type of the items

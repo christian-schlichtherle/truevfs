@@ -4,8 +4,8 @@
  */
 package global.namespace.truevfs.driver.http;
 
-import global.namespace.truevfs.comp.cio.*;
-import global.namespace.truevfs.comp.shed.BitField;
+import global.namespace.truevfs.commons.cio.*;
+import global.namespace.truevfs.commons.shed.BitField;
 import global.namespace.truevfs.kernel.api.FsAbstractNode;
 import global.namespace.truevfs.kernel.api.FsAccessOption;
 import global.namespace.truevfs.kernel.api.FsNodeName;
@@ -28,10 +28,10 @@ import java.util.Date;
 import java.util.Optional;
 import java.util.Set;
 
-import static global.namespace.truevfs.comp.cio.Entry.Access.READ;
-import static global.namespace.truevfs.comp.cio.Entry.Access.WRITE;
-import static global.namespace.truevfs.comp.cio.Entry.Size.DATA;
-import static global.namespace.truevfs.comp.cio.Entry.Type.FILE;
+import static global.namespace.truevfs.commons.cio.Entry.Access.READ;
+import static global.namespace.truevfs.commons.cio.Entry.Access.WRITE;
+import static global.namespace.truevfs.commons.cio.Entry.Size.DATA;
+import static global.namespace.truevfs.commons.cio.Entry.Type.FILE;
 import static global.namespace.truevfs.kernel.api.FsAccessOptions.NONE;
 
 /**

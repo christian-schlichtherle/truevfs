@@ -1,0 +1,22 @@
+/*
+ * Copyright © 2005 - 2021 Schlichtherle IT Services.
+ * All rights reserved. Use is subject to license terms.
+ */
+package global.namespace.truevfs.commons.zip.crypto;
+
+import org.bouncycastle.crypto.BlockCipher;
+import org.bouncycastle.crypto.BufferedBlockCipher;
+
+/**
+ * A buffered block cipher which allows a partial block when calling
+ * {@link #doFinal(byte[], int)}.
+ *
+ * @author Christian Schlichtherle
+ */
+public final class BufferedPartialBlockCipher extends BufferedBlockCipher {
+
+    public BufferedPartialBlockCipher(BlockCipher cipher) {
+        super(cipher);
+        partialBlockOkay = true;
+    }
+}

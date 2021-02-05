@@ -4,9 +4,9 @@
  */
 package global.namespace.truevfs.it.zip.base;
 
-import global.namespace.truevfs.comp.zip.ZipEntry;
+import global.namespace.truevfs.commons.zip.ZipEntry;
 
-import static global.namespace.truevfs.comp.zip.ZipEntry.BZIP2;
+import static global.namespace.truevfs.commons.zip.ZipEntry.BZIP2;
 
 /**
  * @author Christian Schlichtherle

@@ -4,12 +4,12 @@
  */
 package global.namespace.truevfs.it.base;
 
-import global.namespace.truevfs.comp.cio.*;
-import global.namespace.truevfs.comp.io.DecoratingInputStream;
-import global.namespace.truevfs.comp.io.DecoratingOutputStream;
-import global.namespace.truevfs.comp.io.DecoratingSeekableChannel;
-import global.namespace.truevfs.comp.io.PowerBuffer;
-import global.namespace.truevfs.comp.shed.BitField;
+import global.namespace.truevfs.commons.cio.*;
+import global.namespace.truevfs.commons.io.DecoratingInputStream;
+import global.namespace.truevfs.commons.io.DecoratingOutputStream;
+import global.namespace.truevfs.commons.io.DecoratingSeekableChannel;
+import global.namespace.truevfs.commons.io.PowerBuffer;
+import global.namespace.truevfs.commons.shed.BitField;
 import global.namespace.truevfs.driver.mock.MockController;
 import global.namespace.truevfs.kernel.api.*;
 import lombok.val;
@@ -26,12 +26,12 @@ import java.util.NoSuchElementException;
 import java.util.Objects;
 import java.util.Optional;
 
-import static global.namespace.truevfs.comp.cio.Entry.Access.*;
-import static global.namespace.truevfs.comp.cio.Entry.Size.DATA;
-import static global.namespace.truevfs.comp.cio.Entry.Size.STORAGE;
-import static global.namespace.truevfs.comp.cio.Entry.Type.FILE;
-import static global.namespace.truevfs.comp.cio.Entry.UNKNOWN;
-import static global.namespace.truevfs.comp.shed.Throwables.contains;
+import static global.namespace.truevfs.commons.cio.Entry.Access.*;
+import static global.namespace.truevfs.commons.cio.Entry.Size.DATA;
+import static global.namespace.truevfs.commons.cio.Entry.Size.STORAGE;
+import static global.namespace.truevfs.commons.cio.Entry.Type.FILE;
+import static global.namespace.truevfs.commons.cio.Entry.UNKNOWN;
+import static global.namespace.truevfs.commons.shed.Throwables.contains;
 import static global.namespace.truevfs.kernel.api.FsAccessOptions.NONE;
 import static java.nio.charset.StandardCharsets.UTF_8;
 import static org.hamcrest.CoreMatchers.notNullValue;

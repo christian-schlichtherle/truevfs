@@ -4,10 +4,10 @@
  */
 package global.namespace.truevfs.driver.file;
 
-import global.namespace.truevfs.comp.cio.Entry;
-import global.namespace.truevfs.comp.cio.InputSocket;
-import global.namespace.truevfs.comp.cio.IoSockets;
-import global.namespace.truevfs.comp.shed.BitField;
+import global.namespace.truevfs.commons.cio.Entry;
+import global.namespace.truevfs.commons.cio.InputSocket;
+import global.namespace.truevfs.commons.cio.IoSockets;
+import global.namespace.truevfs.commons.shed.BitField;
 import global.namespace.truevfs.kernel.api.FsAccessOption;
 
 import javax.annotation.Nullable;
@@ -22,9 +22,9 @@ import java.util.HashSet;
 import java.util.Optional;
 import java.util.Set;
 
-import static global.namespace.truevfs.comp.cio.Entry.Access.*;
-import static global.namespace.truevfs.comp.cio.Entry.UNKNOWN;
-import static global.namespace.truevfs.comp.shed.HashMaps.initialCapacity;
+import static global.namespace.truevfs.commons.cio.Entry.Access.*;
+import static global.namespace.truevfs.commons.cio.Entry.UNKNOWN;
+import static global.namespace.truevfs.commons.shed.HashMaps.initialCapacity;
 import static global.namespace.truevfs.kernel.api.FsAccessOption.*;
 import static java.lang.Boolean.TRUE;
 import static java.nio.file.Files.*;
@@ -37,7 +37,7 @@ import static java.nio.file.StandardCopyOption.REPLACE_EXISTING;
  * @author Christian Schlichtherle
  */
 @SuppressWarnings("OptionalUsedAsFieldOrParameterType")
-final class FileOutputSocket implements global.namespace.truevfs.comp.cio.OutputSocket<FileNode> {
+final class FileOutputSocket implements global.namespace.truevfs.commons.cio.OutputSocket<FileNode> {
 
     private static final int
             INITIAL_CAPACITY = initialCapacity(FsAccessOption.values().length);

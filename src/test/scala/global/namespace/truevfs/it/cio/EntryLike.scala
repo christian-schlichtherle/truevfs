@@ -1,8 +1,8 @@
 package global.namespace.truevfs.it.cio
 
-import global.namespace.truevfs.comp.cio.Entry.Access._
-import global.namespace.truevfs.comp.cio.Entry.Size.{DATA, STORAGE}
-import global.namespace.truevfs.comp.cio.Entry.{Access, Entity, Size}
+import global.namespace.truevfs.commons.cio.Entry.Access._
+import global.namespace.truevfs.commons.cio.Entry.Size.{DATA, STORAGE}
+import global.namespace.truevfs.commons.cio.Entry.{Access, Entity, Size}
 
 /**
  * @author Christian Schlichtherle

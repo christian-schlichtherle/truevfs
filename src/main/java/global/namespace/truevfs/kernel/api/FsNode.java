@@ -4,8 +4,8 @@
  */
 package global.namespace.truevfs.kernel.api;
 
-import global.namespace.truevfs.comp.cio.Entry;
-import global.namespace.truevfs.comp.shed.BitField;
+import global.namespace.truevfs.commons.cio.Entry;
+import global.namespace.truevfs.commons.shed.BitField;
 
 import javax.annotation.Nullable;
 import java.util.Set;

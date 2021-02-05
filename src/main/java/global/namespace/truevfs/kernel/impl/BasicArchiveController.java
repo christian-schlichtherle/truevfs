@@ -4,13 +4,13 @@
  */
 package global.namespace.truevfs.kernel.impl;
 
-import global.namespace.truevfs.comp.cio.DecoratingEntry;
-import global.namespace.truevfs.comp.cio.Entry;
-import global.namespace.truevfs.comp.cio.InputSocket;
-import global.namespace.truevfs.comp.cio.OutputSocket;
-import global.namespace.truevfs.comp.io.Streams;
-import global.namespace.truevfs.comp.logging.LocalizedLogger;
-import global.namespace.truevfs.comp.shed.BitField;
+import global.namespace.truevfs.commons.cio.DecoratingEntry;
+import global.namespace.truevfs.commons.cio.Entry;
+import global.namespace.truevfs.commons.cio.InputSocket;
+import global.namespace.truevfs.commons.cio.OutputSocket;
+import global.namespace.truevfs.commons.io.Streams;
+import global.namespace.truevfs.commons.logging.LocalizedLogger;
+import global.namespace.truevfs.commons.shed.BitField;
 import global.namespace.truevfs.kernel.api.*;
 import lombok.val;
 import org.slf4j.Logger;
@@ -25,9 +25,9 @@ import java.nio.file.NoSuchFileException;
 import java.util.Map;
 import java.util.Optional;
 
-import static global.namespace.truevfs.comp.cio.Entry.Access.*;
-import static global.namespace.truevfs.comp.cio.Entry.Type.DIRECTORY;
-import static global.namespace.truevfs.comp.cio.Entry.Type.FILE;
+import static global.namespace.truevfs.commons.cio.Entry.Access.*;
+import static global.namespace.truevfs.commons.cio.Entry.Type.DIRECTORY;
+import static global.namespace.truevfs.commons.cio.Entry.Type.FILE;
 import static global.namespace.truevfs.kernel.api.FsAccessOption.APPEND;
 import static global.namespace.truevfs.kernel.api.FsAccessOption.CREATE_PARENTS;
 import static global.namespace.truevfs.kernel.api.FsAccessOptions.NONE;

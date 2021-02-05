@@ -6,17 +6,17 @@ package global.namespace.truevfs.driver.zip.sample;
 
 import global.namespace.truevfs.access.TArchiveDetector;
 import global.namespace.truevfs.access.TConfig;
-import global.namespace.truevfs.comp.key.api.KeyManagerMap;
-import global.namespace.truevfs.comp.key.api.UnknownKeyException;
-import global.namespace.truevfs.comp.key.api.common.AesKeyStrength;
-import global.namespace.truevfs.comp.key.api.common.AesPbeParameters;
-import global.namespace.truevfs.comp.key.api.prompting.PromptingKey.Controller;
-import global.namespace.truevfs.comp.key.api.prompting.PromptingKey.View;
-import global.namespace.truevfs.comp.key.api.prompting.PromptingKeyManagerMap;
-import global.namespace.truevfs.comp.zip.WinZipAesParameters;
-import global.namespace.truevfs.comp.zip.ZipKeyException;
-import global.namespace.truevfs.comp.zipdriver.AbstractZipDriverEntry;
-import global.namespace.truevfs.comp.zipdriver.ZipDriver;
+import global.namespace.truevfs.commons.key.api.KeyManagerMap;
+import global.namespace.truevfs.commons.key.api.UnknownKeyException;
+import global.namespace.truevfs.commons.key.api.common.AesKeyStrength;
+import global.namespace.truevfs.commons.key.api.common.AesPbeParameters;
+import global.namespace.truevfs.commons.key.api.prompting.PromptingKey.Controller;
+import global.namespace.truevfs.commons.key.api.prompting.PromptingKey.View;
+import global.namespace.truevfs.commons.key.api.prompting.PromptingKeyManagerMap;
+import global.namespace.truevfs.commons.zip.WinZipAesParameters;
+import global.namespace.truevfs.commons.zip.ZipKeyException;
+import global.namespace.truevfs.commons.zipdriver.AbstractZipDriverEntry;
+import global.namespace.truevfs.commons.zipdriver.ZipDriver;
 import global.namespace.truevfs.kernel.api.FsController;
 import global.namespace.truevfs.kernel.api.FsModel;
 

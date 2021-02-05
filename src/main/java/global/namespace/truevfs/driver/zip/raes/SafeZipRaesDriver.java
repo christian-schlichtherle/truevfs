@@ -26,7 +26,7 @@ import java.io.IOException;
  * small sink size.
  * It's the ZIP inflation algorithm which actually comes to our rescue!
  * <p>
- * Subclasses must be thread-safe and should be immutable!
+ * Subclasses must be thread-safe.
  * 
  * @see     ParanoidZipRaesDriver
  * @author  Christian Schlichtherle

@@ -4,7 +4,7 @@
  */
 package global.namespace.truevfs.driver.http;
 
-import global.namespace.truevfs.comp.cio.IoBufferPool;
+import global.namespace.truevfs.commons.cio.IoBufferPool;
 import global.namespace.truevfs.kernel.api.FsController;
 import global.namespace.truevfs.kernel.api.FsDriver;
 import global.namespace.truevfs.kernel.api.FsManager;
@@ -21,7 +21,7 @@ import java.util.Optional;
 /**
  * A file system driver for the HTTP(S) schemes.
  * <p>
- * Subclasses must be thread-safe and should be immutable!
+ * Subclasses must be thread-safe.
  *
  * @see     #newClient()
  * @author  Christian Schlichtherle

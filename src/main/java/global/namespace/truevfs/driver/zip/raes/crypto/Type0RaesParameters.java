@@ -4,14 +4,14 @@
  */
 package global.namespace.truevfs.driver.zip.raes.crypto;
 
-import global.namespace.truevfs.comp.key.api.common.AesKeyStrength;
+import global.namespace.truevfs.commons.key.api.common.AesKeyStrength;
 
 /**
  * The parameters of this interface are used with RAES <i>type 0</i> files.
  * Type 0 RAES files use password based encryption according to the
  * specifications in PKCS #5 V2.0 und PKCS #12 V1.0.
  * <p>
- * Implementations do not need to be safe for multi-threading.
+ * Implementations do not need to be thread-safe.
  *
  * @see     <a href="http://www.rsasecurity.com/rsalabs/pkcs/pkcs-5/index.html">PKCS #5</a>
  * @see     <a href="http://www.rsasecurity.com/rsalabs/pkcs/pkcs-12/index.html">PKCS #12</a>

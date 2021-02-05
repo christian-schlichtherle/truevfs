@@ -4,13 +4,13 @@
  */
 package global.namespace.truevfs.kernel.impl;
 
-import global.namespace.truevfs.comp.cio.*;
-import global.namespace.truevfs.comp.io.DecoratingInputStream;
-import global.namespace.truevfs.comp.io.DecoratingOutputStream;
-import global.namespace.truevfs.comp.io.DecoratingSeekableChannel;
-import global.namespace.truevfs.comp.io.ReadOnlyChannel;
-import global.namespace.truevfs.comp.shed.Pool;
-import global.namespace.truevfs.comp.shed.Releasable;
+import global.namespace.truevfs.commons.cio.*;
+import global.namespace.truevfs.commons.io.DecoratingInputStream;
+import global.namespace.truevfs.commons.io.DecoratingOutputStream;
+import global.namespace.truevfs.commons.io.DecoratingSeekableChannel;
+import global.namespace.truevfs.commons.io.ReadOnlyChannel;
+import global.namespace.truevfs.commons.shed.Pool;
+import global.namespace.truevfs.commons.shed.Releasable;
 import lombok.val;
 
 import java.io.*;

@@ -4,13 +4,13 @@
  */
 package global.namespace.truevfs.kernel.impl;
 
-import global.namespace.truevfs.comp.cio.*;
-import global.namespace.truevfs.comp.io.DecoratingInputStream;
-import global.namespace.truevfs.comp.io.DecoratingOutputStream;
-import global.namespace.truevfs.comp.io.DecoratingSeekableChannel;
-import global.namespace.truevfs.comp.shed.BitField;
-import global.namespace.truevfs.comp.shed.ControlFlowException;
-import global.namespace.truevfs.comp.shed.ExceptionHandler;
+import global.namespace.truevfs.commons.cio.*;
+import global.namespace.truevfs.commons.io.DecoratingInputStream;
+import global.namespace.truevfs.commons.io.DecoratingOutputStream;
+import global.namespace.truevfs.commons.io.DecoratingSeekableChannel;
+import global.namespace.truevfs.commons.shed.BitField;
+import global.namespace.truevfs.commons.shed.ControlFlowException;
+import global.namespace.truevfs.commons.shed.ExceptionHandler;
 import global.namespace.truevfs.kernel.api.*;
 import lombok.val;
 

@@ -5,10 +5,10 @@
 package global.namespace.truevfs.tool;
 
 import global.namespace.truevfs.access.*;
-import global.namespace.truevfs.comp.shed.BitField;
-import global.namespace.truevfs.comp.tardriver.TarDriver;
-import global.namespace.truevfs.comp.zipdriver.JarDriver;
-import global.namespace.truevfs.comp.zipdriver.ZipDriver;
+import global.namespace.truevfs.commons.shed.BitField;
+import global.namespace.truevfs.commons.tardriver.TarDriver;
+import global.namespace.truevfs.commons.zipdriver.JarDriver;
+import global.namespace.truevfs.commons.zipdriver.ZipDriver;
 import global.namespace.truevfs.driver.sfx.ReadOnlySfxDriver;
 import global.namespace.truevfs.driver.tar.bzip2.TarBZip2Driver;
 import global.namespace.truevfs.driver.tar.gzip.TarGZipDriver;

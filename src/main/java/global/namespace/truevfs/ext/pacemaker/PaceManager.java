@@ -4,8 +4,8 @@
  */
 package global.namespace.truevfs.ext.pacemaker;
 
-import global.namespace.truevfs.comp.jmx.JmxManager;
-import global.namespace.truevfs.comp.logging.LocalizedLogger;
+import global.namespace.truevfs.commons.jmx.JmxManager;
+import global.namespace.truevfs.commons.logging.LocalizedLogger;
 import global.namespace.truevfs.kernel.api.*;
 import lombok.val;
 import org.slf4j.Logger;

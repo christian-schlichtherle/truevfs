@@ -4,7 +4,7 @@
  */
 package global.namespace.truevfs.kernel.api;
 
-import global.namespace.truevfs.comp.shed.PriorityExceptionBuilder;
+import global.namespace.truevfs.commons.shed.PriorityExceptionBuilder;
 
 import java.util.Comparator;
 

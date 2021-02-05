@@ -4,7 +4,7 @@
  */
 package global.namespace.truevfs.kernel.impl;
 
-import global.namespace.truevfs.comp.shed.ControlFlowException;
+import global.namespace.truevfs.commons.shed.ControlFlowException;
 
 import java.io.IOException;
 

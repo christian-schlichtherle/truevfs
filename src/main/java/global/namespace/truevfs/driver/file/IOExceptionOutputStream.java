@@ -4,7 +4,7 @@
  */
 package global.namespace.truevfs.driver.file;
 
-import global.namespace.truevfs.comp.io.DecoratingOutputStream;
+import global.namespace.truevfs.commons.io.DecoratingOutputStream;
 
 import java.io.IOException;
 import java.io.OutputStream;

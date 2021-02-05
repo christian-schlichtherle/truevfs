@@ -4,7 +4,7 @@
  */
 package global.namespace.truevfs.it.odf;
 
-import global.namespace.truevfs.comp.cio.IoBufferPool;
+import global.namespace.truevfs.commons.cio.IoBufferPool;
 import global.namespace.truevfs.driver.odf.CheckedOdfDriver;
 import global.namespace.truevfs.it.base.TFileITSuite;
 import global.namespace.truevfs.kernel.api.FsTestConfig;

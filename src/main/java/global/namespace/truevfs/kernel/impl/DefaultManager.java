@@ -4,10 +4,10 @@
  */
 package global.namespace.truevfs.kernel.impl;
 
-import global.namespace.truevfs.comp.shed.Filter;
-import global.namespace.truevfs.comp.shed.Link;
-import global.namespace.truevfs.comp.shed.Operation;
-import global.namespace.truevfs.comp.shed.Visitor;
+import global.namespace.truevfs.commons.shed.Filter;
+import global.namespace.truevfs.commons.shed.Link;
+import global.namespace.truevfs.commons.shed.Operation;
+import global.namespace.truevfs.commons.shed.Visitor;
 import global.namespace.truevfs.kernel.api.*;
 import lombok.val;
 
@@ -18,8 +18,8 @@ import java.util.WeakHashMap;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 import java.util.stream.Collectors;
 
-import static global.namespace.truevfs.comp.shed.Link.Type.STRONG;
-import static global.namespace.truevfs.comp.shed.Link.Type.WEAK;
+import static global.namespace.truevfs.commons.shed.Link.Type.STRONG;
+import static global.namespace.truevfs.commons.shed.Link.Type.WEAK;
 
 /**
  * The default implementation of a file system manager.

@@ -4,7 +4,7 @@
  */
 package global.namespace.truevfs.it.cio
 
-import global.namespace.truevfs.comp.cio._
+import global.namespace.truevfs.commons.cio._
 import global.namespace.truevfs.it.util._
 
 import java.util

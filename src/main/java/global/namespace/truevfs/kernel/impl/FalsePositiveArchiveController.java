@@ -5,11 +5,11 @@
 package global.namespace.truevfs.kernel.impl;
 
 import bali.Cache;
-import global.namespace.truevfs.comp.cio.Entry;
-import global.namespace.truevfs.comp.cio.InputSocket;
-import global.namespace.truevfs.comp.cio.OutputSocket;
-import global.namespace.truevfs.comp.shed.BitField;
-import global.namespace.truevfs.comp.shed.ControlFlowException;
+import global.namespace.truevfs.commons.cio.Entry;
+import global.namespace.truevfs.commons.cio.InputSocket;
+import global.namespace.truevfs.commons.cio.OutputSocket;
+import global.namespace.truevfs.commons.shed.BitField;
+import global.namespace.truevfs.commons.shed.ControlFlowException;
 import global.namespace.truevfs.kernel.api.*;
 
 import javax.annotation.CheckForNull;
@@ -41,7 +41,7 @@ import static global.namespace.truevfs.kernel.api.FsNodeName.ROOT;
  *     to provide the caller with a good indication of what went wrong in the first place.
  * <li>Non-{@code IOException}s are excluded from this masquerade in order to support resolving them by a more competent
  *     caller.
- *     This is required to make {@link global.namespace.truevfs.comp.shed.ControlFlowException}s work as designed.
+ *     This is required to make {@link global.namespace.truevfs.commons.shed.ControlFlowException}s work as designed.
  * </ol>
  * <p>
  * As an example consider accessing a RAES encrypted ZIP file:

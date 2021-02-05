@@ -5,7 +5,7 @@
 package global.namespace.truevfs.driver.file;
 
 import global.namespace.service.wight.annotation.ServiceImplementation;
-import global.namespace.truevfs.comp.cio.IoBufferPool;
+import global.namespace.truevfs.commons.cio.IoBufferPool;
 import global.namespace.truevfs.kernel.api.spi.IoBufferPoolFactory;
 
 /**

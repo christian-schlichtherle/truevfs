@@ -4,12 +4,12 @@
  */
 package global.namespace.truevfs.driver.zip.raes.crypto;
 
-import global.namespace.truevfs.comp.io.LittleEndianOutputStream;
-import global.namespace.truevfs.comp.io.Sink;
-import global.namespace.truevfs.comp.key.api.common.AesKeyStrength;
-import global.namespace.truevfs.comp.zip.crypto.BufferedPartialBlockCipher;
-import global.namespace.truevfs.comp.zip.crypto.CipherOutputStream;
-import global.namespace.truevfs.comp.zip.crypto.CtrBlockCipher;
+import global.namespace.truevfs.commons.io.LittleEndianOutputStream;
+import global.namespace.truevfs.commons.io.Sink;
+import global.namespace.truevfs.commons.key.api.common.AesKeyStrength;
+import global.namespace.truevfs.commons.zip.crypto.BufferedPartialBlockCipher;
+import global.namespace.truevfs.commons.zip.crypto.CipherOutputStream;
+import global.namespace.truevfs.commons.zip.crypto.CtrBlockCipher;
 import org.bouncycastle.crypto.*;
 import org.bouncycastle.crypto.digests.SHA256Digest;
 import org.bouncycastle.crypto.engines.AESEngine;

@@ -29,7 +29,7 @@ import scala.jdk.CollectionConverters._
   *
   * This class supports both `null` paths and entries.
   *
-  * This class is ''not'' thread-safe!
+  * This class is not thread-safe.
   *
   * @tparam K the type of the paths (keys) in this (virtual) file system (map).
   * @tparam V the type of the entries (values) in this (virtual) file system

@@ -4,9 +4,9 @@
  */
 package global.namespace.truevfs.it.kernel.impl
 
-import global.namespace.truevfs.comp.cio.Entry.Access._
-import global.namespace.truevfs.comp.cio.Entry._
-import global.namespace.truevfs.comp.cio.{Entry, InputSocket, _}
+import global.namespace.truevfs.commons.cio.Entry.Access._
+import global.namespace.truevfs.commons.cio.Entry._
+import global.namespace.truevfs.commons.cio.{Entry, InputSocket, _}
 import global.namespace.truevfs.it.cio.EntryAspect.apply
 import global.namespace.truevfs.it.kernel.impl.CacheEntrySpec.{BrokenInputSocket, BrokenOutputSocket}
 import global.namespace.truevfs.kernel.impl.CacheEntry.Strategy._

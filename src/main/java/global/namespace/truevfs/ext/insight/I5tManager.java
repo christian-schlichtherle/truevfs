@@ -4,9 +4,9 @@
  */
 package global.namespace.truevfs.ext.insight;
 
-import global.namespace.truevfs.comp.jmx.JmxManager;
-import global.namespace.truevfs.comp.shed.Filter;
-import global.namespace.truevfs.comp.shed.Visitor;
+import global.namespace.truevfs.commons.jmx.JmxManager;
+import global.namespace.truevfs.commons.shed.Filter;
+import global.namespace.truevfs.commons.shed.Visitor;
 import global.namespace.truevfs.kernel.api.FsController;
 import global.namespace.truevfs.kernel.api.FsManager;
 import lombok.val;

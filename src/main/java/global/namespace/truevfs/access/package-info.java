@@ -3,8 +3,7 @@
  * All rights reserved. Use is subject to license terms.
  */
 /**
- * Provides uniform, transparent, thread-safe, read/write access to archive
- * files as if they were virtual directories.
+ * Provides uniform, transparent, thread-safe, read/write access to archive files as if they were virtual directories.
  *
  * <h3>The TFile* Classes</h3>
  * <p>

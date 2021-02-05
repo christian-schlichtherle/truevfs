@@ -4,11 +4,11 @@
  */
 package global.namespace.truevfs.it.zip.raes;
 
-import global.namespace.truevfs.comp.io.AbstractSource;
-import global.namespace.truevfs.comp.io.OneTimeSink;
-import global.namespace.truevfs.comp.io.OneTimeSource;
-import global.namespace.truevfs.comp.zip.ZipFile;
-import global.namespace.truevfs.comp.zip.ZipOutputStream;
+import global.namespace.truevfs.commons.io.AbstractSource;
+import global.namespace.truevfs.commons.io.OneTimeSink;
+import global.namespace.truevfs.commons.io.OneTimeSource;
+import global.namespace.truevfs.commons.zip.ZipFile;
+import global.namespace.truevfs.commons.zip.ZipOutputStream;
 import global.namespace.truevfs.driver.zip.raes.crypto.MockType0RaesParameters;
 import global.namespace.truevfs.driver.zip.raes.crypto.RaesOutputStream;
 import global.namespace.truevfs.driver.zip.raes.crypto.RaesParameters;

@@ -6,7 +6,7 @@ package global.namespace.truevfs.kernel.api;
 
 import java.util.Formatter;
 
-import static global.namespace.truevfs.comp.cio.Entry.*;
+import static global.namespace.truevfs.commons.cio.Entry.*;
 
 /**
  * Static utility methods for {@link FsArchiveEntry} objects.

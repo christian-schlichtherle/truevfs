@@ -4,8 +4,8 @@
  */
 package global.namespace.truevfs.it.zip.base;
 
-import global.namespace.truevfs.comp.key.api.common.AesKeyStrength;
-import global.namespace.truevfs.comp.zip.*;
+import global.namespace.truevfs.commons.key.api.common.AesKeyStrength;
+import global.namespace.truevfs.commons.zip.*;
 
 import java.io.IOException;
 import java.io.OutputStream;
