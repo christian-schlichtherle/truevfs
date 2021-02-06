@@ -10,7 +10,7 @@ import global.namespace.truevfs.kernel.api.spi.IoBufferPoolDecorator;
 /**
  * @author Christian Schlichtherle
  */
-@ServiceImplementation(priority = -300)
+//FIXME: @ServiceImplementation(priority = -300)
 public final class LogBufferPoolDecorator implements IoBufferPoolDecorator {
 
     @Override

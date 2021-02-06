@@ -4,7 +4,6 @@
  */
 package global.namespace.truevfs.ext.insight;
 
-import global.namespace.service.wight.annotation.ServiceImplementation;
 import global.namespace.truevfs.kernel.api.FsManager;
 import global.namespace.truevfs.kernel.api.spi.FsManagerDecorator;
 
@@ -13,7 +12,7 @@ import static global.namespace.truevfs.ext.insight.I5tMediators.syncOperationsMe
 /**
  * @author Christian Schlichtherle
  */
-@ServiceImplementation(priority = -200)
+//FIXME: @ServiceImplementation(priority = -200)
 public final class I5tManagerDecorator implements FsManagerDecorator {
 
     @Override

@@ -12,7 +12,7 @@ import static global.namespace.truevfs.ext.insight.I5tMediators.syncOperationsMe
 /**
  * @author Christian Schlichtherle
  */
-@ServiceImplementation(priority = -200)
+//FIXME: @ServiceImplementation(priority = -200)
 public final class I5tBufferPoolDecorator implements IoBufferPoolDecorator {
 
     @Override

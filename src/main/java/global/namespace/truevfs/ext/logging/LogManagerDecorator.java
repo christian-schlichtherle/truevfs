@@ -4,14 +4,13 @@
  */
 package global.namespace.truevfs.ext.logging;
 
-import global.namespace.service.wight.annotation.ServiceImplementation;
 import global.namespace.truevfs.kernel.api.FsManager;
 import global.namespace.truevfs.kernel.api.spi.FsManagerDecorator;
 
 /**
  * @author Christian Schlichtherle
  */
-@ServiceImplementation(priority = -300)
+//FIXME: @ServiceImplementation(priority = -300)
 public final class LogManagerDecorator implements FsManagerDecorator {
 
     @Override

@@ -4,14 +4,13 @@
  */
 package global.namespace.truevfs.ext.pacemaker;
 
-import global.namespace.service.wight.annotation.ServiceImplementation;
 import global.namespace.truevfs.kernel.api.FsManager;
 import global.namespace.truevfs.kernel.api.spi.FsManagerDecorator;
 
 /**
  * @author Christian Schlichtherle
  */
-@ServiceImplementation(priority = -100)
+//FIXME: @ServiceImplementation(priority = -100)
 public final class PaceManagerDecorator implements FsManagerDecorator {
 
     @Override
