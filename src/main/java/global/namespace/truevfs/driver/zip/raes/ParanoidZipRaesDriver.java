@@ -4,10 +4,10 @@
  */
 package global.namespace.truevfs.driver.zip.raes;
 
-import global.namespace.truevfs.commons.cio.InputContainer;
-import global.namespace.truevfs.commons.zipdriver.JarDriverEntry;
-import global.namespace.truevfs.commons.zipdriver.ZipInputContainer;
-import global.namespace.truevfs.commons.zipdriver.ZipOutputContainer;
+import global.namespace.truevfs.comp.cio.InputContainer;
+import global.namespace.truevfs.comp.zipdriver.JarDriverEntry;
+import global.namespace.truevfs.comp.zipdriver.ZipInputContainer;
+import global.namespace.truevfs.comp.zipdriver.ZipOutputContainer;
 import global.namespace.truevfs.kernel.api.FsModel;
 import global.namespace.truevfs.kernel.api.FsOutputSocketSink;
 

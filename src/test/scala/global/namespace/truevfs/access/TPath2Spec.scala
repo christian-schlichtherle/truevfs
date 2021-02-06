@@ -9,7 +9,7 @@ import org.scalatest.wordspec.AnyWordSpec
 
 class TPath2Spec extends AnyWordSpec {
 
-  "TPath" should {
+  "A TPath" should {
     "cut trailing separators" in {
       TPath.cutTrailingSeparators("c://", 3) shouldBe "c:/"
       TPath.cutTrailingSeparators("///", 2) shouldBe "//"

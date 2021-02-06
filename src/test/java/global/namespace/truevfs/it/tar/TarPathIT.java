@@ -4,8 +4,8 @@
  */
 package global.namespace.truevfs.it.tar;
 
-import global.namespace.truevfs.commons.cio.IoBufferPool;
-import global.namespace.truevfs.commons.tardriver.TarDriver;
+import global.namespace.truevfs.comp.cio.IoBufferPool;
+import global.namespace.truevfs.comp.tardriver.TarDriver;
 import global.namespace.truevfs.it.tar.base.TarPathITSuite;
 import global.namespace.truevfs.kernel.api.FsTestConfig;
 

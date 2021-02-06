@@ -4,11 +4,11 @@
  */
 package global.namespace.truevfs.driver.zip.raes;
 
-import global.namespace.truevfs.commons.cio.IoBufferPool;
-import global.namespace.truevfs.commons.key.api.KeyManagerMap;
-import global.namespace.truevfs.commons.key.api.common.AesPbeParameters;
-import global.namespace.truevfs.commons.key.api.prompting.TestView;
-import global.namespace.truevfs.commons.zipdriver.TestKeyManagerMap;
+import global.namespace.truevfs.comp.cio.IoBufferPool;
+import global.namespace.truevfs.comp.key.api.KeyManagerMap;
+import global.namespace.truevfs.comp.key.api.aes.AesPbeParameters;
+import global.namespace.truevfs.comp.key.api.prompting.TestView;
+import global.namespace.truevfs.comp.zipdriver.TestKeyManagerMap;
 import global.namespace.truevfs.kernel.api.FsTestConfig;
 
 /**

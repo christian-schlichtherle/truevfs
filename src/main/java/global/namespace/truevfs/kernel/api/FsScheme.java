@@ -4,7 +4,7 @@
  */
 package global.namespace.truevfs.kernel.api;
 
-import global.namespace.truevfs.commons.shed.UriBuilder;
+import global.namespace.truevfs.comp.util.UriBuilder;
 
 import java.beans.ConstructorProperties;
 import java.beans.XMLDecoder;

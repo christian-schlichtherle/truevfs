@@ -4,7 +4,7 @@
  */
 package global.namespace.truevfs.kernel.impl;
 
-import global.namespace.truevfs.commons.shed.ControlFlowException;
+import global.namespace.truevfs.comp.util.ControlFlowException;
 
 /**
  * Indicates that an operation needs to get write locked before it can get retried.

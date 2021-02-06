@@ -4,17 +4,17 @@
  */
 package global.namespace.truevfs.driver.tar.gzip;
 
-import global.namespace.truevfs.commons.cio.InputContainer;
-import global.namespace.truevfs.commons.cio.MultiplexingOutputContainer;
-import global.namespace.truevfs.commons.cio.OutputContainer;
-import global.namespace.truevfs.commons.io.AbstractSink;
-import global.namespace.truevfs.commons.io.AbstractSource;
-import global.namespace.truevfs.commons.io.Streams;
-import global.namespace.truevfs.commons.shed.BitField;
-import global.namespace.truevfs.commons.tardriver.TarDriver;
-import global.namespace.truevfs.commons.tardriver.TarDriverEntry;
-import global.namespace.truevfs.commons.tardriver.TarInputContainer;
-import global.namespace.truevfs.commons.tardriver.TarOutputContainer;
+import global.namespace.truevfs.comp.cio.InputContainer;
+import global.namespace.truevfs.comp.cio.MultiplexingOutputContainer;
+import global.namespace.truevfs.comp.cio.OutputContainer;
+import global.namespace.truevfs.comp.io.AbstractSink;
+import global.namespace.truevfs.comp.io.AbstractSource;
+import global.namespace.truevfs.comp.io.Streams;
+import global.namespace.truevfs.comp.tardriver.TarDriver;
+import global.namespace.truevfs.comp.tardriver.TarDriverEntry;
+import global.namespace.truevfs.comp.tardriver.TarInputContainer;
+import global.namespace.truevfs.comp.tardriver.TarOutputContainer;
+import global.namespace.truevfs.comp.util.BitField;
 import global.namespace.truevfs.kernel.api.*;
 
 import javax.annotation.CheckForNull;

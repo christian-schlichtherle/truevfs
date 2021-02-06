@@ -4,7 +4,7 @@
  */
 package global.namespace.truevfs.ext.pacemaker
 
-import global.namespace.truevfs.commons.cio.{Entry, _}
+import global.namespace.truevfs.comp.cio.{Entry, _}
 import global.namespace.truevfs.ext.pacemaker.AspectController.Op
 import global.namespace.truevfs.kernel.api._
 import org.mockito.ArgumentMatchers

@@ -4,7 +4,7 @@
  */
 package global.namespace.truevfs.kernel.api;
 
-import global.namespace.truevfs.commons.shed.Filter;
+import global.namespace.truevfs.comp.util.Filter;
 
 import java.util.Objects;
 

@@ -4,12 +4,12 @@
  */
 package global.namespace.truevfs.kernel.api;
 
-import global.namespace.truevfs.commons.cio.Entry;
-import global.namespace.truevfs.commons.cio.Entry.Type;
-import global.namespace.truevfs.commons.cio.InputContainer;
-import global.namespace.truevfs.commons.cio.IoBufferPool;
-import global.namespace.truevfs.commons.cio.OutputContainer;
-import global.namespace.truevfs.commons.shed.BitField;
+import global.namespace.truevfs.comp.cio.Entry;
+import global.namespace.truevfs.comp.cio.Entry.Type;
+import global.namespace.truevfs.comp.cio.InputContainer;
+import global.namespace.truevfs.comp.cio.IoBufferPool;
+import global.namespace.truevfs.comp.cio.OutputContainer;
+import global.namespace.truevfs.comp.util.BitField;
 
 import javax.annotation.CheckForNull;
 import java.io.CharConversionException;
@@ -18,8 +18,8 @@ import java.nio.charset.Charset;
 import java.nio.charset.CharsetEncoder;
 import java.util.Optional;
 
-import static global.namespace.truevfs.commons.cio.Entry.Type.DIRECTORY;
-import static global.namespace.truevfs.commons.shed.Paths.cutTrailingSeparators;
+import static global.namespace.truevfs.comp.cio.Entry.Type.DIRECTORY;
+import static global.namespace.truevfs.comp.util.Paths.cutTrailingSeparators;
 import static global.namespace.truevfs.kernel.api.FsNodeName.SEPARATOR;
 import static global.namespace.truevfs.kernel.api.FsNodeName.SEPARATOR_CHAR;
 

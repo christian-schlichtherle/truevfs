@@ -4,9 +4,9 @@
  */
 package global.namespace.truevfs.driver.http;
 
-import global.namespace.truevfs.commons.cio.Entry;
-import global.namespace.truevfs.commons.cio.InputSocket;
-import global.namespace.truevfs.commons.shed.BitField;
+import global.namespace.truevfs.comp.cio.Entry;
+import global.namespace.truevfs.comp.cio.InputSocket;
+import global.namespace.truevfs.comp.util.BitField;
 import global.namespace.truevfs.kernel.api.FsAccessOption;
 
 import java.io.IOException;
@@ -21,7 +21,7 @@ import java.util.Optional;
  * @author Christian Schlichtherle
  */
 @SuppressWarnings("OptionalUsedAsFieldOrParameterType")
-public class HttpOutputSocket implements global.namespace.truevfs.commons.cio.OutputSocket<HttpNode> {
+public class HttpOutputSocket implements global.namespace.truevfs.comp.cio.OutputSocket<HttpNode> {
 
     private final HttpNode entry;
 

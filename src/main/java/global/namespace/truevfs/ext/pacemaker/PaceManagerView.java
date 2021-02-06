@@ -4,7 +4,7 @@
  */
 package global.namespace.truevfs.ext.pacemaker;
 
-import global.namespace.truevfs.commons.jmx.JmxManagerView;
+import global.namespace.truevfs.comp.jmx.JmxManagerView;
 
 import javax.management.MBeanAttributeInfo;
 import javax.management.MBeanInfo;

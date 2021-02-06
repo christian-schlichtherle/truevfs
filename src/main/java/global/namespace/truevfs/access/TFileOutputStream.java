@@ -4,8 +4,8 @@
  */
 package global.namespace.truevfs.access;
 
-import global.namespace.truevfs.commons.io.DecoratingOutputStream;
-import global.namespace.truevfs.commons.shed.BitField;
+import global.namespace.truevfs.comp.io.DecoratingOutputStream;
+import global.namespace.truevfs.comp.util.BitField;
 import global.namespace.truevfs.kernel.api.FsAccessOption;
 import global.namespace.truevfs.kernel.api.FsAccessOptions;
 

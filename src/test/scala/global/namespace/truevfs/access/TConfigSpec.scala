@@ -8,7 +8,7 @@ import global.namespace.fun.io.api.Socket
 import global.namespace.service.wight.core.ServiceLocator
 import global.namespace.truevfs.access.TConfig._
 import global.namespace.truevfs.access.TConfigSpec._
-import global.namespace.truevfs.commons.shed._
+import global.namespace.truevfs.comp.util._
 import global.namespace.truevfs.driver.mock.MockArchiveDriver
 import global.namespace.truevfs.kernel.api.FsAccessOption._
 import global.namespace.truevfs.kernel.api.FsManager

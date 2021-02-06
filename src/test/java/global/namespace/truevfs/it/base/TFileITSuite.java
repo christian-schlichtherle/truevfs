@@ -5,11 +5,11 @@
 package global.namespace.truevfs.it.base;
 
 import global.namespace.truevfs.access.*;
-import global.namespace.truevfs.commons.io.ClosedInputException;
-import global.namespace.truevfs.commons.io.ClosedOutputException;
-import global.namespace.truevfs.commons.shed.BitField;
-import global.namespace.truevfs.commons.shed.ConcurrencyUtils.TaskFactory;
-import global.namespace.truevfs.commons.shed.ConcurrencyUtils.TaskJoiner;
+import global.namespace.truevfs.comp.io.ClosedInputException;
+import global.namespace.truevfs.comp.io.ClosedOutputException;
+import global.namespace.truevfs.comp.util.BitField;
+import global.namespace.truevfs.comp.util.ConcurrencyUtils.TaskFactory;
+import global.namespace.truevfs.comp.util.ConcurrencyUtils.TaskJoiner;
 import global.namespace.truevfs.kernel.api.*;
 import org.junit.Test;
 import org.slf4j.Logger;
@@ -26,8 +26,8 @@ import java.util.List;
 import java.util.Random;
 import java.util.concurrent.Callable;
 
-import static global.namespace.truevfs.commons.shed.ConcurrencyUtils.NUM_IO_THREADS;
-import static global.namespace.truevfs.commons.shed.ConcurrencyUtils.start;
+import static global.namespace.truevfs.comp.util.ConcurrencyUtils.NUM_IO_THREADS;
+import static global.namespace.truevfs.comp.util.ConcurrencyUtils.start;
 import static global.namespace.truevfs.kernel.api.FsAccessOption.GROW;
 import static global.namespace.truevfs.kernel.api.FsSyncOption.CLEAR_CACHE;
 import static global.namespace.truevfs.kernel.api.FsSyncOption.WAIT_CLOSE_IO;

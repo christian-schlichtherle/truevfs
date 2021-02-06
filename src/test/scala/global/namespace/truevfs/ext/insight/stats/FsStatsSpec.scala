@@ -17,7 +17,7 @@ class FsStatsSpec extends AnyWordSpec {
     .logWrite(1000 * 1000, 1024, 1)
     .logSync(1000 * 1000 * 1000, 1)
 
-  "File system statistics" should {
+  "The file system statistics" should {
     "be serializable" in {
       val clone = BIOS.clone(original)
       clone should not be theSameInstanceAs(original)

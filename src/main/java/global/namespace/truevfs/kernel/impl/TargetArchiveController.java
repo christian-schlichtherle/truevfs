@@ -6,12 +6,12 @@ package global.namespace.truevfs.kernel.impl;
 
 import bali.Cache;
 import bali.Lookup;
-import global.namespace.truevfs.commons.cio.*;
-import global.namespace.truevfs.commons.io.ClosedInputException;
-import global.namespace.truevfs.commons.io.ClosedOutputException;
-import global.namespace.truevfs.commons.shed.BitField;
-import global.namespace.truevfs.commons.shed.ControlFlowException;
-import global.namespace.truevfs.commons.shed.Operation;
+import global.namespace.truevfs.comp.cio.*;
+import global.namespace.truevfs.comp.io.ClosedInputException;
+import global.namespace.truevfs.comp.io.ClosedOutputException;
+import global.namespace.truevfs.comp.util.BitField;
+import global.namespace.truevfs.comp.util.ControlFlowException;
+import global.namespace.truevfs.comp.util.Operation;
 import global.namespace.truevfs.kernel.api.*;
 import lombok.val;
 
@@ -26,13 +26,13 @@ import java.util.Optional;
 import java.util.function.Supplier;
 
 import static bali.CachingStrategy.NOT_THREAD_SAFE;
-import static global.namespace.truevfs.commons.cio.Entry.ALL_SIZES;
-import static global.namespace.truevfs.commons.cio.Entry.Access.READ;
-import static global.namespace.truevfs.commons.cio.Entry.Access.WRITE;
-import static global.namespace.truevfs.commons.cio.Entry.Size.DATA;
-import static global.namespace.truevfs.commons.cio.Entry.Type.DIRECTORY;
-import static global.namespace.truevfs.commons.cio.Entry.Type.SPECIAL;
-import static global.namespace.truevfs.commons.cio.Entry.UNKNOWN;
+import static global.namespace.truevfs.comp.cio.Entry.ALL_SIZES;
+import static global.namespace.truevfs.comp.cio.Entry.Access.READ;
+import static global.namespace.truevfs.comp.cio.Entry.Access.WRITE;
+import static global.namespace.truevfs.comp.cio.Entry.Size.DATA;
+import static global.namespace.truevfs.comp.cio.Entry.Type.DIRECTORY;
+import static global.namespace.truevfs.comp.cio.Entry.Type.SPECIAL;
+import static global.namespace.truevfs.comp.cio.Entry.UNKNOWN;
 import static global.namespace.truevfs.kernel.api.FsAccessOption.CACHE;
 import static global.namespace.truevfs.kernel.api.FsAccessOption.GROW;
 import static global.namespace.truevfs.kernel.api.FsAccessOptions.ACCESS_PREFERENCES_MASK;
@@ -42,7 +42,7 @@ import static global.namespace.truevfs.kernel.api.FsSyncOption.ABORT_CHANGES;
  * Manages I/O to the entry which represents the target archive file in its parent file system, detects archive entry
  * collisions and implements a sync of the target archive file.
  * <p>
- * This controller is an emitter of {@link global.namespace.truevfs.commons.shed.ControlFlowException}s, for example when
+ * This controller is an emitter of {@link global.namespace.truevfs.comp.util.ControlFlowException}s, for example when
  * {@linkplain global.namespace.truevfs.kernel.impl.FalsePositiveArchiveException detecting a false positive archive file}, or
  * {@linkplain global.namespace.truevfs.kernel.impl.NeedsSyncException requiring a sync}.
  *

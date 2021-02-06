@@ -4,13 +4,13 @@
  */
 package global.namespace.truevfs.access;
 
-import global.namespace.truevfs.commons.cio.Entry.Access;
-import global.namespace.truevfs.commons.cio.Entry.Size;
-import global.namespace.truevfs.commons.io.Streams;
-import global.namespace.truevfs.commons.shed.BitField;
-import global.namespace.truevfs.commons.shed.PathSplitter;
-import global.namespace.truevfs.commons.shed.Paths;
-import global.namespace.truevfs.commons.shed.UriBuilder;
+import global.namespace.truevfs.comp.cio.Entry.Access;
+import global.namespace.truevfs.comp.cio.Entry.Size;
+import global.namespace.truevfs.comp.io.Streams;
+import global.namespace.truevfs.comp.util.BitField;
+import global.namespace.truevfs.comp.util.PathSplitter;
+import global.namespace.truevfs.comp.util.Paths;
+import global.namespace.truevfs.comp.util.UriBuilder;
 import global.namespace.truevfs.kernel.api.*;
 import lombok.val;
 
@@ -27,10 +27,10 @@ import java.util.*;
 
 import static global.namespace.truevfs.access.ExpertFeature.Level.INTERMEDIATE;
 import static global.namespace.truevfs.access.ExpertFeature.Reason.INJECTING_A_DIFFERENT_DETECTOR_FOR_THE_SAME_PATH_MAY_CORRUPT_DATA;
-import static global.namespace.truevfs.commons.cio.Entry.Access.*;
-import static global.namespace.truevfs.commons.cio.Entry.Type.DIRECTORY;
-import static global.namespace.truevfs.commons.cio.Entry.Type.FILE;
-import static global.namespace.truevfs.commons.cio.Entry.UNKNOWN;
+import static global.namespace.truevfs.comp.cio.Entry.Access.*;
+import static global.namespace.truevfs.comp.cio.Entry.Type.DIRECTORY;
+import static global.namespace.truevfs.comp.cio.Entry.Type.FILE;
+import static global.namespace.truevfs.comp.cio.Entry.UNKNOWN;
 import static global.namespace.truevfs.kernel.api.FsAccessOption.EXCLUSIVE;
 import static global.namespace.truevfs.kernel.api.FsAccessOption.GROW;
 import static global.namespace.truevfs.kernel.api.FsAssertion.Level.*;

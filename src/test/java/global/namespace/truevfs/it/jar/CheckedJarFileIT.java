@@ -4,9 +4,9 @@
  */
 package global.namespace.truevfs.it.jar;
 
-import global.namespace.truevfs.commons.cio.IoBufferPool;
-import global.namespace.truevfs.commons.zipdriver.CheckedJarDriver;
-import global.namespace.truevfs.commons.zipdriver.JarDriver;
+import global.namespace.truevfs.comp.cio.IoBufferPool;
+import global.namespace.truevfs.comp.zipdriver.CheckedJarDriver;
+import global.namespace.truevfs.comp.zipdriver.JarDriver;
 import global.namespace.truevfs.it.base.TFileITSuite;
 import global.namespace.truevfs.kernel.api.FsTestConfig;
 

@@ -4,7 +4,7 @@
  */
 package global.namespace.truevfs.access;
 
-import global.namespace.truevfs.commons.shed.Paths;
+import global.namespace.truevfs.comp.util.Paths;
 import global.namespace.truevfs.kernel.api.FsNodePath;
 import org.junit.Test;
 

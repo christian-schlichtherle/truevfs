@@ -4,7 +4,7 @@
  */
 package global.namespace.truevfs.driver.file;
 
-import global.namespace.truevfs.commons.cio.IoBufferPool;
+import global.namespace.truevfs.comp.cio.IoBufferPool;
 
 import javax.annotation.CheckForNull;
 import javax.annotation.Nullable;

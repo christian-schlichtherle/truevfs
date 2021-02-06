@@ -5,7 +5,7 @@
 package global.namespace.truevfs.kernel.api.sl;
 
 import global.namespace.service.wight.core.ServiceLocator;
-import global.namespace.truevfs.commons.cio.IoBufferPool;
+import global.namespace.truevfs.comp.cio.IoBufferPool;
 import global.namespace.truevfs.kernel.api.spi.IoBufferPoolDecorator;
 import global.namespace.truevfs.kernel.api.spi.IoBufferPoolFactory;
 

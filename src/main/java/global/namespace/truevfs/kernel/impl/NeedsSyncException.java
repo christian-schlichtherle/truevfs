@@ -4,8 +4,8 @@
  */
 package global.namespace.truevfs.kernel.impl;
 
-import global.namespace.truevfs.commons.shed.BitField;
-import global.namespace.truevfs.commons.shed.ControlFlowException;
+import global.namespace.truevfs.comp.util.BitField;
+import global.namespace.truevfs.comp.util.ControlFlowException;
 
 /**
  * Indicates that a file system controller needs to get

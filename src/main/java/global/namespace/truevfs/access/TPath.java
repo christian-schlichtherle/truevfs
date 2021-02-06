@@ -4,13 +4,13 @@
  */
 package global.namespace.truevfs.access;
 
-import global.namespace.truevfs.commons.cio.Entry;
-import global.namespace.truevfs.commons.cio.InputSocket;
-import global.namespace.truevfs.commons.cio.OutputSocket;
-import global.namespace.truevfs.commons.shed.BitField;
-import global.namespace.truevfs.commons.shed.Paths;
-import global.namespace.truevfs.commons.shed.QuotedUriSyntaxException;
-import global.namespace.truevfs.commons.shed.UriBuilder;
+import global.namespace.truevfs.comp.cio.Entry;
+import global.namespace.truevfs.comp.cio.InputSocket;
+import global.namespace.truevfs.comp.cio.OutputSocket;
+import global.namespace.truevfs.comp.util.BitField;
+import global.namespace.truevfs.comp.util.Paths;
+import global.namespace.truevfs.comp.util.QuotedUriSyntaxException;
+import global.namespace.truevfs.comp.util.UriBuilder;
 import global.namespace.truevfs.kernel.api.*;
 import lombok.val;
 
@@ -35,7 +35,7 @@ import java.util.*;
 import static global.namespace.truevfs.access.ExpertFeature.Level.INTERMEDIATE;
 import static global.namespace.truevfs.access.ExpertFeature.Reason.INJECTING_A_DIFFERENT_DETECTOR_FOR_THE_SAME_PATH_MAY_CORRUPT_DATA;
 import static global.namespace.truevfs.access.TUriHelper.*;
-import static global.namespace.truevfs.commons.shed.HashMaps.initialCapacity;
+import static global.namespace.truevfs.comp.util.HashMaps.initialCapacity;
 import static global.namespace.truevfs.kernel.api.FsAccessOption.*;
 import static global.namespace.truevfs.kernel.api.FsNodeName.*;
 import static java.io.File.separator;

@@ -8,7 +8,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
 
-import static global.namespace.truevfs.commons.shed.Throwables.wrap;
+import static global.namespace.truevfs.comp.util.Throwables.wrap;
 
 /**
  * @author Christian Schlichtherle

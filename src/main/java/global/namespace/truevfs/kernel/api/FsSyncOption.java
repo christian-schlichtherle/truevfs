@@ -4,9 +4,9 @@
  */
 package global.namespace.truevfs.kernel.api;
 
-import global.namespace.truevfs.commons.io.ClosedInputException;
-import global.namespace.truevfs.commons.io.ClosedOutputException;
-import global.namespace.truevfs.commons.shed.BitField;
+import global.namespace.truevfs.comp.io.ClosedInputException;
+import global.namespace.truevfs.comp.io.ClosedOutputException;
+import global.namespace.truevfs.comp.util.BitField;
 
 import java.io.IOException;
 

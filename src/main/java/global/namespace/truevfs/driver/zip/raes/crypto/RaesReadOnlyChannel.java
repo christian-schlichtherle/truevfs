@@ -4,10 +4,10 @@
  */
 package global.namespace.truevfs.driver.zip.raes.crypto;
 
-import global.namespace.truevfs.commons.io.PowerBuffer;
-import global.namespace.truevfs.commons.io.ReadOnlyChannel;
-import global.namespace.truevfs.commons.io.Source;
-import global.namespace.truevfs.commons.key.api.common.AesKeyStrength;
+import global.namespace.truevfs.comp.io.PowerBuffer;
+import global.namespace.truevfs.comp.io.ReadOnlyChannel;
+import global.namespace.truevfs.comp.io.Source;
+import global.namespace.truevfs.comp.key.api.aes.AesKeyStrength;
 
 import javax.annotation.CheckForNull;
 import java.io.EOFException;

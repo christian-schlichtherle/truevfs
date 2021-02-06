@@ -4,9 +4,9 @@
  */
 package global.namespace.truevfs.kernel.api;
 
-import global.namespace.truevfs.commons.shed.BitField;
-import global.namespace.truevfs.commons.shed.Filter;
-import global.namespace.truevfs.commons.shed.Visitor;
+import global.namespace.truevfs.comp.util.BitField;
+import global.namespace.truevfs.comp.util.Filter;
+import global.namespace.truevfs.comp.util.Visitor;
 
 /**
  * A container which creates {@linkplain FsController} file system controllers

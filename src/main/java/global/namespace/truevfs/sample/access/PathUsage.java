@@ -6,7 +6,7 @@ package global.namespace.truevfs.sample.access;
 
 import global.namespace.truevfs.access.TPath;
 import global.namespace.truevfs.access.TVFS;
-import global.namespace.truevfs.commons.io.Streams;
+import global.namespace.truevfs.comp.io.Streams;
 import global.namespace.truevfs.kernel.api.FsSyncException;
 import global.namespace.truevfs.kernel.api.FsSyncWarningException;
 

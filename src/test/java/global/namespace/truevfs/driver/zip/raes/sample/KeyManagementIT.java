@@ -6,7 +6,7 @@ package global.namespace.truevfs.driver.zip.raes.sample;
 
 import global.namespace.truevfs.access.TArchiveDetector;
 import global.namespace.truevfs.access.TConfig;
-import global.namespace.truevfs.commons.zipdriver.KeyManagementITSuite;
+import global.namespace.truevfs.comp.zipdriver.KeyManagementITSuite;
 
 /**
  * @author Christian Schlichtherle

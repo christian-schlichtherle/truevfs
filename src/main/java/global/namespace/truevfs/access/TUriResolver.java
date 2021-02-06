@@ -4,9 +4,9 @@
  */
 package global.namespace.truevfs.access;
 
-import global.namespace.truevfs.commons.shed.PathSplitter;
-import global.namespace.truevfs.commons.shed.QuotedUriSyntaxException;
-import global.namespace.truevfs.commons.shed.UriBuilder;
+import global.namespace.truevfs.comp.util.PathSplitter;
+import global.namespace.truevfs.comp.util.QuotedUriSyntaxException;
+import global.namespace.truevfs.comp.util.UriBuilder;
 import global.namespace.truevfs.kernel.api.FsMountPoint;
 import global.namespace.truevfs.kernel.api.FsNodeName;
 import global.namespace.truevfs.kernel.api.FsNodePath;

@@ -4,8 +4,8 @@
  */
 package global.namespace.truevfs.it.io;
 
-import global.namespace.truevfs.commons.zip.crypto.CipherReadOnlyChannel;
-import global.namespace.truevfs.commons.zip.crypto.SeekableBlockCipher;
+import global.namespace.truevfs.comp.zip.crypto.CipherReadOnlyChannel;
+import global.namespace.truevfs.comp.zip.crypto.SeekableBlockCipher;
 import org.bouncycastle.crypto.engines.NullEngine;
 
 import java.io.IOException;

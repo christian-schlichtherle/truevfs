@@ -1,7 +1,7 @@
 package global.namespace.truevfs.it.cio
 
-import global.namespace.truevfs.commons.cio.Entry.Access.{CREATE, EXECUTE, READ, WRITE}
-import global.namespace.truevfs.commons.cio.Entry.Size.{DATA, STORAGE}
+import global.namespace.truevfs.comp.cio.Entry.Access.{CREATE, EXECUTE, READ, WRITE}
+import global.namespace.truevfs.comp.cio.Entry.Size.{DATA, STORAGE}
 import global.namespace.truevfs.it.util.MutableIndexedProperty
 
 /**

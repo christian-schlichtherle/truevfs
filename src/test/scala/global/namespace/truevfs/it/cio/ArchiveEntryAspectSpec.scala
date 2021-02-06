@@ -4,11 +4,11 @@
  */
 package global.namespace.truevfs.it.cio
 
-import global.namespace.truevfs.commons.cio.Entry.Access._
-import global.namespace.truevfs.commons.cio.Entry.PosixEntity._
-import global.namespace.truevfs.commons.cio.Entry.Size._
-import global.namespace.truevfs.commons.cio.Entry.Type._
-import global.namespace.truevfs.commons.cio.Entry._
+import global.namespace.truevfs.comp.cio.Entry.Access._
+import global.namespace.truevfs.comp.cio.Entry.PosixEntity._
+import global.namespace.truevfs.comp.cio.Entry.Size._
+import global.namespace.truevfs.comp.cio.Entry.Type._
+import global.namespace.truevfs.comp.cio.Entry._
 import global.namespace.truevfs.driver.mock.MockArchiveDriverEntry
 import global.namespace.truevfs.kernel.api._
 import org.scalatest.matchers.should.Matchers._

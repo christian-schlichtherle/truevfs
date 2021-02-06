@@ -4,9 +4,9 @@
  */
 package global.namespace.truevfs.ext.logging;
 
-import global.namespace.truevfs.commons.cio.Entry;
-import global.namespace.truevfs.commons.cio.IoSocket;
-import global.namespace.truevfs.commons.io.DecoratingOutputStream;
+import global.namespace.truevfs.comp.cio.Entry;
+import global.namespace.truevfs.comp.cio.IoSocket;
+import global.namespace.truevfs.comp.io.DecoratingOutputStream;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

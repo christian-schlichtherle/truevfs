@@ -4,12 +4,12 @@
  */
 package global.namespace.truevfs.ext.insight;
 
-import global.namespace.truevfs.commons.cio.*;
-import global.namespace.truevfs.commons.inst.*;
-import global.namespace.truevfs.commons.jmx.JmxBuffer;
-import global.namespace.truevfs.commons.jmx.JmxComponent;
-import global.namespace.truevfs.commons.jmx.JmxMediator;
-import global.namespace.truevfs.commons.jmx.JmxModel;
+import global.namespace.truevfs.comp.cio.*;
+import global.namespace.truevfs.comp.inst.*;
+import global.namespace.truevfs.comp.jmx.JmxBuffer;
+import global.namespace.truevfs.comp.jmx.JmxComponent;
+import global.namespace.truevfs.comp.jmx.JmxMediator;
+import global.namespace.truevfs.comp.jmx.JmxModel;
 import global.namespace.truevfs.ext.insight.stats.FsLogger;
 import global.namespace.truevfs.ext.insight.stats.FsStats;
 import global.namespace.truevfs.kernel.api.FsCompositeDriver;

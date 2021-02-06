@@ -4,10 +4,10 @@
  */
 package global.namespace.truevfs.sample.kernel;
 
-import global.namespace.truevfs.commons.cio.InputSocket;
-import global.namespace.truevfs.commons.cio.IoSockets;
-import global.namespace.truevfs.commons.cio.OutputSocket;
-import global.namespace.truevfs.commons.shed.BitField;
+import global.namespace.truevfs.comp.cio.InputSocket;
+import global.namespace.truevfs.comp.cio.IoSockets;
+import global.namespace.truevfs.comp.cio.OutputSocket;
+import global.namespace.truevfs.comp.util.BitField;
 import global.namespace.truevfs.kernel.api.*;
 import global.namespace.truevfs.kernel.api.sl.FsDriverMapLocator;
 import global.namespace.truevfs.kernel.api.sl.FsManagerLocator;

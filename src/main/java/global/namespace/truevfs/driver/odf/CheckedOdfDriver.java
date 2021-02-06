@@ -4,8 +4,8 @@
  */
 package global.namespace.truevfs.driver.odf;
 
-import global.namespace.truevfs.commons.zipdriver.JarDriverEntry;
-import global.namespace.truevfs.commons.zipdriver.ZipInputContainer;
+import global.namespace.truevfs.comp.zipdriver.JarDriverEntry;
+import global.namespace.truevfs.comp.zipdriver.ZipInputContainer;
 
 /**
  * An archive driver for ODF files which checks the CRC32 value for all ZIP
@@ -16,7 +16,7 @@ import global.namespace.truevfs.commons.zipdriver.ZipInputContainer;
  * If there is a mismatch of the CRC32 values for a ZIP entry in an input
  * archive, the {@link java.io.InputStream#close} method of the corresponding
  * stream for the archive entry will throw a
- * {@link global.namespace.truevfs.commons.zip.Crc32Exception}.
+ * {@link global.namespace.truevfs.comp.zip.Crc32Exception}.
  * Other than this, the archive entry will be processed normally.
  * So if just the CRC32 value for the entry in the archive file has been
  * modified, you can still read its entire contents.

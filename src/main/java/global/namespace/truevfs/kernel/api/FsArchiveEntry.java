@@ -4,7 +4,7 @@
  */
 package global.namespace.truevfs.kernel.api;
 
-import global.namespace.truevfs.commons.cio.MutableEntry;
+import global.namespace.truevfs.comp.cio.MutableEntry;
 
 /**
  * Represents an entry in an archive file.

@@ -4,12 +4,12 @@
  */
 package global.namespace.truevfs.driver.zip.raes;
 
-import global.namespace.truevfs.commons.key.api.KeyManager;
-import global.namespace.truevfs.commons.key.api.KeyManagerMap;
-import global.namespace.truevfs.commons.key.api.KeyProvider;
-import global.namespace.truevfs.commons.key.api.UnknownKeyException;
-import global.namespace.truevfs.commons.key.api.common.AesKeyStrength;
-import global.namespace.truevfs.commons.key.api.common.AesPbeParameters;
+import global.namespace.truevfs.comp.key.api.KeyManager;
+import global.namespace.truevfs.comp.key.api.KeyManagerMap;
+import global.namespace.truevfs.comp.key.api.KeyProvider;
+import global.namespace.truevfs.comp.key.api.UnknownKeyException;
+import global.namespace.truevfs.comp.key.api.aes.AesKeyStrength;
+import global.namespace.truevfs.comp.key.api.aes.AesPbeParameters;
 import global.namespace.truevfs.driver.zip.raes.crypto.RaesKeyException;
 import global.namespace.truevfs.driver.zip.raes.crypto.RaesParameters;
 import global.namespace.truevfs.driver.zip.raes.crypto.RaesParametersProvider;

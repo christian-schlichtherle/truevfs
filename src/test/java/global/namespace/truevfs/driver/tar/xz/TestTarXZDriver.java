@@ -4,7 +4,7 @@
  */
 package global.namespace.truevfs.driver.tar.xz;
 
-import global.namespace.truevfs.commons.cio.IoBufferPool;
+import global.namespace.truevfs.comp.cio.IoBufferPool;
 import global.namespace.truevfs.kernel.api.FsTestConfig;
 import org.tukaani.xz.LZMA2Options;
 

@@ -4,8 +4,8 @@
  */
 package global.namespace.truevfs.kernel.impl;
 
-import global.namespace.truevfs.commons.io.ClosedStreamException;
-import global.namespace.truevfs.commons.shed.Operation;
+import global.namespace.truevfs.comp.io.ClosedStreamException;
+import global.namespace.truevfs.comp.util.Operation;
 
 import java.io.Closeable;
 import java.io.IOException;

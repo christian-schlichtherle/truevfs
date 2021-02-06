@@ -4,7 +4,7 @@
  */
 package global.namespace.truevfs.kernel.impl
 
-import global.namespace.truevfs.commons.shed.ConcurrencyUtils
+import global.namespace.truevfs.comp.util.ConcurrencyUtils
 import global.namespace.truevfs.kernel.impl.ShutdownFuseSpec._
 import org.mockito.ArgumentMatchers.any
 import org.mockito.InOrder

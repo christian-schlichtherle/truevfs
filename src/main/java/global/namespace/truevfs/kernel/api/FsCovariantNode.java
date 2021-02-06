@@ -4,12 +4,12 @@
  */
 package global.namespace.truevfs.kernel.api;
 
-import global.namespace.truevfs.commons.shed.BitField;
+import global.namespace.truevfs.comp.util.BitField;
 
 import javax.annotation.Nullable;
 import java.util.*;
 
-import static global.namespace.truevfs.commons.cio.Entry.Type.DIRECTORY;
+import static global.namespace.truevfs.comp.cio.Entry.Type.DIRECTORY;
 
 /**
  * A covariant file system node maintains a map of

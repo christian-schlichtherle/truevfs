@@ -4,11 +4,11 @@
  */
 package global.namespace.truevfs.kernel.impl;
 
-import global.namespace.truevfs.commons.cio.Container;
-import global.namespace.truevfs.commons.cio.Entry;
-import global.namespace.truevfs.commons.shed.BitField;
-import global.namespace.truevfs.commons.shed.PathNormalizer;
-import global.namespace.truevfs.commons.shed.PathSplitter;
+import global.namespace.truevfs.comp.cio.Container;
+import global.namespace.truevfs.comp.cio.Entry;
+import global.namespace.truevfs.comp.util.BitField;
+import global.namespace.truevfs.comp.util.PathNormalizer;
+import global.namespace.truevfs.comp.util.PathSplitter;
 import global.namespace.truevfs.kernel.api.FsAccessOption;
 import global.namespace.truevfs.kernel.api.FsArchiveEntry;
 import global.namespace.truevfs.kernel.api.FsCovariantNode;
@@ -24,13 +24,13 @@ import java.nio.file.*;
 import java.util.*;
 import java.util.function.Supplier;
 
-import static global.namespace.truevfs.commons.cio.Entry.*;
-import static global.namespace.truevfs.commons.cio.Entry.Access.WRITE;
-import static global.namespace.truevfs.commons.cio.Entry.Type.DIRECTORY;
-import static global.namespace.truevfs.commons.cio.Entry.Type.FILE;
-import static global.namespace.truevfs.commons.shed.HashMaps.OVERHEAD_SIZE;
-import static global.namespace.truevfs.commons.shed.HashMaps.initialCapacity;
-import static global.namespace.truevfs.commons.shed.Paths.*;
+import static global.namespace.truevfs.comp.cio.Entry.*;
+import static global.namespace.truevfs.comp.cio.Entry.Access.WRITE;
+import static global.namespace.truevfs.comp.cio.Entry.Type.DIRECTORY;
+import static global.namespace.truevfs.comp.cio.Entry.Type.FILE;
+import static global.namespace.truevfs.comp.util.HashMaps.OVERHEAD_SIZE;
+import static global.namespace.truevfs.comp.util.HashMaps.initialCapacity;
+import static global.namespace.truevfs.comp.util.Paths.*;
 import static global.namespace.truevfs.kernel.api.FsAccessOption.CREATE_PARENTS;
 import static global.namespace.truevfs.kernel.api.FsAccessOption.EXCLUSIVE;
 import static global.namespace.truevfs.kernel.api.FsAccessOptions.NONE;

@@ -4,7 +4,7 @@
  */
 package global.namespace.truevfs.ext.insight;
 
-import global.namespace.truevfs.commons.jmx.JmxComponent;
+import global.namespace.truevfs.comp.jmx.JmxComponent;
 
 /**
  * A mediator for the instrumentation of the TrueVFS Kernel with JMX.

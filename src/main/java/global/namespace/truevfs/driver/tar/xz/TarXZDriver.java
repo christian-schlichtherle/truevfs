@@ -4,14 +4,14 @@
  */
 package global.namespace.truevfs.driver.tar.xz;
 
-import global.namespace.truevfs.commons.cio.InputContainer;
-import global.namespace.truevfs.commons.cio.MultiplexingOutputContainer;
-import global.namespace.truevfs.commons.cio.OutputContainer;
-import global.namespace.truevfs.commons.io.AbstractSink;
-import global.namespace.truevfs.commons.io.AbstractSource;
-import global.namespace.truevfs.commons.io.Streams;
-import global.namespace.truevfs.commons.shed.BitField;
-import global.namespace.truevfs.commons.tardriver.*;
+import global.namespace.truevfs.comp.cio.InputContainer;
+import global.namespace.truevfs.comp.cio.MultiplexingOutputContainer;
+import global.namespace.truevfs.comp.cio.OutputContainer;
+import global.namespace.truevfs.comp.io.AbstractSink;
+import global.namespace.truevfs.comp.io.AbstractSource;
+import global.namespace.truevfs.comp.io.Streams;
+import global.namespace.truevfs.comp.tardriver.*;
+import global.namespace.truevfs.comp.util.BitField;
 import global.namespace.truevfs.kernel.api.*;
 import org.tukaani.xz.LZMA2Options;
 import org.tukaani.xz.XZInputStream;

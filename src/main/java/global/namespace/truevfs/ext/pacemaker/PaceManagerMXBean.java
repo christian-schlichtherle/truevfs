@@ -4,7 +4,7 @@
  */
 package global.namespace.truevfs.ext.pacemaker;
 
-import global.namespace.truevfs.commons.jmx.JmxManagerMXBean;
+import global.namespace.truevfs.comp.jmx.JmxManagerMXBean;
 
 /**
  * The MXBean interface for a {@link PaceManager}.

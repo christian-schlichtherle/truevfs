@@ -15,7 +15,7 @@ import java.util.concurrent.locks.ReentrantReadWriteLock;
 import java.util.function.Predicate;
 import java.util.function.Supplier;
 
-import static global.namespace.truevfs.commons.shed.HashMaps.initialCapacity;
+import static global.namespace.truevfs.comp.util.HashMaps.initialCapacity;
 
 /**
  * A simple cache set with a least-recently-used (LRU) eviction strategy.

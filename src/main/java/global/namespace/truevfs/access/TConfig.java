@@ -4,9 +4,9 @@
  */
 package global.namespace.truevfs.access;
 
-import global.namespace.truevfs.commons.shed.BitField;
-import global.namespace.truevfs.commons.shed.InheritableThreadLocalStack;
-import global.namespace.truevfs.commons.shed.Resource;
+import global.namespace.truevfs.comp.util.BitField;
+import global.namespace.truevfs.comp.util.InheritableThreadLocalStack;
+import global.namespace.truevfs.comp.util.Resource;
 import global.namespace.truevfs.kernel.api.FsAccessOption;
 import global.namespace.truevfs.kernel.api.FsAccessOptions;
 import global.namespace.truevfs.kernel.api.FsManager;

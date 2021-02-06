@@ -4,11 +4,11 @@
  */
 package global.namespace.truevfs.driver.mock;
 
-import global.namespace.truevfs.commons.cio.*;
-import global.namespace.truevfs.commons.cio.Entry.Access;
-import global.namespace.truevfs.commons.cio.Entry.Size;
-import global.namespace.truevfs.commons.io.DecoratingOutputStream;
-import global.namespace.truevfs.commons.shed.HashMaps;
+import global.namespace.truevfs.comp.cio.*;
+import global.namespace.truevfs.comp.cio.Entry.Access;
+import global.namespace.truevfs.comp.cio.Entry.Size;
+import global.namespace.truevfs.comp.io.DecoratingOutputStream;
+import global.namespace.truevfs.comp.util.HashMaps;
 import global.namespace.truevfs.kernel.api.FsTestConfig;
 import global.namespace.truevfs.kernel.api.FsThrowManager;
 
@@ -20,8 +20,8 @@ import java.nio.channels.SeekableByteChannel;
 import java.nio.file.NoSuchFileException;
 import java.util.*;
 
-import static global.namespace.truevfs.commons.cio.Entry.ALL_ACCESS;
-import static global.namespace.truevfs.commons.cio.Entry.ALL_SIZES;
+import static global.namespace.truevfs.comp.cio.Entry.ALL_ACCESS;
+import static global.namespace.truevfs.comp.cio.Entry.ALL_SIZES;
 
 /**
  * @author Christian Schlichtherle

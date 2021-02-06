@@ -5,7 +5,7 @@
 package global.namespace.truevfs.it.zip.raes;
 
 import global.namespace.truevfs.access.TPath;
-import global.namespace.truevfs.commons.key.api.prompting.TestView.Action;
+import global.namespace.truevfs.comp.key.api.prompting.TestView.Action;
 import global.namespace.truevfs.driver.zip.raes.TestZipRaesDriver;
 import global.namespace.truevfs.it.base.TPathITSuite;
 import org.junit.Ignore;
@@ -13,8 +13,8 @@ import org.junit.Test;
 
 import java.io.IOException;
 
-import static global.namespace.truevfs.commons.key.api.prompting.TestView.Action.CANCEL;
-import static global.namespace.truevfs.commons.key.api.prompting.TestView.Action.ENTER;
+import static global.namespace.truevfs.comp.key.api.prompting.TestView.Action.CANCEL;
+import static global.namespace.truevfs.comp.key.api.prompting.TestView.Action.ENTER;
 import static java.nio.file.Files.*;
 import static org.junit.Assert.*;
 

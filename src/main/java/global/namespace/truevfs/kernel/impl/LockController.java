@@ -4,14 +4,14 @@
  */
 package global.namespace.truevfs.kernel.impl;
 
-import global.namespace.truevfs.commons.cio.Entry;
-import global.namespace.truevfs.commons.cio.InputSocket;
-import global.namespace.truevfs.commons.cio.OutputSocket;
-import global.namespace.truevfs.commons.io.DecoratingInputStream;
-import global.namespace.truevfs.commons.io.DecoratingOutputStream;
-import global.namespace.truevfs.commons.io.DecoratingSeekableChannel;
-import global.namespace.truevfs.commons.shed.BitField;
-import global.namespace.truevfs.commons.shed.Operation;
+import global.namespace.truevfs.comp.cio.Entry;
+import global.namespace.truevfs.comp.cio.InputSocket;
+import global.namespace.truevfs.comp.cio.OutputSocket;
+import global.namespace.truevfs.comp.io.DecoratingInputStream;
+import global.namespace.truevfs.comp.io.DecoratingOutputStream;
+import global.namespace.truevfs.comp.io.DecoratingSeekableChannel;
+import global.namespace.truevfs.comp.util.BitField;
+import global.namespace.truevfs.comp.util.Operation;
 import global.namespace.truevfs.kernel.api.*;
 
 import java.io.IOException;

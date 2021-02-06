@@ -4,7 +4,7 @@
  */
 package global.namespace.truevfs.driver.zip.raes.crypto;
 
-import global.namespace.truevfs.commons.key.api.common.AesKeyStrength;
+import global.namespace.truevfs.comp.key.api.aes.AesKeyStrength;
 
 /**
  * The parameters of this interface are used with RAES <i>type 0</i> files.

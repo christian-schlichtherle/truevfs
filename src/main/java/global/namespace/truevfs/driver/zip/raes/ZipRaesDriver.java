@@ -4,16 +4,16 @@
  */
 package global.namespace.truevfs.driver.zip.raes;
 
-import global.namespace.truevfs.commons.cio.Entry;
-import global.namespace.truevfs.commons.cio.Entry.Type;
-import global.namespace.truevfs.commons.cio.InputContainer;
-import global.namespace.truevfs.commons.cio.MultiplexingOutputContainer;
-import global.namespace.truevfs.commons.cio.OutputContainer;
-import global.namespace.truevfs.commons.shed.BitField;
-import global.namespace.truevfs.commons.zipdriver.JarDriver;
-import global.namespace.truevfs.commons.zipdriver.JarDriverEntry;
-import global.namespace.truevfs.commons.zipdriver.ZipInputContainer;
-import global.namespace.truevfs.commons.zipdriver.ZipOutputContainer;
+import global.namespace.truevfs.comp.cio.Entry;
+import global.namespace.truevfs.comp.cio.Entry.Type;
+import global.namespace.truevfs.comp.cio.InputContainer;
+import global.namespace.truevfs.comp.cio.MultiplexingOutputContainer;
+import global.namespace.truevfs.comp.cio.OutputContainer;
+import global.namespace.truevfs.comp.util.BitField;
+import global.namespace.truevfs.comp.zipdriver.JarDriver;
+import global.namespace.truevfs.comp.zipdriver.JarDriverEntry;
+import global.namespace.truevfs.comp.zipdriver.ZipInputContainer;
+import global.namespace.truevfs.comp.zipdriver.ZipOutputContainer;
 import global.namespace.truevfs.driver.zip.raes.crypto.RaesOutputStream;
 import global.namespace.truevfs.driver.zip.raes.crypto.RaesParameters;
 import global.namespace.truevfs.driver.zip.raes.crypto.RaesReadOnlyChannel;

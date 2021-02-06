@@ -4,7 +4,7 @@
  */
 package global.namespace.truevfs.driver.tar.bzip2;
 
-import global.namespace.truevfs.commons.tardriver.TarDriverEntry;
+import global.namespace.truevfs.comp.tardriver.TarDriverEntry;
 import global.namespace.truevfs.it.base.FsArchiveDriverTestSuite;
 
 /**

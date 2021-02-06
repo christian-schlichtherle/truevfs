@@ -4,12 +4,12 @@
  */
 package global.namespace.truevfs.driver.file;
 
-import global.namespace.truevfs.commons.cio.Entry;
-import global.namespace.truevfs.commons.cio.Entry.Access;
-import global.namespace.truevfs.commons.cio.Entry.Type;
-import global.namespace.truevfs.commons.cio.InputSocket;
-import global.namespace.truevfs.commons.cio.OutputSocket;
-import global.namespace.truevfs.commons.shed.BitField;
+import global.namespace.truevfs.comp.cio.Entry;
+import global.namespace.truevfs.comp.cio.Entry.Access;
+import global.namespace.truevfs.comp.cio.Entry.Type;
+import global.namespace.truevfs.comp.cio.InputSocket;
+import global.namespace.truevfs.comp.cio.OutputSocket;
+import global.namespace.truevfs.comp.util.BitField;
 import global.namespace.truevfs.kernel.api.*;
 
 import javax.annotation.Nullable;
@@ -24,8 +24,8 @@ import java.util.EnumSet;
 import java.util.Map;
 import java.util.Optional;
 
-import static global.namespace.truevfs.commons.cio.Entry.Access.*;
-import static global.namespace.truevfs.commons.cio.Entry.UNKNOWN;
+import static global.namespace.truevfs.comp.cio.Entry.Access.*;
+import static global.namespace.truevfs.comp.cio.Entry.UNKNOWN;
 import static global.namespace.truevfs.kernel.api.FsAccessOption.EXCLUSIVE;
 import static global.namespace.truevfs.kernel.api.FsNodeName.SEPARATOR;
 import static java.io.File.separatorChar;

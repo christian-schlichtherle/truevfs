@@ -4,9 +4,9 @@
  */
 package global.namespace.truevfs.kernel.impl;
 
-import global.namespace.truevfs.commons.cio.Container;
-import global.namespace.truevfs.commons.cio.Entry;
-import global.namespace.truevfs.commons.shed.BitField;
+import global.namespace.truevfs.comp.cio.Container;
+import global.namespace.truevfs.comp.cio.Entry;
+import global.namespace.truevfs.comp.util.BitField;
 import global.namespace.truevfs.kernel.api.FsAccessOption;
 import global.namespace.truevfs.kernel.api.FsArchiveEntry;
 import global.namespace.truevfs.kernel.api.FsNodeName;
@@ -17,7 +17,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.function.Supplier;
 
-import static global.namespace.truevfs.commons.cio.Entry.Access.READ;
+import static global.namespace.truevfs.comp.cio.Entry.Access.READ;
 
 /**
  * A read-only virtual file system for archive entries.

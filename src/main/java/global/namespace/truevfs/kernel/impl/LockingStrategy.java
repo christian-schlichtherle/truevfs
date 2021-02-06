@@ -4,7 +4,7 @@
  */
 package global.namespace.truevfs.kernel.impl;
 
-import global.namespace.truevfs.commons.shed.Operation;
+import global.namespace.truevfs.comp.util.Operation;
 import lombok.val;
 
 import java.util.Random;

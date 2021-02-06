@@ -4,7 +4,7 @@
  */
 package global.namespace.truevfs.driver.http;
 
-import global.namespace.truevfs.commons.cio.IoBufferPool;
+import global.namespace.truevfs.comp.cio.IoBufferPool;
 import global.namespace.truevfs.kernel.api.FsController;
 import global.namespace.truevfs.kernel.api.FsDriver;
 import global.namespace.truevfs.kernel.api.FsManager;

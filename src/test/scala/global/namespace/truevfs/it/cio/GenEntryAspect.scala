@@ -1,6 +1,6 @@
 package global.namespace.truevfs.it.cio
 
-import global.namespace.truevfs.commons.cio.Entry
+import global.namespace.truevfs.comp.cio.Entry
 
 /**
  * @author Christian Schlichtherle

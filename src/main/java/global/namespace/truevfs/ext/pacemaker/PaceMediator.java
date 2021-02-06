@@ -4,9 +4,9 @@
  */
 package global.namespace.truevfs.ext.pacemaker;
 
-import global.namespace.truevfs.commons.inst.InstrumentingCompositeDriver;
-import global.namespace.truevfs.commons.inst.InstrumentingManager;
-import global.namespace.truevfs.commons.jmx.JmxMediator;
+import global.namespace.truevfs.comp.inst.InstrumentingCompositeDriver;
+import global.namespace.truevfs.comp.inst.InstrumentingManager;
+import global.namespace.truevfs.comp.jmx.JmxMediator;
 import global.namespace.truevfs.kernel.api.*;
 
 import java.util.Set;

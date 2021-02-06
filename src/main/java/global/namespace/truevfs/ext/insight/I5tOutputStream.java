@@ -4,8 +4,8 @@
  */
 package global.namespace.truevfs.ext.insight;
 
-import global.namespace.truevfs.commons.inst.InstrumentingOutputStream;
-import global.namespace.truevfs.commons.jmx.JmxComponent;
+import global.namespace.truevfs.comp.inst.InstrumentingOutputStream;
+import global.namespace.truevfs.comp.jmx.JmxComponent;
 import lombok.val;
 
 import java.io.IOException;

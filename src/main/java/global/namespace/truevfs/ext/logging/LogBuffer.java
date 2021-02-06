@@ -4,8 +4,8 @@
  */
 package global.namespace.truevfs.ext.logging;
 
-import global.namespace.truevfs.commons.cio.IoBuffer;
-import global.namespace.truevfs.commons.inst.InstrumentingBuffer;
+import global.namespace.truevfs.comp.cio.IoBuffer;
+import global.namespace.truevfs.comp.inst.InstrumentingBuffer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

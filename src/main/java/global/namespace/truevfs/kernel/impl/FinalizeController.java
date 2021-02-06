@@ -4,13 +4,13 @@
  */
 package global.namespace.truevfs.kernel.impl;
 
-import global.namespace.truevfs.commons.cio.*;
-import global.namespace.truevfs.commons.io.DecoratingInputStream;
-import global.namespace.truevfs.commons.io.DecoratingOutputStream;
-import global.namespace.truevfs.commons.io.DecoratingSeekableChannel;
-import global.namespace.truevfs.commons.logging.LocalizedLogger;
-import global.namespace.truevfs.commons.shed.BitField;
-import global.namespace.truevfs.commons.shed.ControlFlowException;
+import global.namespace.truevfs.comp.cio.*;
+import global.namespace.truevfs.comp.io.DecoratingInputStream;
+import global.namespace.truevfs.comp.io.DecoratingOutputStream;
+import global.namespace.truevfs.comp.io.DecoratingSeekableChannel;
+import global.namespace.truevfs.comp.logging.LocalizedLogger;
+import global.namespace.truevfs.comp.util.BitField;
+import global.namespace.truevfs.comp.util.ControlFlowException;
 import global.namespace.truevfs.kernel.api.FsAccessOption;
 import global.namespace.truevfs.kernel.api.FsDelegatingController;
 import global.namespace.truevfs.kernel.api.FsNodeName;

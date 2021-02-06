@@ -4,7 +4,7 @@
  */
 package global.namespace.truevfs.kernel.impl;
 
-import global.namespace.truevfs.commons.shed.ReadWriteLockAspect;
+import global.namespace.truevfs.comp.util.ReadWriteLockAspect;
 
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
