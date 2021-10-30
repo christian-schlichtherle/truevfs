@@ -502,10 +502,9 @@ public final class TFileSystem extends FileSystem {
             return UNKNOWN == size ? 0 : size;
         }
 
-        /** @throws UnsupportedOperationException always */
         @Override
         public Object fileKey() {
-            throw new UnsupportedOperationException("Not supported yet.");
+            return null;
         }
     } // FsNodeAttributes
 }
